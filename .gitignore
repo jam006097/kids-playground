@@ -1,0 +1,78 @@
+# Python関連
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+.eggs/
+
+# 環境設定
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ビルド
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# コンパイル済みコード
+*.dll
+*.dylib
+*.exe
+
+# パッケージマネージャ
+*.log
+
+# Django関連
+*.log
+local_settings.py
+db.sqlite3
+media
+
+# MySQL
+*.sql
+
+# Static & Media files
+staticfiles/
+media/
+
+# VSCode
+.vscode/
+
+# IDE関連
+.idea/
+*.sublime-project
+*.sublime-workspace
+.project
+.pydevproject
+
+# macOS関連
+.DS_Store
+
+# Windows関連
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# その他
+*.bak
+*.swp

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>子育て支援施設一覧</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">子育て支援施設一覧</h1>
+        <form method="get" class="form-inline mb-4">
+            <div class="form-group">
+                <label for="city" class="mr-2">市町村名:</label>
+                <input type="text" name="city" id="city" class="form-control mr-2" placeholder="市町村名で検索できます" value="{{ selected_city|default_if_none:'' }}">
+                <button type="submit" class="btn btn-primary">検索</button>
+            </div>
+        </form>
+        <p>{{ filtered_count }} / {{ total_count }} 件を表示しています。</p>
+        <div class="row">
+            {% for playground in playgrounds %}
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ playground.name }}</h5>
+                        <p class="card-text">{{ playground.address }}</p>
+                        <p class="card-text">{{ playground.phone }}</p>  
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div id="map" style="height: 500px; width: 100%;"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
+    <script src="{% static 'js/map.js' %}"></script>
+    <script>
+        var playgrounds = JSON.parse('{{ playgrounds_json|escapejs }}');
+    </script>
+</body>
+</html>

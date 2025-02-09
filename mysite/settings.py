@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'myapp',
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [
@@ -126,3 +128,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# settings.py - crontab設定の追加
+INSTALLED_APPS += ['django_crontab']
+
+CRONJOBS = [
+    ('0 0 1 * *', 'myapp.management.commands.fetch_playgrounds')  # 毎月1日の午前0時に実行
+]
+

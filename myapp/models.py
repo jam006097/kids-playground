@@ -13,7 +13,7 @@ class Playground(models.Model):
     prefecture = models.CharField(max_length=100)
     name = models.CharField(max_length=200)
     address = models.CharField(max_length=300)
-    phone = models.CharField(max_length=15, null=True)  # 電話番号用フィールドを追加
+    phone = models.CharField(max_length=30, null=True)  # 電話番号用フィールドの長さを増やす
 
     def __str__(self):
         return self.name

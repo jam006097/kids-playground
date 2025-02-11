@@ -26,13 +26,14 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ playground.name }}</h5>
                         <p class="card-text">{{ playground.address }}</p>
-                        <p class="card-text">{{ playground.phone }}</p>  
+                        <p class="card-text">{{ playground.phone }}</p>
+                        <a href="#" onclick="searchOnGoogleMaps('{{ playground.name }}', '{{ playground.address }}', '{{ playground.phone }}')">Google Mapsで開く</a>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
-        <div id="map" style="height: 500px; width: 100%;"></div>
+        <div id="map" class="mb-4" style="height: 500px; width: 100%;"></div>
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>

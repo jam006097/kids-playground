@@ -1,3 +1,7 @@
 .highlight {
     background-color: yellow;
 }
+
+.mb-4 {
+    margin-bottom: 1.5rem; /* Bootstrapのmb-4クラスと同じ */
+}

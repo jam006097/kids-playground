@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>子育て支援施設一覧</title>
     {% load static %}
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- カスタムCSS -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <div class="container">
         <h1 class="my-4">子育て支援施設一覧</h1>
+        <!-- 検索フォーム -->
         <form method="get" class="form-inline mb-4">
             <div class="form-group">
                 <label for="city" class="mr-2">市町村名:</label>
@@ -18,7 +21,9 @@
                 <button type="submit" class="btn btn-primary">検索</button>
             </div>
         </form>
+        <!-- 検索結果の件数表示 -->
         <p>{{ filtered_count }} / {{ total_count }} 件を表示しています。</p>
+        <!-- 子育て支援施設の一覧表示 -->
         <div class="row">
             {% for playground in playgrounds %}
             <div class="col-md-4">
@@ -27,21 +32,27 @@
                         <h5 class="card-title">{{ playground.name }}</h5>
                         <p class="card-text">{{ playground.address }}</p>
                         <p class="card-text">{{ playground.phone }}</p>
+                        <!-- Google Mapsで開くリンク -->
                         <a href="#" onclick="searchOnGoogleMaps('{{ playground.name }}', '{{ playground.address }}', '{{ playground.phone }}')">Google Mapsで開く</a>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
+        <!-- 地図表示エリア -->
         <div id="map" class="mb-4" style="height: 500px; width: 100%;"></div>
     </div>
+    <!-- 必要なJavaScriptファイルの読み込み -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Google Maps APIの読み込み -->
     <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
     <script>
+        // Djangoテンプレートから渡されたデータをJavaScriptで使用できるようにする
         var playgrounds = JSON.parse('{{ playgrounds_json|escapejs }}');
     </script>
+    <!-- カスタムJavaScriptファイルの読み込み -->
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
 </html>

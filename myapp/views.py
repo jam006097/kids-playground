@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from .models import Playground
 import urllib.request
-import urllib.parse  # 追加
+import urllib.parse  # URLエンコード用のモジュールを追加
 import json
 import logging
 import os
@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 # .envファイルから環境変数を読み込む
 load_dotenv()
 
+# データAPIのURLとGoogle Maps APIキーを環境変数から取得
 API_URL = 'https://data.bodik.jp/api/3/action/datastore_search?resource_id=2ed1eb60-1a5d-46fc-9e55-cd1c35f2be93'
 GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
 
@@ -31,9 +32,11 @@ def fetch_data_from_api():
     logging.info("Starting data fetch process from API")
 
     try:
+        # APIからデータを取得
         with urllib.request.urlopen(API_URL) as response:
             data = json.loads(response.read().decode())
             records = data['result']['records']
+            # 取得したデータをデータベースに保存
             for row in records:
                 Playground.objects.update_or_create(
                     name=row['センター名'],
@@ -55,14 +58,23 @@ def index(request):
     """
     google_maps_api_key = os.getenv('GOOGLE_MAPS_API_KEY')
 
-    fetch_data_from_api()  # APIからデータを取得
+    # APIからデータを取得
+    fetch_data_from_api()
+    
+    # 市町村名でフィルタリング
     selected_city = request.GET.get('city')
     playgrounds = Playground.objects.all()
-    if selected_city:
+    if (selected_city):
         playgrounds = playgrounds.filter(address__icontains=selected_city)
+    
+    # 全件数とフィルタリング後の件数を取得
     total_count = Playground.objects.count()
     filtered_count = playgrounds.count()
+    
+    # PlaygroundオブジェクトをJSON形式に変換
     playgrounds_json = json.dumps(list(playgrounds.values('name', 'address', 'phone')))
+    
+    # テンプレートにデータを渡してレンダリング
     return render(request, 'index.html', {
         'playgrounds': playgrounds,
         'selected_city': selected_city,
@@ -76,22 +88,27 @@ def search_place(request):
     """
     Google Places APIを使用して施設を検索し、最も近い結果を返す関数。
     """
+    # リクエストからパラメータを取得
     name = request.GET.get('name')
     address = request.GET.get('address')
     phone = request.GET.get('phone')
 
     logging.info(f"Searching for place: name={name}, address={address}, phone={phone}")
 
+    # Google Places APIのURLを生成
     search_url = f"https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input={urllib.parse.quote(name)}&inputtype=textquery&fields=name,formatted_address,geometry&key={GOOGLE_MAPS_API_KEY}"
     
     try:
+        # APIからデータを取得
         with urllib.request.urlopen(search_url) as response:
             data = json.loads(response.read().decode())
             logging.info(f"Google Places API response: {data}")
             candidates = data.get('candidates', [])
+            # 住所が一致する候補を探す
             for candidate in candidates:
                 if address in candidate.get('formatted_address', ''):
                     return JsonResponse({'url': f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(name)}"})
+            # 候補が見つからない場合、最初の候補を返す
             if candidates:
                 candidate = candidates[0]
                 return JsonResponse({'url': f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(name)}"})

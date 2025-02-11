@@ -17,7 +17,7 @@ logging.basicConfig(
 )
 
 # 定数を使用してマジックナンバーを避ける
-URLS_FILE_PATH = 'urls.json'
+URLS_FILE_PATH = 'urls.json'  # URLリストが保存されているJSONファイルのパス
 ENCODING = 'shift_jis'  # CSVファイルのエンコーディング
 HTTP_STATUS_OK = 200  # HTTPステータスコード200を定数として定義
 LOCAL_CSV_FILE_PATH = 'local_data.csv'  # ローカルCSVファイルのパス
@@ -37,6 +37,7 @@ def fetch_data():
         logging.error(f"Failed to load URLs from {URLS_FILE_PATH}: {e}")
         return
     
+    # 各URLからデータを取得し、データベースに保存する
     for prefecture, url in urls.items():
         try:
             response = requests.get(url)

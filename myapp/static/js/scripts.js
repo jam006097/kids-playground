@@ -7,7 +7,7 @@ function initMap() {
 
     // 地図の初期設定
     var mapOptions = {
-        zoom: 12,
+        zoom: 13,
         center: kagoshimaCenter  // デフォルトは鹿児島県の中心座標
     };
 
@@ -50,6 +50,7 @@ function initMap() {
     }
 
     // 各施設の住所をジオコーディングし、地図上にマーカーを追加
+    var markers = [];
     playgrounds.forEach(function(playground) {
         var geocoder = new google.maps.Geocoder();
         geocoder.geocode({'address': playground.address}, function(results, status) {
@@ -66,18 +67,43 @@ function initMap() {
                     content: '<div><strong>' + playground.name + '</strong><br>' +
                              '住所: ' + playground.address + '<br>' +
                              '電話: ' + playground.phone + '<br>' +
-                             '<a href="#" onclick="searchOnGoogleMaps(\'' + playground.name + '\', \'' + playground.address + '\', \'' + playground.phone + '\')">Google Mapsで開く</a></div>'
+                             '<a href="#" onclick="searchOnGoogleMaps(\'' + playground.name + '\', \'' + playground.address + '\', \'' + playground.phone + '\')">Google Mapsで開く</a></div>',
+                    disableAutoPan: true  // 情報ウィンドウを開いた際に表示位置が変更されないようにする
                 });
 
-                // マーカーをクリックしたときに情報ウィンドウを表示
-                marker.addListener('click', function() {
-                    infowindow.open(map, marker);
-                });
+                // 情報ウィンドウを常に表示
+                infowindow.open(map, marker);
+
+                markers.push({marker: marker, infowindow: infowindow});
             } else {
                 console.error('Geocode was not successful for the following reason: ' + status);
                 alert('Geocode was not successful for the following reason: ' + status);
             }
         });
+    });
+
+    // ズームレベルが変更されたときのイベントリスナーを追加
+    map.addListener('zoom_changed', function() {
+        var zoomLevel = map.getZoom();
+        if (zoomLevel <= 12) {
+            markers.forEach(function(item) {
+                item.infowindow.close();
+            });
+        } else {
+            markers.forEach(function(item) {
+                item.infowindow.open(map, item.marker);
+            });
+        }
+    });
+
+    // 地図のドラッグ終了時のイベントリスナーを追加
+    map.addListener('dragend', function() {
+        var zoomLevel = map.getZoom();
+        if (zoomLevel > 12) {
+            markers.forEach(function(item) {
+                item.infowindow.open(map, item.marker);
+            });
+        }
     });
 }
 

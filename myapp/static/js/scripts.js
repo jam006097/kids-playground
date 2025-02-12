@@ -4,8 +4,8 @@
 function initMap() {
     // 定数の定義
     const KAGOSHIMA_CENTER = {lat: 31.5602, lng: 130.5581};
-    const DEFAULT_ZOOM_LEVEL = 13;
-    const MIN_ZOOM_LEVEL_FOR_INFO_WINDOW = 12;
+    const DEFAULT_ZOOM_LEVEL = 14;
+    const MIN_ZOOM_LEVEL_FOR_INFO_WINDOW = 13;
 
     // 地図の初期設定
     var mapOptions = {
@@ -80,6 +80,12 @@ function initMap() {
                 // 情報ウィンドウが閉じられたときのイベントリスナーを追加
                 google.maps.event.addListener(infowindow, 'closeclick', function() {
                     isInfoWindowOpen = false;
+                });
+
+                // マーカーをクリックしたときに情報ウィンドウを表示
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                    isInfoWindowOpen = true;
                 });
 
                 markers.push({marker: marker, infowindow: infowindow, isInfoWindowOpen: isInfoWindowOpen});

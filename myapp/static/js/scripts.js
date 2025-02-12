@@ -2,13 +2,15 @@
  * Google Mapsを初期化し、地図上に子育て支援施設のマーカーを表示する関数。
  */
 function initMap() {
-    // 鹿児島県の中心座標
-    var kagoshimaCenter = {lat: 31.5602, lng: 130.5581};
+    // 定数の定義
+    const KAGOSHIMA_CENTER = {lat: 31.5602, lng: 130.5581};
+    const DEFAULT_ZOOM_LEVEL = 13;
+    const MIN_ZOOM_LEVEL_FOR_INFO_WINDOW = 12;
 
     // 地図の初期設定
     var mapOptions = {
-        zoom: 13,
-        center: kagoshimaCenter  // デフォルトは鹿児島県の中心座標
+        zoom: DEFAULT_ZOOM_LEVEL,
+        center: KAGOSHIMA_CENTER  // デフォルトは鹿児島県の中心座標
     };
 
     var map = new google.maps.Map(document.getElementById('map'), mapOptions);
@@ -34,7 +36,7 @@ function initMap() {
                     });
 
                     if (!isKagoshima) {
-                        map.setCenter(kagoshimaCenter);
+                        map.setCenter(KAGOSHIMA_CENTER);
                     }
                 } else {
                     console.error('Geocode was not successful for the following reason: ' + status);
@@ -42,11 +44,11 @@ function initMap() {
             });
         }, function() {
             // 位置情報の利用を許可しない場合、鹿児島県の中心座標を使用
-            handleLocationError(true, map, kagoshimaCenter);
+            handleLocationError(true, map, KAGOSHIMA_CENTER);
         });
     } else {
         // ブラウザが位置情報をサポートしていない場合、鹿児島県の中心座標を使用
-        handleLocationError(false, map, kagoshimaCenter);
+        handleLocationError(false, map, KAGOSHIMA_CENTER);
     }
 
     // 各施設の住所をジオコーディングし、地図上にマーカーを追加
@@ -65,16 +67,22 @@ function initMap() {
                 // 情報ウィンドウの内容を設定
                 var infowindow = new google.maps.InfoWindow({
                     content: '<div><strong>' + playground.name + '</strong><br>' +
-                             '住所: ' + playground.address + '<br>' +
-                             '電話: ' + playground.phone + '<br>' +
                              '<a href="#" onclick="searchOnGoogleMaps(\'' + playground.name + '\', \'' + playground.address + '\', \'' + playground.phone + '\')">Google Mapsで開く</a></div>',
                     disableAutoPan: true  // 情報ウィンドウを開いた際に表示位置が変更されないようにする
                 });
 
+                // 情報ウィンドウの状態を管理するフラグ
+                var isInfoWindowOpen = true;
+
                 // 情報ウィンドウを常に表示
                 infowindow.open(map, marker);
 
-                markers.push({marker: marker, infowindow: infowindow});
+                // 情報ウィンドウが閉じられたときのイベントリスナーを追加
+                google.maps.event.addListener(infowindow, 'closeclick', function() {
+                    isInfoWindowOpen = false;
+                });
+
+                markers.push({marker: marker, infowindow: infowindow, isInfoWindowOpen: isInfoWindowOpen});
             } else {
                 console.error('Geocode was not successful for the following reason: ' + status);
                 alert('Geocode was not successful for the following reason: ' + status);
@@ -85,25 +93,13 @@ function initMap() {
     // ズームレベルが変更されたときのイベントリスナーを追加
     map.addListener('zoom_changed', function() {
         var zoomLevel = map.getZoom();
-        if (zoomLevel <= 12) {
-            markers.forEach(function(item) {
+        markers.forEach(function(item) {
+            if (zoomLevel <= MIN_ZOOM_LEVEL_FOR_INFO_WINDOW) {
                 item.infowindow.close();
-            });
-        } else {
-            markers.forEach(function(item) {
+            } else if (item.isInfoWindowOpen) {
                 item.infowindow.open(map, item.marker);
-            });
-        }
-    });
-
-    // 地図のドラッグ終了時のイベントリスナーを追加
-    map.addListener('dragend', function() {
-        var zoomLevel = map.getZoom();
-        if (zoomLevel > 12) {
-            markers.forEach(function(item) {
-                item.infowindow.open(map, item.marker);
-            });
-        }
+            }
+        });
     });
 }
 

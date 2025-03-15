@@ -13,7 +13,7 @@ function initMap() {
         center: KAGOSHIMA_CENTER  // デフォルトは鹿児島県の中心座標
     };
 
-    var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    var map = new google.maps.Map(document.getElementById('map-container'), mapOptions);
 
     // 位置情報の利用を許可するか確認
     if (navigator.geolocation) {
@@ -148,3 +148,10 @@ function searchOnGoogleMaps(name, address, phone) {
             alert('Error: ' + error);
         });
 }
+
+// タブがアクティブになったときに地図を初期化
+$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    if (e.target.id === 'map-tab') {
+        initMap();
+    }
+});

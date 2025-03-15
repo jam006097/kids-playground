@@ -23,24 +23,39 @@
         </form>
         <!-- 検索結果の件数表示 -->
         <p>{{ filtered_count }} / {{ total_count }} 件を表示しています。</p>
-        <!-- 子育て支援施設の一覧表示 -->
-        <div class="row">
-            {% for playground in playgrounds %}
-            <div class="col-md-4">
-                <div class="card mb-4 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ playground.name }}</h5>
-                        <p class="card-text">{{ playground.address }}</p>
-                        <p class="card-text">{{ playground.phone }}</p>
-                        <!-- Google Mapsで開くリンク -->
-                        <a href="#" onclick="searchOnGoogleMaps('{{ playground.name }}', '{{ playground.address }}', '{{ playground.phone }}')">Google Mapsで開く</a>
+        <!-- タブメニュー -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="true">一覧</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="map-tab" data-toggle="tab" href="#map" role="tab" aria-controls="map" aria-selected="false">地図</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <!-- 一覧タブ -->
+            <div class="tab-pane fade show active" id="list" role="tabpanel" aria-labelledby="list-tab">
+                <div class="row">
+                    {% for playground in playgrounds %}
+                    <div class="col-md-4">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ playground.name }}</h5>
+                                <p class="card-text">{{ playground.address }}</p>
+                                <p class="card-text">{{ playground.phone }}</p>
+                                <!-- Google Mapsで開くリンク -->
+                                <a href="#" onclick="searchOnGoogleMaps('{{ playground.name }}', '{{ playground.address }}', '{{ playground.phone }}')">Google Mapsで開く</a>
+                            </div>
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
-            {% endfor %}
+            <!-- 地図タブ -->
+            <div class="tab-pane fade" id="map" role="tabpanel" aria-labelledby="map-tab">
+                <div id="map-container" class="mb-4" style="height: 500px; width: 100%;"></div>
+            </div>
         </div>
-        <!-- 地図表示エリア -->
-        <div id="map" class="mb-4" style="height: 500px; width: 100%;"></div>
     </div>
     <!-- 必要なJavaScriptファイルの読み込み -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

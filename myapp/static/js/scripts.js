@@ -122,13 +122,45 @@ function initFavoritesMap() {
         center: KAGOSHIMA_CENTER
     };
 
-    // 変更: マイページ用コンテナを指定
+    // マイページ用コンテナを指定
     var map = new google.maps.Map(document.getElementById('mypage-map-container'), mapOptions);
 
-    // ユーザー位置やお気に入り施設情報は、必要に応じて処理してください
-    // ここでは favorites 配列（必要ならサーバーサイドから favorites_json で渡す）を使い、マーカーを表示します。
-    var favorites = getLocalFavorites();
-    favorites.forEach(function(playground) {
+    // 位置情報の利用（initMapと同じ処理）
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+
+            // ユーザーの位置情報を中心に設定
+            map.setCenter(userLocation);
+
+            // 位置が鹿児島県外の場合、デフォルトの中心座標に戻す
+            var geocoder = new google.maps.Geocoder();
+            geocoder.geocode({'location': userLocation}, function(results, status) {
+                if (status === 'OK') {
+                    var addressComponents = results[0].address_components;
+                    var isKagoshima = addressComponents.some(function(component) {
+                        return component.long_name === '鹿児島県';
+                    });
+                    if (!isKagoshima) {
+                        map.setCenter(KAGOSHIMA_CENTER);
+                    }
+                } else {
+                    console.error('Geocode was not successful for the following reason: ' + status);
+                }
+            });
+        }, function() {
+            handleLocationError(true, map, KAGOSHIMA_CENTER);
+        });
+    } else {
+        handleLocationError(false, map, KAGOSHIMA_CENTER);
+    }
+
+    // 各お気に入り施設の住所をジオコーディングし、地図上にマーカーを追加（お気に入りはローカルストレージから取得）
+    var localFavorites = getLocalFavorites();
+    localFavorites.forEach(function(playground) {
         var geocoder = new google.maps.Geocoder();
         geocoder.geocode({'address': playground.address}, function(results, status) {
             if (status === 'OK') {
@@ -149,8 +181,9 @@ function initFavoritesMap() {
         });
     });
 
+    // ズームレベルが変更されたときの処理（必要に応じて追加）
     map.addListener('zoom_changed', function() {
-        // 必要に応じて、ズームレベルによる制御を追加
+        // ...existing code...
     });
 }
 

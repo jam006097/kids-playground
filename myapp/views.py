@@ -81,8 +81,16 @@ def index(request):
     
     # ユーザーのお気に入りの施設IDを取得
     favorite_ids = []
+    favorites = []
+    favorites_json = '[]'
     if request.user.is_authenticated:
         favorite_ids = list(Favorite.objects.filter(user=request.user).values_list('playground_id', flat=True))
+        fav_objs = Favorite.objects.filter(user=request.user).select_related('playground')
+        favorites = [fav.playground for fav in fav_objs]
+        favorites_json = json.dumps([
+            {'name': p.name, 'address': p.address, 'phone': p.phone}
+            for p in favorites
+        ])
     
     # テンプレートにデータを渡してレンダリング
     return render(request, 'index.html', {
@@ -92,7 +100,9 @@ def index(request):
         'filtered_count': filtered_count,
         'playgrounds_json': playgrounds_json,
         'google_maps_api_key': google_maps_api_key,
-        'favorite_ids': favorite_ids
+        'favorite_ids': favorite_ids,
+        'favorites': favorites,
+        'favorites_json': favorites_json,
     })
 
 def search_place(request):

@@ -110,6 +110,51 @@ function initMap() {
 }
 
 /**
+ * マイページタブ用にGoogle Mapsを初期化し、地図上にお気に入り施設のマーカーを表示する関数。
+ */
+function initFavoritesMap() {
+    const KAGOSHIMA_CENTER = {lat: 31.5602, lng: 130.5581};
+    const DEFAULT_ZOOM_LEVEL = 14;
+    const MIN_ZOOM_LEVEL_FOR_INFO_WINDOW = 13;
+
+    var mapOptions = {
+        zoom: DEFAULT_ZOOM_LEVEL,
+        center: KAGOSHIMA_CENTER
+    };
+
+    // 変更: マイページ用コンテナを指定
+    var map = new google.maps.Map(document.getElementById('mypage-map-container'), mapOptions);
+
+    // ユーザー位置やお気に入り施設情報は、必要に応じて処理してください
+    // ここでは favorites 配列（必要ならサーバーサイドから favorites_json で渡す）を使い、マーカーを表示します。
+    var favorites = getLocalFavorites();
+    favorites.forEach(function(playground) {
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({'address': playground.address}, function(results, status) {
+            if (status === 'OK') {
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location,
+                    title: playground.name
+                });
+                var infowindow = new google.maps.InfoWindow({
+                    content: '<div><strong>' + playground.name + '</strong><br>' +
+                             '<a href="#" onclick="searchOnGoogleMaps(\'' + playground.name + '\', \'' + playground.address + '\', \'' + playground.phone + '\')">Google Mapsで開く</a></div>',
+                    disableAutoPan: true
+                });
+                infowindow.open(map, marker);
+            } else {
+                console.error('Geocode error: ' + status);
+            }
+        });
+    });
+
+    map.addListener('zoom_changed', function() {
+        // 必要に応じて、ズームレベルによる制御を追加
+    });
+}
+
+/**
  * 位置情報の取得に失敗した場合のエラーハンドリング関数。
  * @param {boolean} browserHasGeolocation - ブラウザが位置情報をサポートしているかどうか
  * @param {object} map - Google Mapsオブジェクト
@@ -149,9 +194,80 @@ function searchOnGoogleMaps(name, address, phone) {
         });
 }
 
-// タブがアクティブになったときに地図を初期化
+// お気に入り情報を取得、保存、表示する関数を追加
+function getLocalFavorites() {
+    var data = localStorage.getItem("favoriteFacilities");
+    return data ? JSON.parse(data) : [];
+}
+
+function saveLocalFavorites(favorites) {
+    localStorage.setItem("favoriteFacilities", JSON.stringify(favorites));
+}
+
+function updateFavoritesDisplay() {
+    // MyPageタブ内のお気に入り一覧リストを更新する
+    var favorites = getLocalFavorites();
+    var favoritesHtml = "";
+    favorites.forEach(function(playground) {
+        favoritesHtml += '<div class="col-md-4">';
+        favoritesHtml += '  <div class="card mb-4 shadow-sm">';
+        favoritesHtml += '    <div class="card-body">';
+        favoritesHtml += '      <h5 class="card-title">' + playground.name + '</h5>';
+        favoritesHtml += '      <p class="card-text">' + playground.address + '</p>';
+        favoritesHtml += '      <p class="card-text">' + playground.phone + '</p>';
+        favoritesHtml += '      <a href="#" onclick="searchOnGoogleMaps(\'' + playground.name + '\', \'' + playground.address + '\', \'' + playground.phone + '\')">Google Mapsで開く</a>';
+        favoritesHtml += '    </div>';
+        favoritesHtml += '  </div>';
+        favoritesHtml += '</div>';
+    });
+    var container = document.querySelector("#mypage .row");
+    if (container) {
+        container.innerHTML = favoritesHtml;
+    }
+}
+
+function toggleFavorite(button, playgroundId) {
+    // playgroundsは index.html で定義されている全施設の配列
+    var facility = playgrounds.find(function(item) {
+        return item.id.toString() === playgroundId.toString();
+    });
+    if (!facility) return;
+
+    var favorites = getLocalFavorites();
+    var foundIndex = favorites.findIndex(function(item) {
+        return item.id.toString() === playgroundId.toString();
+    });
+
+    if (foundIndex !== -1) {
+        // 既にお気に入りの場合、削除
+        favorites.splice(foundIndex, 1);
+        button.textContent = 'お気に入りに追加';
+    } else {
+        // お気に入りに追加（必要な項目を含める）
+        var favItem = {
+            id: facility.id,
+            name: facility.name,
+            address: facility.address,
+            phone: facility.phone
+        };
+        favorites.push(favItem);
+        button.textContent = 'お気に入り解除';
+    }
+    saveLocalFavorites(favorites);
+    updateFavoritesDisplay();
+}
+
+// タブがアクティブになった時に地図を初期化
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
     if (e.target.id === 'map-tab') {
         initMap();
     }
+    if (e.target.id === 'mypage-tab') {
+        initFavoritesMap();
+    }
+});
+
+// ページ読み込み時にお気に入り表示を更新
+document.addEventListener("DOMContentLoaded", function(){
+    updateFavoritesDisplay();
 });

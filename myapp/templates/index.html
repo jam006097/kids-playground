@@ -25,9 +25,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">ログアウト</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'mypage' %}">マイページ</a>
-                </li>
                 {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'login' %}">ログイン</a>
@@ -48,18 +45,23 @@
         </form>
         <!-- 検索結果の件数表示 -->
         <p>{{ filtered_count }} / {{ total_count }} 件を表示しています。</p>
-        <!-- タブメニュー（一覧と地図のみ） -->
+        <!-- タブメニュー（一覧、地図、マイページ） -->
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
-                <a class="nav-link {% if request.GET.tab != 'map' %}active{% endif %}" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="true">一覧</a>
+                <a class="nav-link {% if request.GET.tab != 'map' and request.GET.tab != 'mypage' %}active{% endif %}" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="true">一覧</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.GET.tab == 'map' %}active{% endif %}" id="map-tab" data-toggle="tab" href="#map" role="tab" aria-controls="map" aria-selected="false">地図</a>
             </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.GET.tab == 'mypage' %}active{% endif %}" id="mypage-tab" data-toggle="tab" href="#mypage" role="tab" aria-controls="mypage" aria-selected="false">マイページ</a>
+            </li>
+            {% endif %}
         </ul>
         <div class="tab-content" id="myTabContent">
             <!-- 一覧タブ -->
-            <div class="tab-pane fade {% if request.GET.tab != 'map' %}show active{% endif %}" id="list" role="tabpanel" aria-labelledby="list-tab">
+            <div class="tab-pane fade {% if request.GET.tab != 'map' and request.GET.tab != 'mypage' %}show active{% endif %}" id="list" role="tabpanel" aria-labelledby="list-tab">
                 <div class="row">
                     {% for playground in playgrounds %}
                     <div class="col-md-4">
@@ -88,6 +90,30 @@
             <div class="tab-pane fade {% if request.GET.tab == 'map' %}show active{% endif %}" id="map" role="tabpanel" aria-labelledby="map-tab">
                 <div id="map-container" class="mb-4" style="height: 500px; width: 100%;"></div>
             </div>
+            <!-- マイページタブ -->
+            {% if user.is_authenticated %}
+            <div class="tab-pane fade {% if request.GET.tab == 'mypage' %}show active{% endif %}" id="mypage" role="tabpanel" aria-labelledby="mypage-tab">
+                <h2>マイページへようこそ、{{ user.username }}さん！</h2>
+                <h3>お気に入りの施設</h3>
+                <div class="row">
+                    {% for playground in favorites %}
+                    <div class="col-md-4">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ playground.name }}</h5>
+                                <p class="card-text">{{ playground.address }}</p>
+                                <p class="card-text">{{ playground.phone }}</p>
+                                <!-- Google Mapsで開くリンク -->
+                                <a href="#" onclick="searchOnGoogleMaps('{{ playground.name }}', '{{ playground.address }}', '{{ playground.phone }}')">Google Mapsで開く</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <h3>お気に入りの施設地図</h3>
+                <div id="mypage-map-container" class="mb-4" style="height: 500px; width: 100%;"></div>
+            </div>
+            {% endif %}
         </div>
     </div>
     <!-- 必要なJavaScriptファイルの読み込み -->
@@ -100,34 +126,8 @@
         // Djangoテンプレートから渡されたデータをJavaScriptで使用できるようにする
         var playgrounds = JSON.parse('{{ playgrounds_json|escapejs }}');
         var favoriteIds = JSON.parse('{{ favorite_ids|escapejs }}');
-
-        function toggleFavorite(button, playgroundId) {
-            const isFavorite = button.textContent.includes('解除');
-            const url = isFavorite ? "{% url 'remove_favorite' %}" : "{% url 'add_favorite' %}";
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({playground_id: playgroundId})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'ok') {
-                    button.textContent = isFavorite ? 'お気に入りに追加' : 'お気に入り解除';
-                } else {
-                    alert('お気に入りの更新に失敗しました');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('お気に入りの更新に失敗しました');
-            });
-        }
+        var favorites = JSON.parse('{{ favorites_json|escapejs }}');  // 追加：お気に入り施設データを定義
     </script>
-    <!-- カスタムJavaScriptファイルの読み込み -->
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
 </html>

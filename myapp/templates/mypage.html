@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>マイページ</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">マイページ</h1>
+        <p>ようこそ、{{ user.username }}さん！</p>
+        <h2>お気に入りの施設</h2>
+        <div class="row">
+            {% for playground in favorites %}
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ playground.name }}</h5>
+                        <p class="card-text">{{ playground.address }}</p>
+                        <p class="card-text">{{ playground.phone }}</p>
+                        <!-- Google Mapsで開くリンク -->
+                        <a href="#" onclick="searchOnGoogleMaps('{{ playground.name }}', '{{ playground.address }}', '{{ playground.phone }}')">Google Mapsで開く</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <h2>お気に入りの施設地図</h2>
+        <div id="map-container" class="mb-4" style="height: 500px; width: 100%;"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
+    <script>
+        var playgrounds = JSON.parse('{{ playgrounds_json|escapejs }}');
+    </script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>

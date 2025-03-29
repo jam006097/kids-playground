@@ -1,6 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from .models import Playground
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from .models import Playground, Favorite
+from django.views.decorators.http import require_POST
 import urllib.request
 import urllib.parse  # URLエンコード用のモジュールを追加
 import json
@@ -64,7 +69,7 @@ def index(request):
     # 市町村名でフィルタリング
     selected_city = request.GET.get('city')
     playgrounds = Playground.objects.all()
-    if (selected_city):
+    if selected_city:
         playgrounds = playgrounds.filter(address__icontains=selected_city)
     
     # 全件数とフィルタリング後の件数を取得
@@ -72,7 +77,12 @@ def index(request):
     filtered_count = playgrounds.count()
     
     # PlaygroundオブジェクトをJSON形式に変換
-    playgrounds_json = json.dumps(list(playgrounds.values('name', 'address', 'phone')))
+    playgrounds_json = json.dumps(list(playgrounds.values('id', 'name', 'address', 'phone')))
+    
+    # ユーザーのお気に入りの施設IDを取得
+    favorite_ids = []
+    if request.user.is_authenticated:
+        favorite_ids = list(Favorite.objects.filter(user=request.user).values_list('playground_id', flat=True))
     
     # テンプレートにデータを渡してレンダリング
     return render(request, 'index.html', {
@@ -81,7 +91,8 @@ def index(request):
         'total_count': total_count,
         'filtered_count': filtered_count,
         'playgrounds_json': playgrounds_json,
-        'google_maps_api_key': google_maps_api_key
+        'google_maps_api_key': google_maps_api_key,
+        'favorite_ids': favorite_ids
     })
 
 def search_place(request):
@@ -116,3 +127,85 @@ def search_place(request):
     except Exception as e:
         logging.error(f"Error searching place: {e}")
         return JsonResponse({'error': str(e)}, status=500)
+
+def user_login(request):
+    """
+    ユーザーのログインを処理するビュー。
+    """
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                # 変更: トップページのmypageタブを表示するようリダイレクト
+                return redirect("/?tab=mypage")
+    else:
+        form = AuthenticationForm()
+    return render(request, 'login.html', {'form': form})
+
+def user_logout(request):
+    """
+    ユーザーのログアウトを処理するビュー。
+    """
+    logout(request)
+    return redirect('index')
+
+def register(request):
+    """
+    ユーザーの登録を処理するビュー。
+    """
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)  # 変更：標準のUserCreationFormを使用
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('index')
+    else:
+        form = UserCreationForm()  # 変更：標準のUserCreationFormを使用
+    return render(request, 'register.html', {'form': form})
+
+@require_POST
+@login_required
+def add_favorite(request):
+    """
+    ユーザーがお気に入りの施設を登録するビュー。
+    """
+    playground_id = request.POST.get('playground_id')
+    playground = Playground.objects.get(id=playground_id)
+    Favorite.objects.get_or_create(user=request.user, playground=playground)
+    return JsonResponse({'status': 'ok'})
+
+@require_POST
+@login_required
+def remove_favorite(request):
+    """
+    ユーザーのお気に入りの施設を削除するビュー。
+    """
+    playground_id = request.POST.get('playground_id')
+    playground = Playground.objects.get(id=playground_id)
+    Favorite.objects.filter(user=request.user, playground=playground).delete()
+    return JsonResponse({'status': 'ok'})
+
+@login_required
+def mypage(request):
+    """
+    ユーザーのマイページを表示するビュー。
+    """
+    favorites = Favorite.objects.filter(user=request.user).select_related('playground')
+    favorite_playgrounds = [favorite.playground for favorite in favorites]
+    playgrounds_json = json.dumps([
+        {'name': p.name, 'address': p.address, 'phone': p.phone}
+        for p in favorite_playgrounds
+    ])
+    return render(request, 'mypage.html', {
+        'favorites': favorite_playgrounds,
+        'playgrounds_json': playgrounds_json,
+        'google_maps_api_key': os.getenv('GOOGLE_MAPS_API_KEY')
+    })

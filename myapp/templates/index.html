@@ -7,10 +7,35 @@
     {% load static %}
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <!-- カスタムCSS -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">子育て支援施設</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <span class="navbar-text">ようこそ、{{ user.username }}さん</span>
+                </li>
+                <!-- 追加: ログアウトリンク -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">ログアウト</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'mypage' %}">マイページ</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">ログイン</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
     <div class="container">
         <h1 class="my-4">子育て支援施設一覧</h1>
         <!-- 検索フォーム -->
@@ -23,18 +48,18 @@
         </form>
         <!-- 検索結果の件数表示 -->
         <p>{{ filtered_count }} / {{ total_count }} 件を表示しています。</p>
-        <!-- タブメニュー -->
+        <!-- タブメニュー（一覧と地図のみ） -->
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="true">一覧</a>
+                <a class="nav-link {% if request.GET.tab != 'map' %}active{% endif %}" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="true">一覧</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="map-tab" data-toggle="tab" href="#map" role="tab" aria-controls="map" aria-selected="false">地図</a>
+                <a class="nav-link {% if request.GET.tab == 'map' %}active{% endif %}" id="map-tab" data-toggle="tab" href="#map" role="tab" aria-controls="map" aria-selected="false">地図</a>
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">
             <!-- 一覧タブ -->
-            <div class="tab-pane fade show active" id="list" role="tabpanel" aria-labelledby="list-tab">
+            <div class="tab-pane fade {% if request.GET.tab != 'map' %}show active{% endif %}" id="list" role="tabpanel" aria-labelledby="list-tab">
                 <div class="row">
                     {% for playground in playgrounds %}
                     <div class="col-md-4">
@@ -45,6 +70,14 @@
                                 <p class="card-text">{{ playground.phone }}</p>
                                 <!-- Google Mapsで開くリンク -->
                                 <a href="#" onclick="searchOnGoogleMaps('{{ playground.name }}', '{{ playground.address }}', '{{ playground.phone }}')">Google Mapsで開く</a>
+                                <!-- お気に入り登録ボタン -->
+                                <button class="btn btn-primary" onclick="toggleFavorite(this, '{{ playground.id }}')">
+                                    {% if playground.id in favorite_ids %}
+                                        お気に入り解除
+                                    {% else %}
+                                        お気に入りに追加
+                                    {% endif %}
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -52,7 +85,7 @@
                 </div>
             </div>
             <!-- 地図タブ -->
-            <div class="tab-pane fade" id="map" role="tabpanel" aria-labelledby="map-tab">
+            <div class="tab-pane fade {% if request.GET.tab == 'map' %}show active{% endif %}" id="map" role="tabpanel" aria-labelledby="map-tab">
                 <div id="map-container" class="mb-4" style="height: 500px; width: 100%;"></div>
             </div>
         </div>
@@ -66,6 +99,33 @@
     <script>
         // Djangoテンプレートから渡されたデータをJavaScriptで使用できるようにする
         var playgrounds = JSON.parse('{{ playgrounds_json|escapejs }}');
+        var favoriteIds = JSON.parse('{{ favorite_ids|escapejs }}');
+
+        function toggleFavorite(button, playgroundId) {
+            const isFavorite = button.textContent.includes('解除');
+            const url = isFavorite ? "{% url 'remove_favorite' %}" : "{% url 'add_favorite' %}";
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({playground_id: playgroundId})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    button.textContent = isFavorite ? 'お気に入りに追加' : 'お気に入り解除';
+                } else {
+                    alert('お気に入りの更新に失敗しました');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('お気に入りの更新に失敗しました');
+            });
+        }
     </script>
     <!-- カスタムJavaScriptファイルの読み込み -->
     <script src="{% static 'js/scripts.js' %}"></script>

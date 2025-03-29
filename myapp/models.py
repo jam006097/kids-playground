@@ -1,5 +1,6 @@
 # myapp/models.py - Djangoモデルの定義
 from django.db import models
+from django.contrib.auth.models import User
 
 class Playground(models.Model):
     """
@@ -17,3 +18,16 @@ class Playground(models.Model):
 
     def __str__(self):
         return self.name
+
+class Favorite(models.Model):
+    """
+    Favoriteモデルは、ユーザーがお気に入り登録した施設を格納するためのモデルです。
+    フィールド:
+        user: ユーザー
+        playground: お気に入りの施設
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    playground = models.ForeignKey(Playground, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'playground')

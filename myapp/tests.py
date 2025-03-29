@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from unittest.mock import patch
+import json  # 追加: jsonモジュールをインポート
 from .models import Playground
 
 class PlaygroundTests(TestCase):

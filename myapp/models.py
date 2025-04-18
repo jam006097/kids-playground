@@ -31,3 +31,22 @@ class Favorite(models.Model):
 
     class Meta:
         unique_together = ('user', 'playground')
+    
+class Review(models.Model):
+    """
+    Reviewモデルは、施設に対する口コミを格納するためのモデルです。
+    フィールド:
+        playground: 口コミ対象の施設
+        user: 口コミを投稿したユーザー
+        content: 口コミ内容
+        rating: 評価（1〜5の整数）
+        created_at: 口コミ投稿日時
+    """
+    playground = models.ForeignKey(Playground, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    rating = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.playground.name} - {self.rating}"

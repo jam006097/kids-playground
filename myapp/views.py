@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
@@ -12,6 +12,7 @@ import json
 import logging
 import os
 from dotenv import load_dotenv
+from .models import Playground, Review
 
 # .envファイルから環境変数を読み込む
 load_dotenv()
@@ -219,3 +220,28 @@ def mypage(request):
         'playgrounds_json': playgrounds_json,
         'google_maps_api_key': os.getenv('GOOGLE_MAPS_API_KEY')
     })
+
+
+@login_required
+def add_review(request, playground_id):
+    """
+    口コミを投稿するビュー
+    """
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        rating = request.POST.get('rating')
+
+        # 対象の施設を取得
+        playground = get_object_or_404(Playground, id=playground_id)
+
+        # 口コミを作成
+        Review.objects.create(
+            playground=playground,
+            user=request.user,
+            content=content,
+            rating=rating
+        )
+
+        return JsonResponse({'status': 'success', 'message': '口コミが投稿されました！'})
+
+    return JsonResponse({'status': 'error', 'message': '無効なリクエストです。'}, status=400)

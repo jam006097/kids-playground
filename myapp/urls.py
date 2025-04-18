@@ -10,4 +10,7 @@ urlpatterns = [
     path('remove_favorite/', views.remove_favorite, name='remove_favorite'),
     path('register/', views.register, name='register'),
     path('logout/', views.user_logout, name='logout'),
+    path('playground/<int:playground_id>/add_review/', views.add_review, name='add_review'),
+
+
 ]

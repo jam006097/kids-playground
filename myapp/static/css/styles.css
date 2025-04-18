@@ -5,3 +5,14 @@
 .mb-4 {
     margin-bottom: 1.5rem; /* Bootstrapのmb-4クラスと同じ */
 }
+
+.modal-content {
+    border-radius: 10px;
+}
+
+/* ボタンを縦に並べる */
+.card-body .btn {
+    display: block; /* ボタンをブロック要素にする */
+    width: 100%;    /* ボタンの幅を100%にする */
+    margin-bottom: 10px; /* ボタン間の余白を設定 */
+}

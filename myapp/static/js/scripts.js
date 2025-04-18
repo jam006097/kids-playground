@@ -304,3 +304,37 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 document.addEventListener("DOMContentLoaded", function(){
     updateFavoritesDisplay();
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    // モーダルが開かれるときに施設情報を設定
+    $('#reviewModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // ボタンを取得
+        var playgroundId = button.data('playground-id');
+        var playgroundName = button.data('playground-name');
+
+        var modal = $(this);
+        modal.find('#playgroundId').val(playgroundId);
+        modal.find('.modal-title').text(playgroundName + 'への口コミ');
+    });
+
+    // 口コミフォームの送信処理
+    $('#reviewForm').on('submit', function (event) {
+        event.preventDefault(); // デフォルトの送信を防止
+
+        var formData = $(this).serialize(); // フォームデータを取得
+        var playgroundId = $('#playgroundId').val();
+
+        $.ajax({
+            url: `/playground/${playgroundId}/add_review/`,
+            method: 'POST',
+            data: formData,
+            success: function (response) {
+                alert(response.message); // 成功メッセージを表示
+                $('#reviewModal').modal('hide'); // モーダルを閉じる
+            },
+            error: function (xhr) {
+                alert('口コミの投稿に失敗しました。');
+            }
+        });
+    });
+});

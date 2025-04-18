@@ -73,19 +73,62 @@
                                 <p class="card-text">{{ playground.address }}</p>
                                 <p class="card-text">{{ playground.phone }}</p>
                                 <!-- Google Mapsで開くリンク -->
-                                <a href="#" onclick="searchOnGoogleMaps('{{ playground.name }}', '{{ playground.address }}', '{{ playground.phone }}')">Google Mapsで開く</a>
+                                <a href="#" class="btn btn-outline-primary" onclick="searchOnGoogleMaps('{{ playground.name }}', '{{ playground.address }}', '{{ playground.phone }}')">
+                                    Google Mapsで開く
+                                </a>
                                 <!-- お気に入り登録ボタン -->
-                                <button class="btn btn-primary" onclick="toggleFavorite(this, '{{ playground.id }}')">
+                                <button class="btn btn-outline-success" onclick="toggleFavorite(this, '{{ playground.id }}')">
                                     {% if playground.id in favorite_ids %}
                                         お気に入り解除
                                     {% else %}
                                         お気に入りに追加
                                     {% endif %}
                                 </button>
+                                <!-- 口コミボタン -->
+                                {% if user.is_authenticated %}
+                                <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#reviewModal"
+                                        data-playground-id="{{ playground.id }}" data-playground-name="{{ playground.name }}">
+                                    口コミを書く
+                                </button>
+                                {% else %}
+                                <button class="btn btn-outline-secondary" onclick="alert('口コミを投稿するにはログインが必要です。')">
+                                    口コミを書く
+                                </button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                     {% endfor %}
+                    <!-- モーダル -->
+                    <div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="reviewModalLabel">口コミを投稿</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="reviewForm">
+                                        {% csrf_token %}
+                                        <input type="hidden" id="playgroundId" name="playground_id">
+                                        <div class="form-group">
+                                            <label for="reviewContent">施設の感想</label>
+                                            <textarea id="reviewContent" name="content" class="form-control" required></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="reviewRating">評価 (1〜5)</label>
+                                            <input type="number" id="reviewRating" name="rating" class="form-control" min="1" max="5"
+                                                required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">送信</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- 地図タブ -->
@@ -119,7 +162,7 @@
         </div>
     </div>
     <!-- 必要なJavaScriptファイルの読み込み -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- Google Maps APIの読み込み -->

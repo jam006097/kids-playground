@@ -245,3 +245,14 @@ def add_review(request, playground_id):
         return JsonResponse({'status': 'success', 'message': '口コミが投稿されました！'})
 
     return JsonResponse({'status': 'error', 'message': '無効なリクエストです。'}, status=400)
+
+def view_reviews(request, playground_id):
+    """
+    指定された施設の口コミを表示するビュー
+    """
+    playground = get_object_or_404(Playground, id=playground_id)
+    reviews = Review.objects.filter(playground=playground).select_related('user')
+    return render(request, 'view_reviews.html', {
+        'playground': playground,
+        'reviews': reviews,
+    })

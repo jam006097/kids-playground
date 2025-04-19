@@ -11,6 +11,5 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('logout/', views.user_logout, name='logout'),
     path('playground/<int:playground_id>/add_review/', views.add_review, name='add_review'),
-
-
+    path('playground/<int:playground_id>/reviews/', views.view_reviews, name='view_reviews'),
 ]

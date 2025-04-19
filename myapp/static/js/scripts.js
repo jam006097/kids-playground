@@ -66,8 +66,26 @@ function initMap() {
 
                 // 情報ウィンドウの内容を設定
                 var infowindow = new google.maps.InfoWindow({
-                    content: '<div><strong>' + playground.name + '</strong><br>' +
-                             '<a href="#" onclick="searchOnGoogleMaps(\'' + playground.name + '\', \'' + playground.address + '\', \'' + playground.phone + '\')">Google Mapsで開く</a></div>',
+                    //content: '<div><strong>' + playground.name + '</strong><br>' +
+                    //    '<a href="#" onclick="searchOnGoogleMaps(\'' + playground.name + '\', \'' + playground.address + '\', \'' + playground.phone + '\')">Google Mapsで開く</a></div>',
+                    content: `
+                    <div>
+                        <strong>${playground.name}</strong><br>
+                        住所: ${playground.address}<br>
+                        電話番号: ${playground.phone}<br>
+                        <button class="btn btn-outline-primary btn-sm" onclick="searchOnGoogleMaps('${playground.name}', '${playground.address}', '${playground.phone}')">
+                            Google Mapsで開く
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" onclick="toggleFavoriteFromMap('${playground.id}', this)">
+                            お気に入りに追加
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" 
+                                data-playground-id="${playground.id}" data-playground-name="${playground.name}">
+                            口コミを書く
+                        </button>
+                        <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
+                    </div>
+                `,
                     disableAutoPan: true  // 情報ウィンドウを開いた際に表示位置が変更されないようにする
                 });
 
@@ -290,10 +308,57 @@ function toggleFavorite(button, playgroundId) {
     updateFavoritesDisplay();
 }
 
+function toggleFavoriteFromMap(playgroundId, button) {
+    // playgrounds 配列から対象の施設を検索
+    var facility = playgrounds.find(function(item) {
+        return item.id.toString() === playgroundId.toString();
+    });
+    if (!facility) return;
+
+    // ローカルストレージからお気に入りを取得
+    var favorites = getLocalFavorites();
+    var foundIndex = favorites.findIndex(function(item) {
+        return item.id.toString() === playgroundId.toString();
+    });
+
+    if (foundIndex !== -1) {
+        // 既にお気に入りの場合、削除
+        favorites.splice(foundIndex, 1);
+        button.textContent = 'お気に入りに追加';
+    } else {
+        // お気に入りに追加
+        var favItem = {
+            id: facility.id,
+            name: facility.name,
+            address: facility.address,
+            phone: facility.phone
+        };
+        favorites.push(favItem);
+        button.textContent = 'お気に入り解除';
+    }
+
+    // ローカルストレージに保存
+    saveLocalFavorites(favorites);
+
+    // お気に入り表示を更新
+    updateFavoritesDisplay();
+}
+
 // タブがアクティブになった時に地図を初期化
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
     if (e.target.id === 'map-tab') {
         initMap();
+
+        // 地図タブがアクティブになったときにイベントリスナーを再登録
+        $('#reviewModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // ボタンを取得
+            var playgroundId = button.data('playground-id');
+            var playgroundName = button.data('playground-name');
+
+            var modal = $(this);
+            modal.find('#playgroundId').val(playgroundId);
+            modal.find('.modal-title').text(playgroundName + 'への口コミ');
+        });
     }
     if (e.target.id === 'mypage-tab') {
         initFavoritesMap();
@@ -306,6 +371,21 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+    // 地図タブがアクティブになったときにイベントリスナーを再登録
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        if (e.target.id === 'map-tab') {
+            $('#reviewModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // ボタンを取得
+                var playgroundId = button.data('playground-id');
+                var playgroundName = button.data('playground-name');
+
+                var modal = $(this);
+                modal.find('#playgroundId').val(playgroundId);
+                modal.find('.modal-title').text(playgroundName + 'への口コミ');
+            });
+        }
+    });
+
     // モーダルが開かれるときに施設情報を設定
     $('#reviewModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // ボタンを取得

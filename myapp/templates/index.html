@@ -77,8 +77,8 @@
                                     Google Mapsで開く
                                 </a>
                                 <!-- お気に入り登録ボタン -->
-                                <button class="btn btn-outline-success" onclick="toggleFavorite(this, '{{ playground.id }}')">
-                                    {% if playground.id in favorite_ids %}
+                                <button class="btn btn-outline-success" data-playground-id="{{ playground.id }}" onclick="toggleFavorite(this, '{{ playground.id }}')">
+                                    {% if playground.id|stringformat:"s" in favorite_ids %}
                                         お気に入り解除
                                     {% else %}
                                         お気に入りに追加

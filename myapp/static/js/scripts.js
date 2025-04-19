@@ -344,6 +344,41 @@ function toggleFavoriteFromMap(playgroundId, button) {
     updateFavoritesDisplay();
 }
 
+/**
+ * お気に入りボタンの状態を更新する関数。
+ */
+function updateFavoriteButtons() {
+    var favorites = getLocalFavorites(); // ローカルストレージからお気に入りを取得
+
+    // 一覧画面のボタンを更新
+    document.querySelectorAll('.btn-outline-success').forEach(function(button) {
+        var playgroundId = button.getAttribute('onclick').match(/'(\d+)'/)[1]; // ボタンのplaygroundIdを取得
+        var isFavorite = favorites.some(function(item) {
+            return item.id.toString() === playgroundId;
+        });
+
+        if (isFavorite) {
+            button.textContent = 'お気に入り解除';
+        } else {
+            button.textContent = 'お気に入りに追加';
+        }
+    });
+
+    // 地図上のボタンを更新
+    document.querySelectorAll('.btn-outline-success[data-playground-id]').forEach(function(button) {
+        var playgroundId = button.getAttribute('data-playground-id');
+        var isFavorite = favorites.some(function(item) {
+            return item.id.toString() === playgroundId;
+        });
+
+        if (isFavorite) {
+            button.textContent = 'お気に入り解除';
+        } else {
+            button.textContent = 'お気に入りに追加';
+        }
+    });
+}
+
 // タブがアクティブになった時に地図を初期化
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
     if (e.target.id === 'map-tab') {
@@ -368,6 +403,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 // ページ読み込み時にお気に入り表示を更新
 document.addEventListener("DOMContentLoaded", function(){
     updateFavoritesDisplay();
+    updateFavoriteButtons();
 });
 
 document.addEventListener("DOMContentLoaded", function () {

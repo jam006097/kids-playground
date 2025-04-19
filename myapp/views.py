@@ -86,6 +86,7 @@ def index(request):
     favorites_json = '[]'
     if request.user.is_authenticated:
         favorite_ids = list(Favorite.objects.filter(user=request.user).values_list('playground_id', flat=True))
+        favorite_ids = [str(id) for id in favorite_ids]  # IDを文字列に変換
         fav_objs = Favorite.objects.filter(user=request.user).select_related('playground')
         favorites = [fav.playground for fav in fav_objs]
         favorites_json = json.dumps([

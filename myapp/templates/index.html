@@ -121,7 +121,24 @@
                                 <p class="card-text">{{ playground.address }}</p>
                                 <p class="card-text">{{ playground.phone }}</p>
                                 <!-- Google Mapsで開くリンク -->
-                                <a href="#" onclick="searchOnGoogleMaps('{{ playground.name }}', '{{ playground.address }}', '{{ playground.phone }}')">Google Mapsで開く</a>
+                                <a href="#" class="btn btn-outline-primary" onclick="searchOnGoogleMaps('{{ playground.name }}', '{{ playground.address }}', '{{ playground.phone }}')">
+                                    Google Mapsで開く
+                                </a>
+                                <!-- お気に入り登録ボタン -->
+                                <button class="btn btn-outline-success" data-playground-id="{{ playground.id }}" onclick="toggleFavorite(this, '{{ playground.id }}')">
+                                    {% if playground.id|stringformat:"s" in favorite_ids %}
+                                        お気に入り解除
+                                    {% else %}
+                                        お気に入りに追加
+                                    {% endif %}
+                                </button>
+                                <!-- 口コミを書くボタン -->
+                                <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#reviewModal"
+                                        data-playground-id="{{ playground.id }}" data-playground-name="{{ playground.name }}">
+                                    口コミを書く
+                                </button>
+                                <!-- 口コミを見るボタン -->
+                                <a href="{% url 'view_reviews' playground.id %}" class="btn btn-outline-info mt-2">口コミを見る</a>
                             </div>
                         </div>
                     </div>

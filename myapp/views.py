@@ -212,12 +212,14 @@ def mypage(request):
     """
     favorites = Favorite.objects.filter(user=request.user).select_related('playground')
     favorite_playgrounds = [favorite.playground for favorite in favorites]
+    favorite_ids = [str(p.id) for p in favorite_playgrounds]  # 追加：お気に入り施設のIDを文字列に変換してリスト化
     playgrounds_json = json.dumps([
         {'name': p.name, 'address': p.address, 'phone': p.phone}
         for p in favorite_playgrounds
     ])
     return render(request, 'mypage.html', {
         'favorites': favorite_playgrounds,
+        'favorite_ids': favorite_ids,  # 追加
         'playgrounds_json': playgrounds_json,
         'google_maps_api_key': os.getenv('GOOGLE_MAPS_API_KEY')
     })

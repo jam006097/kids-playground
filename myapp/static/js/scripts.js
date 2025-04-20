@@ -193,8 +193,23 @@ function initFavoritesMap() {
                     title: playground.name
                 });
                 var infowindow = new google.maps.InfoWindow({
-                    content: '<div><strong>' + playground.name + '</strong><br>' +
-                             '<a href="#" onclick="searchOnGoogleMaps(\'' + playground.name + '\', \'' + playground.address + '\', \'' + playground.phone + '\')">Google Mapsで開く</a></div>',
+                    content: `
+                    <div>
+                        <strong>${playground.name}</strong><br>
+                        住所: ${playground.address}<br>
+                        電話番号: ${playground.phone}<br>
+                        <button class="btn btn-outline-primary btn-sm" onclick="searchOnGoogleMaps('${playground.name}', '${playground.address}', '${playground.phone}')">
+                            Google Mapsで開く
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" onclick="toggleFavoriteFromFavorites(this, '${playground.id}')">
+                            お気に入り解除
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" data-playground-id="${playground.id}" data-playground-name="${playground.name}">
+                            口コミを書く
+                        </button>
+                        <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
+                    </div>
+                    `,
                     disableAutoPan: true
                 });
                 infowindow.open(map, marker);

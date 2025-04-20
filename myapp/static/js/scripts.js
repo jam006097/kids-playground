@@ -66,8 +66,6 @@ function initMap() {
 
                 // 情報ウィンドウの内容を設定
                 var infowindow = new google.maps.InfoWindow({
-                    //content: '<div><strong>' + playground.name + '</strong><br>' +
-                    //    '<a href="#" onclick="searchOnGoogleMaps(\'' + playground.name + '\', \'' + playground.address + '\', \'' + playground.phone + '\')">Google Mapsで開く</a></div>',
                     content: `
                     <div>
                         <strong>${playground.name}</strong><br>
@@ -76,7 +74,7 @@ function initMap() {
                         <button class="btn btn-outline-primary btn-sm" onclick="searchOnGoogleMaps('${playground.name}', '${playground.address}', '${playground.phone}')">
                             Google Mapsで開く
                         </button>
-                        <button class="btn btn-outline-success btn-sm" onclick="toggleFavoriteFromMap('${playground.id}', this)">
+                        <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" onclick="toggleFavoriteFromMap('${playground.id}', this)">
                             お気に入りに追加
                         </button>
                         <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" 
@@ -95,8 +93,13 @@ function initMap() {
                 // 情報ウィンドウを常に表示
                 infowindow.open(map, marker);
 
+                // domreadyイベントでお気に入りボタンの状態を更新する
+                google.maps.event.addListener(infowindow, 'domready', function () {
+                    updateFavoriteButtonsOnMap();
+                });
+
                 // 情報ウィンドウが閉じられたときのイベントリスナーを追加
-                google.maps.event.addListener(infowindow, 'closeclick', function() {
+                google.maps.event.addListener(infowindow, 'closeclick', function () {
                     isInfoWindowOpen = false;
                 });
 
@@ -125,6 +128,8 @@ function initMap() {
             }
         });
     });
+    // 地図のマーカーがすべて描画された後にボタンの状態を更新
+    setTimeout(updateFavoriteButtonsOnMap, 500);
 }
 
 /**
@@ -344,6 +349,25 @@ function toggleFavoriteFromMap(playgroundId, button) {
     updateFavoritesDisplay();
 }
 
+function updateFavoriteButtonsOnMap() {
+    // ローカルストレージからお気に入りを取得
+    var favorites = getLocalFavorites();
+
+    // 地図上のボタンを更新
+    document.querySelectorAll('.btn-outline-success[data-playground-id]').forEach(function(button) {
+        var playgroundId = button.getAttribute('data-playground-id');
+        var isFavorite = favorites.some(function(item) {
+            return item.id.toString() === playgroundId;
+        });
+
+        if (isFavorite) {
+            button.textContent = 'お気に入り解除';
+        } else {
+            button.textContent = 'お気に入りに追加';
+        }
+    });
+}
+
 /**
  * お気に入りボタンの状態を更新する関数。
  */
@@ -410,6 +434,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // 地図タブがアクティブになったときにイベントリスナーを再登録
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         if (e.target.id === 'map-tab') {
+            initMap();
+            updateFavoriteButtonsOnMap(); // 初期表示時にボタンの状態を更新
+
             $('#reviewModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget); // ボタンを取得
                 var playgroundId = button.data('playground-id');
@@ -453,4 +480,10 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+
+    // ページ読み込み時にお気に入り表示を更新
+    updateFavoritesDisplay();
+    updateFavoriteButtons();
+    updateFavoriteButtonsOnMap(); // 初期表示時に地図上のボタンの状態を更新
+
 });

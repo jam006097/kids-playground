@@ -137,29 +137,23 @@ function initMap() {
  */
 function initFavoritesMap() {
     const KAGOSHIMA_CENTER = {lat: 31.5602, lng: 130.5581};
-    const DEFAULT_ZOOM_LEVEL = 14;
-    const MIN_ZOOM_LEVEL_FOR_INFO_WINDOW = 13;
+    const DEFAULT_ZOOM_LEVEL = 10;
 
     var mapOptions = {
         zoom: DEFAULT_ZOOM_LEVEL,
         center: KAGOSHIMA_CENTER
     };
 
-    // マイページ用コンテナを指定
     var map = new google.maps.Map(document.getElementById('mypage-map-container'), mapOptions);
 
-    // 位置情報の利用（initMapと同じ処理）
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             var userLocation = {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             };
-
-            // ユーザーの位置情報を中心に設定
             map.setCenter(userLocation);
 
-            // 位置が鹿児島県外の場合、デフォルトの中心座標に戻す
             var geocoder = new google.maps.Geocoder();
             geocoder.geocode({'location': userLocation}, function(results, status) {
                 if (status === 'OK') {
@@ -181,7 +175,8 @@ function initFavoritesMap() {
         handleLocationError(false, map, KAGOSHIMA_CENTER);
     }
 
-    // 各お気に入り施設の住所をジオコーディングし、地図上にマーカーを追加（お気に入りはローカルストレージから取得）
+    // お気に入り施設のマーカーとinfowindowを管理する配列（自動制御は行わない）
+    var favMarkers = [];
     var localFavorites = getLocalFavorites();
     localFavorites.forEach(function(playground) {
         var geocoder = new google.maps.Geocoder();
@@ -212,16 +207,15 @@ function initFavoritesMap() {
                     `,
                     disableAutoPan: true
                 });
-                infowindow.open(map, marker);
+                // 初期表示時は infowindow を開かず、マーカークリック時にのみ表示する
+                marker.addListener('click', function() {
+                    infowindow.open(map, marker);
+                });
+                favMarkers.push({marker: marker, infowindow: infowindow});
             } else {
                 console.error('Geocode error: ' + status);
             }
         });
-    });
-
-    // ズームレベルが変更されたときの処理（必要に応じて追加）
-    map.addListener('zoom_changed', function() {
-        // ...existing code...
     });
 }
 

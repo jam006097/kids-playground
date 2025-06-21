@@ -1,23 +1,26 @@
-# Python関連
+# =========================
+# Python / Django 用 .gitignore
+# =========================
+
+# Python bytecode
 *.pyc
 *.pyo
 *.pyd
 __pycache__/
-*.so
-*.egg
-*.egg-info/
-.eggs/
 
-# 環境設定
+# C Extensions
+*.so
+
+# Environment files
 .env
-.venv
+.venv/
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
 
-# ビルド
+# Build
 build/
 develop-eggs/
 dist/
@@ -30,49 +33,43 @@ sdist/
 var/
 wheels/
 share/python-wheels/
-*.egg-info/
 .installed.cfg
+
+# Packaging
 *.egg
+*.egg-info/
+.eggs/
 
-# コンパイル済みコード
-*.dll
-*.dylib
-*.exe
-
-# パッケージマネージャ
+# Logs
 *.log
 
-# Django関連
-*.log
+# Django local settings
 local_settings.py
 db.sqlite3
-media
 
-# MySQL
+# MySQL dumps
 *.sql
 
-# Static & Media files
+# Static & media files (served/generated, not source)
 staticfiles/
 media/
 
 # VSCode
 .vscode/
 
-# IDE関連
+# IDE / Editor
 .idea/
 *.sublime-project
 *.sublime-workspace
 .project
 .pydevproject
 
-# macOS関連
+# OS-specific files
 .DS_Store
-
-# Windows関連
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# その他
+# Others
 *.bak
 *.swp

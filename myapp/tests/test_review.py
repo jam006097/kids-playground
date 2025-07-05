@@ -1,9 +1,8 @@
-import unittest
-from django.test import Client
+from django.test import TestCase, Client
 from django.contrib.auth.models import User
-from models import Playground, Review
+from myapp.models import Playground, Review  
 
-class ReviewTestCase(unittest.TestCase):
+class ReviewTestCase(TestCase):
     def setUp(self):
         # テストクライアントの作成
         self.client = Client()
@@ -36,8 +35,3 @@ class ReviewTestCase(unittest.TestCase):
         review = reviews.first()
         self.assertEqual(review.content, '素晴らしい施設でした！')
         self.assertEqual(review.rating, 5)
-
-    def tearDown(self):
-        # テストデータの削除
-        self.user.delete()
-        self.playground.delete()

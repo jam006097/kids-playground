@@ -7,18 +7,25 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Playground',
+            name="Playground",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('prefecture', models.CharField(max_length=100)),
-                ('name', models.CharField(max_length=200)),
-                ('address', models.CharField(max_length=300)),
-                ('description', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("prefecture", models.CharField(max_length=100)),
+                ("name", models.CharField(max_length=200)),
+                ("address", models.CharField(max_length=300)),
+                ("description", models.TextField()),
             ],
         ),
     ]

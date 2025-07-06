@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Playground(models.Model):
     """
     Playgroundモデルは、子育て支援施設の情報を格納するためのモデルです。
@@ -11,13 +12,17 @@ class Playground(models.Model):
         address: 施設住所
         phone: 電話番号
     """
+
     prefecture = models.CharField(max_length=100)
     name = models.CharField(max_length=200)
     address = models.CharField(max_length=300)
-    phone = models.CharField(max_length=30, null=True)  # 電話番号用フィールドの長さを増やす
+    phone = models.CharField(
+        max_length=30, null=True
+    )  # 電話番号用フィールドの長さを増やす
 
     def __str__(self):
         return self.name
+
 
 class Favorite(models.Model):
     """
@@ -26,12 +31,14 @@ class Favorite(models.Model):
         user: ユーザー
         playground: お気に入りの施設
     """
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     playground = models.ForeignKey(Playground, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('user', 'playground')
-    
+        unique_together = ("user", "playground")
+
+
 class Review(models.Model):
     """
     Reviewモデルは、施設に対する口コミを格納するためのモデルです。
@@ -42,7 +49,10 @@ class Review(models.Model):
         rating: 評価（1〜5の整数）
         created_at: 口コミ投稿日時
     """
-    playground = models.ForeignKey(Playground, on_delete=models.CASCADE, related_name='reviews')
+
+    playground = models.ForeignKey(
+        Playground, on_delete=models.CASCADE, related_name="reviews"
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     rating = models.PositiveIntegerField()

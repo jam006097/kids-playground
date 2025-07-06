@@ -13,12 +13,11 @@ class Playground(models.Model):
         phone: 電話番号
     """
 
+    id = models.AutoField(primary_key=True)  # 明示的にidを追加
     prefecture = models.CharField(max_length=100)
     name = models.CharField(max_length=200)
     address = models.CharField(max_length=300)
-    phone = models.CharField(
-        max_length=30, null=True
-    )  # 電話番号用フィールドの長さを増やす
+    phone = models.CharField(max_length=30, null=True)
 
     def __str__(self):
         return self.name

@@ -3,8 +3,7 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from .models import Playground, Favorite
+from .models import Playground, Favorite, Review
 from django.views.decorators.http import require_POST
 import urllib.request
 import urllib.parse  # URLエンコード用のモジュールを追加
@@ -12,7 +11,6 @@ import json
 import logging
 import os
 from dotenv import load_dotenv
-from .models import Playground, Review
 
 # .envファイルから環境変数を読み込む
 load_dotenv()
@@ -52,7 +50,7 @@ def fetch_data_from_api():
                         "phone": row["電話番号"],
                     },
                 )
-        logging.info(f"Successfully fetched data from API")
+        logging.info("Successfully fetched data from API")
     except Exception as e:
         logging.error(f"Error fetching data from API: {e}")
 
@@ -136,7 +134,13 @@ def search_place(request):
     logging.info(f"Searching for place: name={name}, address={address}, phone={phone}")
 
     # Google Places APIのURLを生成
-    search_url = f"https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input={urllib.parse.quote(name)}&inputtype=textquery&fields=name,formatted_address,geometry&key={GOOGLE_MAPS_API_KEY}"
+    search_url = (
+        "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
+        f"?input={urllib.parse.quote(name)}"
+        "&inputtype=textquery"
+        "&fields=name,formatted_address,geometry"
+        f"&key={GOOGLE_MAPS_API_KEY}"
+    )
 
     try:
         # APIからデータを取得

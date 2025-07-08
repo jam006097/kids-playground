@@ -8,6 +8,8 @@ classDiagram
         +string name
         +string address
         +string phone
+        +float latitude
+        +float longitude
     }
     class Favorite {
         +int id

@@ -11,13 +11,17 @@ class Playground(models.Model):
         name: 施設名
         address: 施設住所
         phone: 電話番号
+        latitude: 緯度
+        longitude: 経度
     """
 
-    id = models.AutoField(primary_key=True)  # 明示的にidを追加
-    prefecture = models.CharField(max_length=100)
-    name = models.CharField(max_length=200)
-    address = models.CharField(max_length=300)
-    phone = models.CharField(max_length=30, null=True)
+    id = models.AutoField(primary_key=True)  # ID
+    prefecture = models.CharField(max_length=100)  # 都道府県
+    name = models.CharField(max_length=200)  # 施設名
+    address = models.CharField(max_length=300)  # 住所
+    phone = models.CharField(max_length=30, null=True)  # 電話番号
+    latitude = models.FloatField(null=True)  # 緯度
+    longitude = models.FloatField(null=True)  # 経度
 
     def __str__(self):
         return self.name

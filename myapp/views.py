@@ -30,31 +30,6 @@ logging.basicConfig(
 )
 
 
-def fetch_data_from_api():
-    """
-    データAPIからデータを取得し、データベースに保存する関数。
-    """
-    logging.info("Starting data fetch process from API")
-
-    try:
-        # APIからデータを取得
-        with urllib.request.urlopen(API_URL) as response:
-            data = json.loads(response.read().decode())
-            records = data["result"]["records"]
-            # 取得したデータをデータベースに保存
-            for row in records:
-                Playground.objects.update_or_create(
-                    name=row["センター名"],
-                    defaults={
-                        "address": row["施設住所"],
-                        "phone": row["電話番号"],
-                    },
-                )
-        logging.info("Successfully fetched data from API")
-    except Exception as e:
-        logging.error(f"Error fetching data from API: {e}")
-
-    logging.info("Data fetch process from API completed")
 
 
 def index(request):
@@ -63,9 +38,6 @@ def index(request):
     市町村名でフィルタリングが可能。
     """
     google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-
-    # APIからデータを取得
-    fetch_data_from_api()
 
     # 市町村名でフィルタリング
     selected_city = request.GET.get("city")

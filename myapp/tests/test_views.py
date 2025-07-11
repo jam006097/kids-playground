@@ -13,8 +13,7 @@ class PlaygroundTests(TestCase):
             name="Test Playground", address="Test Address", phone="123456789"
         )
 
-    @patch("myapp.views.fetch_data_from_api")
-    def test_index_view(self, mock_fetch_data):
+    def test_index_view(self):
         # indexビューのテスト
         response = self.client.get(reverse("index"))
         self.assertEqual(

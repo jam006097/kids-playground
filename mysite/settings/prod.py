@@ -1,4 +1,23 @@
-from .base import *
+from .base import (
+    BASE_DIR,
+    SECRET_KEY,
+    INSTALLED_APPS,
+    MIDDLEWARE,
+    ROOT_URLCONF,
+    TEMPLATES,
+    WSGI_APPLICATION,
+    AUTH_PASSWORD_VALIDATORS,
+    LANGUAGE_CODE,
+    TIME_ZONE,
+    USE_I18N,
+    USE_TZ,
+    STATIC_URL,
+    STATIC_ROOT,
+    DEFAULT_AUTO_FIELD,
+    CRONJOBS,
+    GOOGLE_MAPS_API_KEY,
+)
+import os
 
 DEBUG = False
 ALLOWED_HOSTS = ["jam006097.pythonanywhere.com"]

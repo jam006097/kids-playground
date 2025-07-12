@@ -10,7 +10,7 @@ class SearchPlaceViewTest(TestCase):
         self.url = reverse("search_place")
 
     # 場所検索ビューが成功するケースのテスト
-    @patch("myapp.views.urllib.request.urlopen")
+    @patch("myapp.views.search_views.urllib.request.urlopen")
     def test_search_place_view_success(self, mock_urlopen):
         # Google Places APIからのレスポンスをモック
         class MockResponse:
@@ -36,7 +36,7 @@ class SearchPlaceViewTest(TestCase):
         )
 
     # 場所検索ビューで候補が見つからないケースのテスト
-    @patch("myapp.views.urllib.request.urlopen")
+    @patch("myapp.views.search_views.urllib.request.urlopen")
     def test_search_place_view_not_found(self, mock_urlopen):
         # Google Places APIからのレスポンスをモック（候補なし）
         class MockResponse:

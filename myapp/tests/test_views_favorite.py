@@ -5,6 +5,7 @@ from myapp.models import Playground, Favorite
 
 
 class FavoriteViewsTest(TestCase):
+    # テストのセットアップ
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
@@ -17,6 +18,7 @@ class FavoriteViewsTest(TestCase):
         self.remove_favorite_url = reverse("remove_favorite")
         self.mypage_url = reverse("mypage")
 
+    # お気に入り追加ビューのテスト
     def test_add_favorite_view(self):
         self.client.login(username="testuser", password="testpassword")
         response = self.client.post(
@@ -27,6 +29,7 @@ class FavoriteViewsTest(TestCase):
             Favorite.objects.filter(user=self.user, playground=self.playground).exists()
         )
 
+    # お気に入り削除ビューのテスト
     def test_remove_favorite_view(self):
         self.client.login(username="testuser", password="testpassword")
         Favorite.objects.create(user=self.user, playground=self.playground)
@@ -38,6 +41,7 @@ class FavoriteViewsTest(TestCase):
             Favorite.objects.filter(user=self.user, playground=self.playground).exists()
         )
 
+    # マイページビューのテスト
     def test_mypage_view(self):
         self.client.login(username="testuser", password="testpassword")
         Favorite.objects.create(user=self.user, playground=self.playground)

@@ -5,6 +5,7 @@ from myapp.models import Playground, Review
 
 
 class ReviewViewsTest(TestCase):
+    # テストのセットアップ
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
@@ -20,6 +21,7 @@ class ReviewViewsTest(TestCase):
             "view_reviews", kwargs={"playground_id": self.playground.id}
         )
 
+    # レビュー追加ビューのテスト
     def test_add_review_view(self):
         self.client.login(username="testuser", password="testpassword")
         response = self.client.post(
@@ -30,6 +32,7 @@ class ReviewViewsTest(TestCase):
             Review.objects.filter(user=self.user, playground=self.playground).exists()
         )
 
+    # レビューリストビューのテスト
     def test_review_list_view(self):
         Review.objects.create(
             user=self.user, playground=self.playground, content="Nice!", rating=4

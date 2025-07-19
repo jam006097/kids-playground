@@ -71,9 +71,6 @@ function initMap() {
                         <strong>${playground.name}</strong><br>
                         住所: ${playground.address}<br>
                         電話番号: ${playground.phone}<br>
-                        <button class="btn btn-outline-primary btn-sm" onclick="searchOnGoogleMaps('${playground.name}', '${playground.address}', '${playground.phone}')">
-                            Google Mapsで開く
-                        </button>
                         <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" onclick="toggleFavoriteFromMap('${playground.id}', this)">
                             お気に入りに追加
                         </button>
@@ -193,9 +190,6 @@ function initFavoritesMap() {
                         <strong>${playground.name}</strong><br>
                         住所: ${playground.address}<br>
                         電話番号: ${playground.phone}<br>
-                        <button class="btn btn-outline-primary btn-sm" onclick="searchOnGoogleMaps('${playground.name}', '${playground.address}', '${playground.phone}')">
-                            Google Mapsで開く
-                        </button>
                         <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" onclick="toggleFavoriteFromFavorites(this, '${playground.id}')">
                             お気に入り解除
                         </button>
@@ -232,33 +226,6 @@ function handleLocationError(browserHasGeolocation, map, center) {
     map.setCenter(center);
 }
 
-/**
- * Google Mapsで施設を検索し、新しいタブで開く関数。
- * @param {string} name - 施設名
- * @param {string} address - 施設住所
- * @param {string} phone - 施設電話番号
- */
-function searchOnGoogleMaps(name, address, phone) {
-    // サーバーサイドのエンドポイントにリクエストを送信
-    var searchUrl = `/search_place?name=${encodeURIComponent(name)}&address=${encodeURIComponent(address)}&phone=${encodeURIComponent(phone)}`;
-
-    fetch(searchUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data.url) {
-                // 取得したURLを新しいタブで開く
-                window.open(data.url, '_blank');
-            } else {
-                console.error('No URL found in response');
-                alert('No URL found in response');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error: ' + error);
-        });
-}
-
 // お気に入り情報を取得、保存、表示する関数を追加
 function getLocalFavorites() {
     var data = localStorage.getItem("favoriteFacilities");
@@ -280,8 +247,6 @@ function updateFavoritesDisplay() {
         favoritesHtml += '      <h5 class="card-title">' + playground.name + '</h5>';
         favoritesHtml += '      <p class="card-text">' + playground.address + '</p>';
         favoritesHtml += '      <p class="card-text">' + playground.phone + '</p>';
-        // Google Mapsで開くリンク
-        favoritesHtml += '      <a href="#" class="btn btn-outline-primary btn-sm" onclick="searchOnGoogleMaps(\'' + playground.name + '\', \'' + playground.address + '\', \'' + playground.phone + '\')">Google Mapsで開く</a>';
         // お気に入り切替ボタン（mypage用）
         favoritesHtml += '      <button class="btn btn-outline-success btn-sm" data-playground-id="' + playground.id + '" onclick="toggleFavoriteFromFavorites(this, \'' + playground.id + '\')">お気に入り解除</button>';
         // 口コミを書くボタン（モーダルを起動）

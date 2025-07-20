@@ -8,6 +8,8 @@ import json
 import logging
 import os
 from dotenv import load_dotenv
+from django.contrib.auth import logout
+from django.shortcuts import redirect
 from django.views.generic import ListView, View, CreateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin

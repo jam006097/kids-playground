@@ -23,9 +23,12 @@
                 <li class="nav-item">
                     <span class="navbar-text">ようこそ、{{ user.username }}さん</span>
                 </li>
-                <!-- 追加: ログアウトリンク -->
+                <!-- 追加: ログアウトフォーム -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">ログアウト</a>
+                    <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                    <a class="nav-link" href="#" onclick="document.getElementById('logout-form').submit();">ログアウト</a>
                 </li>
                 {% else %}
                 <li class="nav-item">

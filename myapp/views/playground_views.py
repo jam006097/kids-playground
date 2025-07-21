@@ -35,7 +35,7 @@ class PlaygroundListView(ListView):
     都市によるフィルタリング機能と、ユーザーのお気に入り公園情報を表示する。
     """
     model = Playground
-    template_name = "index.html"
+    template_name = "playgrounds/list.html"
     context_object_name = "playgrounds"
 
     def get_queryset(self):

@@ -67,7 +67,7 @@ class MyPageView(LoginRequiredMixin, TemplateView):
     ログインしているユーザーのみがアクセス可能。
     ユーザーのお気に入り公園一覧を表示する。
     """
-    template_name = "mypage.html"
+    template_name = "users/mypage.html"
 
     def get_context_data(self, **kwargs):
         """

@@ -47,5 +47,5 @@ class FavoriteViewsTest(TestCase):
         Favorite.objects.create(user=self.user, playground=self.playground)
         response = self.client.get(self.mypage_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "mypage.html")
+        self.assertTemplateUsed(response, "users/mypage.html")
         self.assertEqual(len(response.context["favorites"]), 1)

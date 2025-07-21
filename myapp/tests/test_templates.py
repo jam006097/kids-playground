@@ -50,3 +50,18 @@ class TemplateRenderTest(TestCase):
         # playground2（お気に入り未登録）のボタンを確認
         button2 = soup.find('button', {'data-playground-id': self.playground2.id})
         self.assertIn('お気に入りに追加', button2.text)
+
+    def test_favorite_button_disabled_for_anonymous_user(self):
+        """
+        未ログインユーザーにはお気に入りボタンが無効化されているかテスト
+        """
+        response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # playground1のボタンが無効化されているか確認
+        button1 = soup.find('button', {'data-playground-id': self.playground1.id})
+        self.assertIsNotNone(button1, "ボタンが見つかりません")
+        self.assertTrue(button1.has_attr('disabled'), "disabled属性がありません")
+        self.assertEqual(button1.get('title'), 'ログインするとお気に入り機能が使えます')

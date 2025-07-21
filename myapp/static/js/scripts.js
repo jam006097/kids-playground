@@ -265,6 +265,11 @@ function updateFavoritesDisplay() {
 
 // マイページ用：お気に入り切替処理（MyPageタブの施設詳細用）
 function toggleFavoriteFromFavorites(button, playgroundId) {
+    // ボタンが無効化されている場合は何もしない
+    if (button.disabled) {
+        return;
+    }
+
     var favorites = getLocalFavorites();
     var foundIndex = favorites.findIndex(function(item) {
         return item.id.toString() === playgroundId.toString();
@@ -295,6 +300,11 @@ function toggleFavoriteFromFavorites(button, playgroundId) {
 }
 
 function toggleFavorite(button, playgroundId) {
+    // ボタンが無効化されている場合は何もしない
+    if (button.disabled) {
+        return;
+    }
+
     // playgroundsは index.html で定義されている全施設の配列
     var facility = playgrounds.find(function(item) {
         return item.id.toString() === playgroundId.toString();
@@ -326,6 +336,11 @@ function toggleFavorite(button, playgroundId) {
 }
 
 function toggleFavoriteFromMap(playgroundId, button) {
+    // ボタンが無効化されている場合は何もしない
+    if (button.disabled) {
+        return;
+    }
+
     // playgrounds 配列から対象の施設を検索
     var facility = playgrounds.find(function(item) {
         return item.id.toString() === playgroundId.toString();

@@ -76,20 +76,7 @@
                                 <p class="card-text">{{ playground.address }}</p>
                                 <p class="card-text">{{ playground.phone }}</p>
                                 <!-- お気に入り登録ボタン -->
-                                {% if user.is_authenticated %}
-                                <button class="btn btn-outline-success" data-playground-id="{{ playground.id }}" onclick="toggleFavorite(this, '{{ playground.id }}')">
-                                    {% is_favorite playground user as is_fav %}
-                                    {% if is_fav %}
-                                        お気に入り解除
-                                    {% else %}
-                                        お気に入りに追加
-                                    {% endif %}
-                                </button>
-                                {% else %}
-                                <button class="btn btn-outline-success" data-playground-id="{{ playground.id }}" disabled title="ログインするとお気に入り機能が使えます">
-                                    お気に入りに追加
-                                </button>
-                                {% endif %}
+                                {% include 'partials/_favorite_button.html' with playground=playground %}
                                 <!-- 口コミボタン -->
                                 {% if user.is_authenticated %}
                                 <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#reviewModal"
@@ -127,20 +114,7 @@
                                 <p class="card-text">{{ playground.address }}</p>
                                 <p class="card-text">{{ playground.phone }}</p>
                                 <!-- お気に入り登録ボタン -->
-                                {% if user.is_authenticated %}
-                                <button class="btn btn-outline-success" data-playground-id="{{ playground.id }}" onclick="toggleFavorite(this, '{{ playground.id }}')">
-                                    {% is_favorite playground user as is_fav %}
-                                    {% if is_fav %}
-                                        お気に入り解除
-                                    {% else %}
-                                        お気に入りに追加
-                                    {% endif %}
-                                </button>
-                                {% else %}
-                                <button class="btn btn-outline-success" data-playground-id="{{ playground.id }}" disabled title="ログインするとお気に入り機能が使えます">
-                                    お気に入りに追加
-                                </button>
-                                {% endif %}
+                                {% include 'partials/_favorite_button.html' with playground=playground %}
                                 <!-- 口コミを書くボタン -->
                                 <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#reviewModal"
                                         data-playground-id="{{ playground.id }}" data-playground-name="{{ playground.name }}">

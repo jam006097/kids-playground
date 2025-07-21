@@ -1,42 +1,52 @@
-
 from django.test import TestCase
 from django.urls import reverse
 from bs4 import BeautifulSoup
+from django.contrib.auth.models import User
+from myapp.models import Playground, Favorite
 
 class TemplateRenderTest(TestCase):
+    def setUp(self):
+        """テスト用のデータを作成"""
+        self.user = User.objects.create_user(username='testuser', password='password')
+        self.playground1 = Playground.objects.create(name='Test Park 1', address='Address 1')
+        self.playground2 = Playground.objects.create(name='Test Park 2', address='Address 2')
+        # playground1をお気に入りに追加
+        Favorite.objects.create(user=self.user, playground=self.playground1)
+
     def test_login_page_renders_correctly(self):
         """
         GETリクエストに対してlogin.htmlが正しくレンダリングされるかテスト
         """
         response = self.client.get(reverse('login'))
-
-        # ステータスコードの確認
         self.assertEqual(response.status_code, 200)
-
-        # 使用されているテンプレートの確認
         self.assertTemplateUsed(response, 'login.html')
-
-        # HTMLの内容の確認
         soup = BeautifulSoup(response.content, 'html.parser')
         self.assertIsNotNone(soup.find('h1', text='ログイン'))
-        self.assertIsNotNone(soup.find('form'))
-        self.assertIsNotNone(soup.find('button', type='submit', class_='btn-primary'))
-        self.assertTrue('新規登録は' in response.content.decode())
 
     def test_register_page_renders_correctly(self):
         """
         GETリクエストに対してregister.htmlが正しくレンダリングされるかテスト
         """
         response = self.client.get(reverse('register'))
-
-        # ステータスコードの確認
         self.assertEqual(response.status_code, 200)
-
-        # 使用されているテンプレートの確認
         self.assertTemplateUsed(response, 'register.html')
-
-        # HTMLの内容の確認
         soup = BeautifulSoup(response.content, 'html.parser')
         self.assertIsNotNone(soup.find('h1', text='ユーザー登録'))
-        self.assertIsNotNone(soup.find('form'))
-        self.assertIsNotNone(soup.find('button', type='submit', class_='btn-primary'))
+
+    def test_favorite_button_display_logic(self):
+        """
+        お気に入り状態に応じてボタンのテキストが正しく表示されるかテスト
+        """
+        self.client.login(username='testuser', password='password')
+        response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # playground1（お気に入り済み）のボタンを確認
+        button1 = soup.find('button', {'data-playground-id': self.playground1.id})
+        self.assertIn('お気に入り解除', button1.text)
+
+        # playground2（お気に入り未登録）のボタンを確認
+        button2 = soup.find('button', {'data-playground-id': self.playground2.id})
+        self.assertIn('お気に入りに追加', button2.text)

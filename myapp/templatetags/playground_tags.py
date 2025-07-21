@@ -3,6 +3,7 @@ from myapp.models import Favorite
 
 register = template.Library()
 
+
 @register.simple_tag
 def is_favorite(playground, user):
     """ユーザーが施設をお気に入り登録しているか判定する"""

@@ -33,6 +33,7 @@ class SearchPlaceView(View):
     """
     Google Places APIを使用して場所を検索し、その場所のGoogleマップURLを返すビュー。
     """
+
     def get(self, request, *args, **kwargs):
         """
         GETリクエストを処理し、場所を検索してJSONレスポンスを返す。

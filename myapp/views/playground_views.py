@@ -34,6 +34,7 @@ class PlaygroundListView(ListView):
     公園一覧を表示するビュー。
     都市によるフィルタリング機能と、ユーザーのお気に入り公園情報を表示する。
     """
+
     model = Playground
     template_name = "playgrounds/list.html"
     context_object_name = "playgrounds"

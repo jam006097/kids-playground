@@ -34,6 +34,7 @@ class AddReviewView(LoginRequiredMixin, View):
     レビュー追加ビュー。
     ログインしているユーザーのみがアクセス可能。
     """
+
     def post(self, request, playground_id, *args, **kwargs):
         """
         POSTリクエストを処理し、指定された公園にレビューを追加する。
@@ -67,6 +68,7 @@ class ReviewListView(ListView):
     レビュー一覧ビュー。
     指定された公園のレビュー一覧を表示する。
     """
+
     model = Review
     template_name = "reviews/view_reviews.html"
     context_object_name = "reviews"

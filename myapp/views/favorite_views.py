@@ -34,6 +34,7 @@ class AddFavoriteView(LoginRequiredMixin, View):
     お気に入り追加ビュー。
     ログインしているユーザーのみがアクセス可能。
     """
+
     def post(self, request, *args, **kwargs):
         """
         POSTリクエストを処理し、指定された公園をお気に入りに追加する。
@@ -50,6 +51,7 @@ class RemoveFavoriteView(LoginRequiredMixin, View):
     お気に入り削除ビュー。
     ログインしているユーザーのみがアクセス可能。
     """
+
     def post(self, request, *args, **kwargs):
         """
         POSTリクエストを処理し、指定された公園をお気に入りから削除する。
@@ -67,6 +69,7 @@ class MyPageView(LoginRequiredMixin, TemplateView):
     ログインしているユーザーのみがアクセス可能。
     ユーザーのお気に入り公園一覧を表示する。
     """
+
     template_name = "users/mypage.html"
 
     def get_context_data(self, **kwargs):

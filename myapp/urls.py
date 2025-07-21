@@ -13,9 +13,7 @@ urlpatterns = [
     path("register/", UserRegisterView.as_view(), name="register"),
     path("mypage/", MyPageView.as_view(), name="mypage"),
     path("add_favorite/", AddFavoriteView.as_view(), name="add_favorite"),
-    path(
-        "remove_favorite/", RemoveFavoriteView.as_view(), name="remove_favorite"
-    ),
+    path("remove_favorite/", RemoveFavoriteView.as_view(), name="remove_favorite"),
     path(
         "playground/<int:playground_id>/add_review/",
         AddReviewView.as_view(),

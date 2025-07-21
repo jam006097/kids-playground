@@ -19,7 +19,7 @@ class TemplateRenderTest(TestCase):
         """
         response = self.client.get(reverse('login'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'login.html')
+        self.assertTemplateUsed(response, 'registration/login.html')
         soup = BeautifulSoup(response.content, 'html.parser')
         self.assertIsNotNone(soup.find('h1', text='ログイン'))
 
@@ -29,7 +29,7 @@ class TemplateRenderTest(TestCase):
         """
         response = self.client.get(reverse('register'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'register.html')
+        self.assertTemplateUsed(response, 'registration/register.html')
         soup = BeautifulSoup(response.content, 'html.parser')
         self.assertIsNotNone(soup.find('h1', text='ユーザー登録'))
 

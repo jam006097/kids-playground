@@ -36,7 +36,7 @@ class UserLoginView(LoginView):
     ユーザーログインビュー。
     ログインフォームと成功時のリダイレクトURLを設定する。
     """
-    template_name = "login.html"
+    template_name = "registration/login.html"
     authentication_form = AuthenticationForm
 
     def get_success_url(self):
@@ -59,6 +59,6 @@ class UserRegisterView(CreateView):
     ユーザー登録ビュー。
     ユーザー作成フォームと成功時のリダイレクトURLを設定する。
     """
-    template_name = "register.html"
+    template_name = "registration/register.html"
     form_class = UserCreationForm
     success_url = "/"

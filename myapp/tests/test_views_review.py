@@ -39,5 +39,5 @@ class ReviewViewsTest(TestCase):
         )
         response = self.client.get(self.review_list_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "view_reviews.html")
+        self.assertTemplateUsed(response, "reviews/view_reviews.html")
         self.assertEqual(len(response.context["reviews"]), 1)

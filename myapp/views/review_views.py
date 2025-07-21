@@ -68,7 +68,7 @@ class ReviewListView(ListView):
     指定された公園のレビュー一覧を表示する。
     """
     model = Review
-    template_name = "view_reviews.html"
+    template_name = "reviews/view_reviews.html"
     context_object_name = "reviews"
 
     def get_queryset(self):

@@ -22,3 +22,21 @@ class TemplateRenderTest(TestCase):
         self.assertIsNotNone(soup.find('form'))
         self.assertIsNotNone(soup.find('button', type='submit', class_='btn-primary'))
         self.assertTrue('新規登録は' in response.content.decode())
+
+    def test_register_page_renders_correctly(self):
+        """
+        GETリクエストに対してregister.htmlが正しくレンダリングされるかテスト
+        """
+        response = self.client.get(reverse('register'))
+
+        # ステータスコードの確認
+        self.assertEqual(response.status_code, 200)
+
+        # 使用されているテンプレートの確認
+        self.assertTemplateUsed(response, 'register.html')
+
+        # HTMLの内容の確認
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertIsNotNone(soup.find('h1', text='ユーザー登録'))
+        self.assertIsNotNone(soup.find('form'))
+        self.assertIsNotNone(soup.find('button', type='submit', class_='btn-primary'))

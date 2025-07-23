@@ -76,6 +76,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # Default primary key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# リダイレクトURL
+LOGIN_REDIRECT_URL = "myapp:index"
+LOGOUT_REDIRECT_URL = "myapp:login"
+
 # cron設定
 CRONJOBS = [("0 0 1 * *", "myapp.management.commands.fetch_playgrounds")]
 

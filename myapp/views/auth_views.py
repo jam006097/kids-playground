@@ -13,6 +13,7 @@ from django.shortcuts import redirect
 from django.views.generic import ListView, View, CreateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
 
 # .envファイルから環境変数を読み込む
 load_dotenv()
@@ -53,7 +54,7 @@ class UserLogoutView(LogoutView):
     ログアウト後のリダイレクト先を設定する。
     """
 
-    next_page = "index"
+    next_page = reverse_lazy("myapp:login")
 
 
 class UserRegisterView(CreateView):

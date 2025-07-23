@@ -15,10 +15,10 @@ class ReviewViewsTest(TestCase):
             name="Test Park", address="Test Address", phone="123-456-7890"
         )
         self.add_review_url = reverse(
-            "add_review", kwargs={"playground_id": self.playground.id}
+            "myapp:add_review", kwargs={"playground_id": self.playground.id}
         )
         self.review_list_url = reverse(
-            "view_reviews", kwargs={"playground_id": self.playground.id}
+            "myapp:view_reviews", kwargs={"playground_id": self.playground.id}
         )
 
     # レビュー追加ビューのテスト

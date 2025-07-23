@@ -69,8 +69,6 @@ class PlaygroundListView(ListView):
         )
 
         favorite_ids = []
-        favorites = []
-        favorites_json = "[]"
         # ユーザーが認証済みの場合、お気に入り公園の情報を取得
         if self.request.user.is_authenticated:
             # お気に入り公園のIDリストを取得
@@ -80,18 +78,6 @@ class PlaygroundListView(ListView):
                 )
             )
             favorite_ids = [str(id) for id in favorite_ids]
-            # お気に入り公園オブジェクトを取得
-            fav_objs = Favorite.objects.filter(user=self.request.user).select_related(
-                "playground"
-            )
-            favorites = [fav.playground for fav in fav_objs]
-            # お気に入り公園データをJSON形式に変換
-            favorites_json = json.dumps(
-                [
-                    {"name": p.name, "address": p.address, "phone": p.phone}
-                    for p in favorites
-                ]
-            )
 
         # コンテキストを更新
         context.update(
@@ -102,8 +88,6 @@ class PlaygroundListView(ListView):
                 "playgrounds_json": playgrounds_json,
                 "google_maps_api_key": os.getenv("GOOGLE_MAPS_API_KEY"),
                 "favorite_ids": favorite_ids,
-                "favorites": favorites,
-                "favorites_json": favorites_json,
             }
         )
         return context

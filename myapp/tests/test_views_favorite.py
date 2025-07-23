@@ -14,9 +14,9 @@ class FavoriteViewsTest(TestCase):
         self.playground = Playground.objects.create(
             name="Test Park", address="Test Address", phone="123-456-7890"
         )
-        self.add_favorite_url = reverse("add_favorite")
-        self.remove_favorite_url = reverse("remove_favorite")
-        self.mypage_url = reverse("mypage")
+        self.add_favorite_url = reverse("myapp:add_favorite")
+        self.remove_favorite_url = reverse("myapp:remove_favorite")
+        self.favorites_url = reverse("myapp:favorites")
 
     # お気に入り追加ビューのテスト
     def test_add_favorite_view(self):
@@ -41,11 +41,11 @@ class FavoriteViewsTest(TestCase):
             Favorite.objects.filter(user=self.user, playground=self.playground).exists()
         )
 
-    # マイページビューのテスト
-    def test_mypage_view(self):
+    # お気に入り一覧ページのテスト
+    def test_favorite_list_view(self):
         self.client.login(username="testuser", password="testpassword")
         Favorite.objects.create(user=self.user, playground=self.playground)
-        response = self.client.get(self.mypage_url)
+        response = self.client.get(self.favorites_url)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "users/mypage.html")
+        self.assertTemplateUsed(response, "favorites/list.html")
         self.assertEqual(len(response.context["favorites"]), 1)

@@ -63,14 +63,14 @@ class RemoveFavoriteView(LoginRequiredMixin, View):
         return JsonResponse({"status": "ok"})
 
 
-class MyPageView(LoginRequiredMixin, TemplateView):
+class FavoriteListView(LoginRequiredMixin, TemplateView):
     """
-    マイページビュー。
+    お気に入り一覧ページビュー。
     ログインしているユーザーのみがアクセス可能。
     ユーザーのお気に入り公園一覧を表示する。
     """
 
-    template_name = "users/mypage.html"
+    template_name = "favorites/list.html"
 
     def get_context_data(self, **kwargs):
         """

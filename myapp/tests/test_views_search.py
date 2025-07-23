@@ -7,7 +7,7 @@ class SearchPlaceViewTest(TestCase):
     # テストのセットアップ
     def setUp(self):
         self.client = Client()
-        self.url = reverse("search_place")
+        self.url = reverse("myapp:search_place")
 
     # 場所検索ビューが成功するケースのテスト
     @patch("myapp.views.search_views.urllib.request.urlopen")

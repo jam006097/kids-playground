@@ -22,7 +22,7 @@ class TemplateRenderTest(TestCase):
         """
         GETリクエストに対してlogin.htmlが正しくレンダリングされるかテスト
         """
-        response = self.client.get(reverse("login"))
+        response = self.client.get(reverse("myapp:login"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "registration/login.html")
         soup = BeautifulSoup(response.content, "html.parser")
@@ -32,7 +32,7 @@ class TemplateRenderTest(TestCase):
         """
         GETリクエストに対してregister.htmlが正しくレンダリングされるかテスト
         """
-        response = self.client.get(reverse("register"))
+        response = self.client.get(reverse("myapp:register"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "registration/register.html")
         soup = BeautifulSoup(response.content, "html.parser")
@@ -43,7 +43,7 @@ class TemplateRenderTest(TestCase):
         お気に入り状態に応じてボタンのテキストが正しく表示されるかテスト
         """
         self.client.login(username="testuser", password="password")
-        response = self.client.get(reverse("index"))
+        response = self.client.get(reverse("myapp:index"))
         self.assertEqual(response.status_code, 200)
 
         soup = BeautifulSoup(response.content, "html.parser")
@@ -60,7 +60,7 @@ class TemplateRenderTest(TestCase):
         """
         未ログインユーザーにはお気に入りボタンが無効化されているかテスト
         """
-        response = self.client.get(reverse("index"))
+        response = self.client.get(reverse("myapp:index"))
         self.assertEqual(response.status_code, 200)
 
         soup = BeautifulSoup(response.content, "html.parser")

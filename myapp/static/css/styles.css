@@ -1,3 +1,7 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
 .highlight {
     background-color: yellow;
 }
@@ -15,4 +19,27 @@
     display: block; /* ボタンをブロック要素にする */
     width: 100%;    /* ボタンの幅を100%にする */
     margin-bottom: 10px; /* ボタン間の余白を設定 */
+}
+
+/* Header */
+.navbar-brand {
+    font-weight: bold;
+}
+
+.nav-link {
+    color: #333;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: #007bff;
+}
+
+/* Footer */
+footer a {
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
 }

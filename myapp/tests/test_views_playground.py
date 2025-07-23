@@ -7,7 +7,7 @@ class PlaygroundListViewTest(TestCase):
     # テストのセットアップ
     def setUp(self):
         self.client = Client()
-        self.url = reverse("index")
+        self.url = reverse("myapp:index")
         Playground.objects.create(
             name="Test Park 1", address="CityA", phone="123-456-7890"
         )
@@ -21,6 +21,7 @@ class PlaygroundListViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "playgrounds/list.html")
         self.assertEqual(len(response.context["playgrounds"]), 2)
+        self.assertNotContains(response, 'id="mypage-tab"')
 
     # 都市フィルタ付きで公園リストビューが正常に表示されることをテスト
     def test_playground_list_view_with_city_filter(self):

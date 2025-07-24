@@ -37,5 +37,6 @@ class AuthViewsTest(TestCase):
     # ユーザーが正常にログアウトできることをテスト
     def test_user_logout_view(self):
         self.client.login(**self.user_data)
-        response = self.client.post(self.logout_url)
-        self.assertRedirects(response, self.login_url)
+        response = self.client.post(self.logout_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["user"].is_authenticated)

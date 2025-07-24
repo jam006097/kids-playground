@@ -2,7 +2,11 @@ from django.urls import path
 from myapp.views.playground_views import PlaygroundListView
 from myapp.views.search_views import SearchPlaceView
 from myapp.views.auth_views import UserLoginView, UserLogoutView, UserRegisterView
-from myapp.views.favorite_views import AddFavoriteView, RemoveFavoriteView, FavoriteListView
+from myapp.views.favorite_views import (
+    AddFavoriteView,
+    RemoveFavoriteView,
+    FavoriteListView,
+)
 from myapp.views.review_views import AddReviewView, ReviewListView
 
 app_name = "myapp"

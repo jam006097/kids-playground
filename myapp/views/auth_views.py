@@ -1,35 +1,9 @@
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from myapp.models import Playground, Favorite, Review
-import urllib.request
-import urllib.parse
-import json
-import logging
-import os
-from dotenv import load_dotenv
 from django.contrib.auth import logout
 from django.shortcuts import redirect
-from django.views.generic import ListView, View, CreateView, TemplateView
-from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-
-# .envファイルから環境変数を読み込む
-load_dotenv()
-
-# APIのURLとGoogle Maps APIキーを環境変数から取得
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-
-# ロギングの設定
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s",
-    handlers=[
-        logging.FileHandler("app.log"),  # ログをファイルに保存
-        logging.StreamHandler(),  # コンソールにもログを表示
-    ],
-)
+from django.views.generic import CreateView
+from django.contrib.auth.views import LoginView, LogoutView
 
 
 class UserLoginView(LoginView):

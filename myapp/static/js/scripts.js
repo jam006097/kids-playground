@@ -174,43 +174,46 @@ function initFavoritesMap() {
 
     // お気に入り施設のマーカーとinfowindowを管理する配列（自動制御は行わない）
     var favMarkers = [];
-    var localFavorites = getLocalFavorites();
-    localFavorites.forEach(function(playground) {
-        var geocoder = new google.maps.Geocoder();
-        geocoder.geocode({'address': playground.address}, function(results, status) {
-            if (status === 'OK') {
-                var marker = new google.maps.Marker({
-                    map: map,
-                    position: results[0].geometry.location,
-                    title: playground.name
-                });
-                var infowindow = new google.maps.InfoWindow({
-                    content: `
-                    <div>
-                        <strong>${playground.name}</strong><br>
-                        住所: ${playground.address}<br>
-                        電話番号: ${playground.phone}<br>
-                        <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" onclick="toggleFavoriteFromFavorites(this, '${playground.id}')">
-                            お気に入り解除
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" data-playground-id="${playground.id}" data-playground-name="${playground.name}">
-                            口コミを書く
-                        </button>
-                        <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
-                    </div>
-                    `,
-                    disableAutoPan: true
-                });
-                // 初期表示時は infowindow を開かず、マーカークリック時にのみ表示する
-                marker.addListener('click', function() {
-                    infowindow.open(map, marker);
-                });
-                favMarkers.push({marker: marker, infowindow: infowindow});
-            } else {
-                console.error('Geocode error: ' + status);
-            }
+    // テンプレートから渡される playgrounds_json を使用
+    if (typeof playgrounds_json !== 'undefined' && playgrounds_json) {
+        var favorites = JSON.parse(playgrounds_json);
+        favorites.forEach(function(playground) {
+            var geocoder = new google.maps.Geocoder();
+            geocoder.geocode({'address': playground.address}, function(results, status) {
+                if (status === 'OK') {
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: results[0].geometry.location,
+                        title: playground.name
+                    });
+                    var infowindow = new google.maps.InfoWindow({
+                        content: `
+                        <div>
+                            <strong>${playground.name}</strong><br>
+                            住所: ${playground.address}<br>
+                            電話番号: ${playground.phone}<br>
+                            <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" onclick="toggleFavoriteFromFavorites(this, '${playground.id}')">
+                                お気に入り解除
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" data-playground-id="${playground.id}" data-playground-name="${playground.name}">
+                                口コミを書く
+                            </button>
+                            <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
+                        </div>
+                        `,
+                        disableAutoPan: true
+                    });
+                    // 初期表示時は infowindow を開かず、マーカークリック時にのみ表示する
+                    marker.addListener('click', function() {
+                        infowindow.open(map, marker);
+                    });
+                    favMarkers.push({marker: marker, infowindow: infowindow});
+                } else {
+                    console.error('Geocode error: ' + status);
+                }
+            });
         });
-    });
+    }
 }
 
 /**
@@ -227,76 +230,58 @@ function handleLocationError(browserHasGeolocation, map, center) {
 }
 
 // お気に入り情報を取得、保存、表示する関数を追加
-function getLocalFavorites() {
-    var data = localStorage.getItem("favoriteFacilities");
-    return data ? JSON.parse(data) : [];
-}
 
-function saveLocalFavorites(favorites) {
-    localStorage.setItem("favoriteFacilities", JSON.stringify(favorites));
-}
 
 function updateFavoritesDisplay() {
-    // MyPageタブ内のお気に入り一覧リストを更新する
-    var favorites = getLocalFavorites();
-    var favoritesHtml = "";
-    favorites.forEach(function(playground) {
-        favoritesHtml += '<div class="col-md-4">';
-        favoritesHtml += '  <div class="card mb-4 shadow-sm">';
-        favoritesHtml += '    <div class="card-body">';
-        favoritesHtml += '      <h5 class="card-title">' + playground.name + '</h5>';
-        favoritesHtml += '      <p class="card-text">' + playground.address + '</p>';
-        favoritesHtml += '      <p class="card-text">' + playground.phone + '</p>';
-        // お気に入り切替ボタン（mypage用）
-        favoritesHtml += '      <button class="btn btn-outline-success btn-sm" data-playground-id="' + playground.id + '" onclick="toggleFavoriteFromFavorites(this, \'' + playground.id + '\')">お気に入り解除</button>';
-        // 口コミを書くボタン（モーダルを起動）
-        favoritesHtml += '      <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" data-playground-id="' + playground.id + '" data-playground-name="' + playground.name + '">口コミを書く</button>';
-        // 口コミを見るボタン
-        favoritesHtml += '      <a href="/playground/' + playground.id + '/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>';
-        favoritesHtml += '    </div>';
-        favoritesHtml += '  </div>';
-        favoritesHtml += '</div>';
-    });
-    var container = document.querySelector("#mypage .row");
-    if (container) {
-        container.innerHTML = favoritesHtml;
+    // myapp/views/favorite_views.py から渡される playgrounds_json を使用
+    // この変数はテンプレート内で定義されていることを想定
+    if (typeof playgrounds_json !== 'undefined' && playgrounds_json) {
+        var favorites = JSON.parse(playgrounds_json);
+        var favoritesHtml = "";
+        favorites.forEach(function(playground) {
+            favoritesHtml += '<div class="col-md-4">';
+            favoritesHtml += '  <div class="card mb-4 shadow-sm">';
+            favoritesHtml += '    <div class="card-body">';
+            favoritesHtml += '      <h5 class="card-title">' + playground.name + '</h5>';
+            favoritesHtml += '      <p class="card-text">' + playground.address + '</p>';
+            favoritesHtml += '      <p class="card-text">' + playground.phone + '</p>';
+            // お気に入り切替ボタン（mypage用）
+            favoritesHtml += '      <button class="btn btn-outline-success btn-sm" data-playground-id="' + playground.id + '" onclick="toggleFavoriteFromFavorites(this, \'' + playground.id + '\')">お気に入り解除</button>';
+            // 口コミを書くボタン（モーダルを起動）
+            favoritesHtml += '      <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" data-playground-id="' + playground.id + '" data-playground-name="' + playground.name + '">口コミを書く</button>';
+            // 口コミを見るボタン
+            favoritesHtml += '      <a href="/playground/' + playground.id + '/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>';
+            favoritesHtml += '    </div>';
+            favoritesHtml += '  </div>';
+            favoritesHtml += '</div>';
+        });
+        var container = document.querySelector("#mypage .row");
+        if (container) {
+            container.innerHTML = favoritesHtml;
+        }
     }
 }
 
 // マイページ用：お気に入り切替処理（MyPageタブの施設詳細用）
 function toggleFavoriteFromFavorites(button, playgroundId) {
-    // ボタンが無効化されている場合は何もしない
-    if (button.disabled) {
-        return;
+    toggleFavorite(button, playgroundId);
+}
+
+// CSRFトークンを取得するヘルパー関数
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
     }
-
-    var favorites = getLocalFavorites();
-    var foundIndex = favorites.findIndex(function(item) {
-        return item.id.toString() === playgroundId.toString();
-    });
-
-    if (foundIndex !== -1) {
-        // 既にお気に入りの場合、削除
-        favorites.splice(foundIndex, 1);
-        button.textContent = 'お気に入りに追加';
-    } else {
-        // お気に入りに追加（通常はここには来ないが保険として）
-        var facility = playgrounds.find(function(item) {
-            return item.id.toString() === playgroundId.toString();
-        });
-        if (!facility) return;
-        favorites.push({
-            id: facility.id,
-            name: facility.name,
-            address: facility.address,
-            phone: facility.phone
-        });
-        button.textContent = 'お気に入り解除';
-    }
-
-    saveLocalFavorites(favorites);
-    updateFavoritesDisplay();
-    updateFavoriteButtons();
+    return cookieValue;
 }
 
 function toggleFavorite(button, playgroundId) {
@@ -305,129 +290,93 @@ function toggleFavorite(button, playgroundId) {
         return;
     }
 
-    // playgroundsは index.html で定義されている全施設の配列
-    var facility = playgrounds.find(function(item) {
-        return item.id.toString() === playgroundId.toString();
-    });
-    if (!facility) return;
+    const csrfToken = getCookie('csrftoken');
+    const isFavorite = button.textContent.includes('解除'); // 現在の状態をテキストで判断
 
-    var favorites = getLocalFavorites();
-    var foundIndex = favorites.findIndex(function(item) {
-        return item.id.toString() === playgroundId.toString();
-    });
-
-    if (foundIndex !== -1) {
-        // 既にお気に入りの場合、削除
-        favorites.splice(foundIndex, 1);
-        button.textContent = 'お気に入りに追加';
+    let url = '';
+    if (isFavorite) {
+        url = '/remove_favorite/';
     } else {
-        // お気に入りに追加（必要な項目を含める）
-        var favItem = {
-            id: facility.id,
-            name: facility.name,
-            address: facility.address,
-            phone: facility.phone
-        };
-        favorites.push(favItem);
-        button.textContent = 'お気に入り解除';
+        url = '/add_favorite/';
     }
-    saveLocalFavorites(favorites);
-    updateFavoritesDisplay();
+
+    // ボタンを無効化して二重クリックを防ぐ
+    button.disabled = true;
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrfToken,
+        },
+        body: `playground_id=${playgroundId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'ok') {
+            if (isFavorite) {
+                button.textContent = 'お気に入りに追加';
+            } else {
+                button.textContent = 'お気に入り解除';
+            }
+            // お気に入り一覧ページにいる場合は、表示を更新
+            if (window.location.pathname.includes('/favorites/')) {
+                location.reload(); // ページをリロードして最新のお気に入り状態を反映
+            }
+        } else {
+            alert('操作に失敗しました。');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('エラーが発生しました。');
+    })
+    .finally(() => {
+        button.disabled = false; // ボタンを再度有効化
+    });
 }
 
 function toggleFavoriteFromMap(playgroundId, button) {
-    // ボタンが無効化されている場合は何もしない
-    if (button.disabled) {
-        return;
-    }
-
-    // playgrounds 配列から対象の施設を検索
-    var facility = playgrounds.find(function(item) {
-        return item.id.toString() === playgroundId.toString();
-    });
-    if (!facility) return;
-
-    // ローカルストレージからお気に入りを取得
-    var favorites = getLocalFavorites();
-    var foundIndex = favorites.findIndex(function(item) {
-        return item.id.toString() === playgroundId.toString();
-    });
-
-    if (foundIndex !== -1) {
-        // 既にお気に入りの場合、削除
-        favorites.splice(foundIndex, 1);
-        button.textContent = 'お気に入りに追加';
-    } else {
-        // お気に入りに追加
-        var favItem = {
-            id: facility.id,
-            name: facility.name,
-            address: facility.address,
-            phone: facility.phone
-        };
-        favorites.push(favItem);
-        button.textContent = 'お気に入り解除';
-    }
-
-    // ローカルストレージに保存
-    saveLocalFavorites(favorites);
-
-    // お気に入り表示を更新
-    updateFavoritesDisplay();
+    toggleFavorite(button, playgroundId);
 }
 
 function updateFavoriteButtonsOnMap() {
-    // ローカルストレージからお気に入りを取得
-    var favorites = getLocalFavorites();
+    // myapp/views/favorite_views.py から渡される favorite_ids を使用
+    // この変数はテンプレート内で定義されていることを想定
+    if (typeof favorite_ids !== 'undefined' && favorite_ids) {
+        // 地図上のボタンを更新
+        document.querySelectorAll('.btn-outline-success[data-playground-id]').forEach(function(button) {
+            var playgroundId = button.getAttribute('data-playground-id');
+            var isFavorite = favorite_ids.includes(playgroundId);
 
-    // 地図上のボタンを更新
-    document.querySelectorAll('.btn-outline-success[data-playground-id]').forEach(function(button) {
-        var playgroundId = button.getAttribute('data-playground-id');
-        var isFavorite = favorites.some(function(item) {
-            return item.id.toString() === playgroundId;
+            if (isFavorite) {
+                button.textContent = 'お気に入り解除';
+            } else {
+                button.textContent = 'お気に入りに追加';
+            }
         });
-
-        if (isFavorite) {
-            button.textContent = 'お気に入り解除';
-        } else {
-            button.textContent = 'お気に入りに追加';
-        }
-    });
+    }
 }
 
 /**
  * お気に入りボタンの状態を更新する関数。
  */
 function updateFavoriteButtons() {
-    var favorites = getLocalFavorites(); // ローカルストレージからお気に入りを取得
+    // myapp/views/favorite_views.py から渡される favorite_ids を使用
+    // この変数はテンプレート内で定義されていることを想定
+    if (typeof favorite_ids !== 'undefined' && favorite_ids) {
+        // 一覧画面のボタンを更新
+        document.querySelectorAll('.btn-outline-success[data-playground-id]').forEach(function(button) {
+            var playgroundId = button.getAttribute('data-playground-id');
+            var isFavorite = favorite_ids.includes(playgroundId);
 
-    // 一覧画面のボタンを更新
-    document.querySelectorAll('.btn-outline-success').forEach(function(button) {
-        var playgroundId = button.getAttribute('onclick').match(/'(\d+)'/)[1]; // ボタンのplaygroundIdを取得
-        var isFavorite = favorites.some(function(item) {
-            return item.id.toString() === playgroundId;
+            if (isFavorite) {
+                button.textContent = 'お気に入り解除';
+            } else {
+                button.textContent = 'お気に入りに追加';
+            }
         });
-
-        if (isFavorite) {
-            button.textContent = 'お気に入り解除';
-        } else {
-            button.textContent = 'お気に入りに追加';
-        }
-    });
-
-    // 地図上のボタンを更新
-    document.querySelectorAll('.btn-outline-success[data-playground-id]').forEach(function(button) {
-        var playgroundId = button.getAttribute('data-playground-id');
-        var isFavorite = favorites.some(function(item) {
-            return item.id.toString() === playgroundId;
-        });
-
-        if (isFavorite) {
-            button.textContent = 'お気に入り解除';
-        } else {
-            button.textContent = 'お気に入りに追加';
-        }
-    });
+    }
 }
 
 // タブがアクティブになった時に地図を初期化

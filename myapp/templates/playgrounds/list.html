@@ -97,8 +97,14 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- Google Maps APIの読み込み -->
-<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
+<!-- Leaflet.jsのCSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+crossorigin=""/>
+<!-- Leaflet.jsのJS -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+crossorigin=""></script>
 <script>
     // Djangoテンプレートから渡されたデータをJavaScriptで使用できるようにする
     var playgrounds = JSON.parse('{{ playgrounds_json|escapejs }}');

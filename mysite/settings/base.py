@@ -83,5 +83,4 @@ LOGOUT_REDIRECT_URL = "myapp:login"
 # cron設定
 CRONJOBS = [("0 0 1 * *", "myapp.management.commands.fetch_playgrounds")]
 
-# APIキーなど
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+

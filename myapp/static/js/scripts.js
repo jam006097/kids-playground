@@ -1,182 +1,100 @@
 /**
- * Google Mapsを初期化し、地図上に子育て支援施設のマーカーを表示する関数。
+ * Leaflet.jsを使用して地図を初期化し、施設マーカーを表示する関数。
  */
 function initMap() {
-    // 定数の定義
-    const KAGOSHIMA_CENTER = {lat: 31.5602, lng: 130.5581};
-    const DEFAULT_ZOOM_LEVEL = 14;
-    const MIN_ZOOM_LEVEL_FOR_INFO_WINDOW = 13;
+    const KAGOSHIMA_CENTER = [31.5602, 130.5581];
+    const DEFAULT_ZOOM_LEVEL = 10;
 
-    // 地図の初期設定
-    var mapOptions = {
-        zoom: DEFAULT_ZOOM_LEVEL,
-        center: KAGOSHIMA_CENTER  // デフォルトは鹿児島県の中心座標
-    };
+    // 地図が既に初期化されている場合は削除
+    if (window.mapInstance) {
+        window.mapInstance.remove();
+    }
 
-    var map = new google.maps.Map(document.getElementById('map-container'), mapOptions);
+    // 地図を初期化
+    window.mapInstance = L.map('map-container').setView(KAGOSHIMA_CENTER, DEFAULT_ZOOM_LEVEL);
 
-    // 各施設の緯度経度を使用して、地図上にマーカーを追加
-    var markers = [];
+    // OpenStreetMapのタイルレイヤーを追加
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(window.mapInstance);
+
+    // マーカーを追加
     playgrounds.forEach(function(playground) {
-        // 緯度経度情報が存在するか確認
         if (playground.latitude && playground.longitude) {
-            var position = {lat: parseFloat(playground.latitude), lng: parseFloat(playground.longitude)};
+            var position = [parseFloat(playground.latitude), parseFloat(playground.longitude)];
+            var marker = L.marker(position).addTo(window.mapInstance);
 
-            // マーカーを地図上に追加
-            var marker = new google.maps.Marker({
-                map: map,
-                position: position,
-                title: playground.name
-            });
-
-                // 情報ウィンドウの内容を設定
-                var infowindow = new google.maps.InfoWindow({
-                    content: `
-                    <div>
-                        <strong>${playground.name}</strong><br>
-                        住所: ${playground.address}<br>
-                        電話番号: ${playground.phone}<br>
-                        <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" onclick="toggleFavoriteFromMap('${playground.id}', this)">
-                            お気に入りに追加
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" 
-                                data-playground-id="${playground.id}" data-playground-name="${playground.name}">
-                            口コミを書く
-                        </button>
-                        <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
-                    </div>
-                `,
-                    disableAutoPan: true  // 情報ウィンドウを開いた際に表示位置が変更されないようにする
-                });
-
-                // マーカーをクリックしたときに情報ウィンドウを表示
-                marker.addListener('click', function() {
-                    infowindow.open(map, marker);
-                });
-
-                markers.push({marker: marker, infowindow: infowindow});
-            }
-        });
-
-    // ズームレベルが変更されたときのイベントリスナーを追加
-    map.addListener('zoom_changed', function() {
-        var zoomLevel = map.getZoom();
-        markers.forEach(function(item) {
-            if (zoomLevel <= MIN_ZOOM_LEVEL_FOR_INFO_WINDOW) {
-                item.infowindow.close();
-            } else if (item.isInfoWindowOpen) {
-                item.infowindow.open(map, item.marker);
-            }
-        });
+            // ポップアップの内容
+            var popupContent = `
+                <div>
+                    <strong>${playground.name}</strong><br>
+                    住所: ${playground.address}<br>
+                    電話番号: ${playground.phone}<br>
+                    <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" onclick="toggleFavoriteFromMap('${playground.id}', this)">
+                        お気に入りに追加
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" 
+                            data-playground-id="${playground.id}" data-playground-name="${playground.name}">
+                        口コミを書く
+                    </button>
+                    <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
+                </div>
+            `;
+            marker.bindPopup(popupContent);
+        }
     });
-    // 地図のマーカーがすべて描画された後にボタンの状態を更新
+
+    // ボタンの状態を更新
     setTimeout(updateFavoriteButtonsOnMap, 500);
 }
 
 /**
- * マイページタブ用にGoogle Mapsを初期化し、地図上にお気に入り施設のマーカーを表示する関数。
+ * Leaflet.jsを使用してお気に入り施設の地図を初期化する関数。
  */
 function initFavoritesMap() {
-    const KAGOSHIMA_CENTER = {lat: 31.5602, lng: 130.5581};
+    const KAGOSHIMA_CENTER = [31.5602, 130.5581];
     const DEFAULT_ZOOM_LEVEL = 10;
 
-    var mapOptions = {
-        zoom: DEFAULT_ZOOM_LEVEL,
-        center: KAGOSHIMA_CENTER
-    };
-
-    var map = new google.maps.Map(document.getElementById('mypage-map-container'), mapOptions);
-
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var userLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-            map.setCenter(userLocation);
-
-            var geocoder = new google.maps.Geocoder();
-            geocoder.geocode({'location': userLocation}, function(results, status) {
-                if (status === 'OK') {
-                    var addressComponents = results[0].address_components;
-                    var isKagoshima = addressComponents.some(function(component) {
-                        return component.long_name === '鹿児島県';
-                    });
-                    if (!isKagoshima) {
-                        map.setCenter(KAGOSHIMA_CENTER);
-                    }
-                } else {
-                    console.error('Geocode was not successful for the following reason: ' + status);
-                }
-            });
-        }, function() {
-            handleLocationError(true, map, KAGOSHIMA_CENTER);
-        });
-    } else {
-        handleLocationError(false, map, KAGOSHIMA_CENTER);
+    if (window.favMapInstance) {
+        window.favMapInstance.remove();
     }
 
-    // お気に入り施設のマーカーとinfowindowを管理する配列（自動制御は行わない）
-    var favMarkers = [];
-    // テンプレートから渡される playgrounds_json を使用
+    var map = L.map('mypage-map-container').setView(KAGOSHIMA_CENTER, DEFAULT_ZOOM_LEVEL);
+    window.favMapInstance = map;
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
     if (typeof playgrounds_json !== 'undefined' && playgrounds_json) {
         var favorites = JSON.parse(playgrounds_json);
         favorites.forEach(function(playground) {
-            // 緯度経度情報が存在するか確認
             if (playground.latitude && playground.longitude) {
-                var position = {lat: parseFloat(playground.latitude), lng: parseFloat(playground.longitude)};
-
-                var marker = new google.maps.Marker({
-                    map: map,
-                    position: position,
-                    title: playground.name
-                });
-                    var infowindow = new google.maps.InfoWindow({
-                        content: `
-                        <div>
-                            <strong>${playground.name}</strong><br>
-                            住所: ${playground.address}<br>
-                            電話番号: ${playground.phone}<br>
-                            <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" onclick="toggleFavoriteFromFavorites(this, '${playground.id}')">
-                                お気に入り解除
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" data-playground-id="${playground.id}" data-playground-name="${playground.name}">
-                                口コミを書く
-                            </button>
-                            <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
-                        </div>
-                        `,
-                        disableAutoPan: true
-                    });
-                    // 初期表示時は infowindow を開かず、マーカークリック時にのみ表示する
-                    marker.addListener('click', function() {
-                        infowindow.open(map, marker);
-                    });
-                    favMarkers.push({marker: marker, infowindow: infowindow});
-                }
-            });
+                var position = [parseFloat(playground.latitude), parseFloat(playground.longitude)];
+                var marker = L.marker(position).addTo(map);
+                var popupContent = `
+                    <div>
+                        <strong>${playground.name}</strong><br>
+                        住所: ${playground.address}<br>
+                        電話番号: ${playground.phone}<br>
+                        <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" onclick="toggleFavoriteFromFavorites(this, '${playground.id}')">
+                            お気に入り解除
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" data-playground-id="${playground.id}" data-playground-name="${playground.name}">
+                            口コミを書く
+                        </button>
+                        <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
+                    </div>
+                `;
+                marker.bindPopup(popupContent);
+            }
+        });
     }
 }
 
-/**
- * 位置情報の取得に失敗した場合のエラーハンドリング関数。
- * @param {boolean} browserHasGeolocation - ブラウザが位置情報をサポートしているかどうか
- * @param {object} map - Google Mapsオブジェクト
- * @param {object} center - デフォルトの中心座標
- */
-function handleLocationError(browserHasGeolocation, map, center) {
-    console.error(browserHasGeolocation ?
-                  'Error: The Geolocation service failed.' :
-                  'Error: Your browser doesn\'t support geolocation.');
-    map.setCenter(center);
-}
 
 // お気に入り情報を取得、保存、表示する関数を追加
-
-
 function updateFavoritesDisplay() {
-    // myapp/views/favorite_views.py から渡される playgrounds_json を使用
-    // この変数はテンプレート内で定義されていることを想定
     if (typeof playgrounds_json !== 'undefined' && playgrounds_json) {
         var favorites = JSON.parse(playgrounds_json);
         var favoritesHtml = "";
@@ -187,11 +105,8 @@ function updateFavoritesDisplay() {
             favoritesHtml += '      <h5 class="card-title">' + playground.name + '</h5>';
             favoritesHtml += '      <p class="card-text">' + playground.address + '</p>';
             favoritesHtml += '      <p class="card-text">' + playground.phone + '</p>';
-            // お気に入り切替ボタン（mypage用）
             favoritesHtml += '      <button class="btn btn-outline-success btn-sm" data-playground-id="' + playground.id + '" onclick="toggleFavoriteFromFavorites(this, \'' + playground.id + '\')">お気に入り解除</button>';
-            // 口コミを書くボタン（モーダルを起動）
             favoritesHtml += '      <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" data-playground-id="' + playground.id + '" data-playground-name="' + playground.name + '">口コミを書く</button>';
-            // 口コミを見るボタン
             favoritesHtml += '      <a href="/playground/' + playground.id + '/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>';
             favoritesHtml += '    </div>';
             favoritesHtml += '  </div>';
@@ -204,19 +119,16 @@ function updateFavoritesDisplay() {
     }
 }
 
-// マイページ用：お気に入り切替処理（MyPageタブの施設詳細用）
 function toggleFavoriteFromFavorites(button, playgroundId) {
     toggleFavorite(button, playgroundId);
 }
 
-// CSRFトークンを取得するヘルパー関数
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
         for (let i = 0; i < cookies.length; i++) {
             const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
             if (cookie.substring(0, name.length + 1) === (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                 break;
@@ -227,22 +139,15 @@ function getCookie(name) {
 }
 
 function toggleFavorite(button, playgroundId) {
-    // ボタンが無効化されている場合は何もしない
     if (button.disabled) {
         return;
     }
 
     const csrfToken = getCookie('csrftoken');
-    const isFavorite = button.textContent.includes('解除'); // 現在の状態をテキストで判断
+    const isFavorite = button.textContent.includes('解除');
 
-    let url = '';
-    if (isFavorite) {
-        url = '/remove_favorite/';
-    } else {
-        url = '/add_favorite/';
-    }
+    let url = isFavorite ? '/remove_favorite/' : '/add_favorite/';
 
-    // ボタンを無効化して二重クリックを防ぐ
     button.disabled = true;
 
     fetch(url, {
@@ -256,14 +161,9 @@ function toggleFavorite(button, playgroundId) {
     .then(response => response.json())
     .then(data => {
         if (data.status === 'ok') {
-            if (isFavorite) {
-                button.textContent = 'お気に入りに追加';
-            } else {
-                button.textContent = 'お気に入り解除';
-            }
-            // お気に入り一覧ページにいる場合は、表示を更新
+            button.textContent = isFavorite ? 'お気に入りに追加' : 'お気に入り解除';
             if (window.location.pathname.includes('/favorites/')) {
-                location.reload(); // ページをリロードして最新のお気に入り状態を反映
+                location.reload();
             }
         } else {
             alert('操作に失敗しました。');
@@ -274,7 +174,7 @@ function toggleFavorite(button, playgroundId) {
         alert('エラーが発生しました。');
     })
     .finally(() => {
-        button.disabled = false; // ボタンを再度有効化
+        button.disabled = false;
     });
 }
 
@@ -283,96 +183,43 @@ function toggleFavoriteFromMap(playgroundId, button) {
 }
 
 function updateFavoriteButtonsOnMap() {
-    // myapp/views/favorite_views.py から渡される favorite_ids を使用
-    // この変数はテンプレート内で定義されていることを想定
     if (typeof favorite_ids !== 'undefined' && favorite_ids) {
-        // 地図上のボタンを更新
         document.querySelectorAll('.btn-outline-success[data-playground-id]').forEach(function(button) {
             var playgroundId = button.getAttribute('data-playground-id');
             var isFavorite = favorite_ids.includes(playgroundId);
-
-            if (isFavorite) {
-                button.textContent = 'お気に入り解除';
-            } else {
-                button.textContent = 'お気に入りに追加';
-            }
+            button.textContent = isFavorite ? 'お気に入り解除' : 'お気に入りに追加';
         });
     }
 }
 
-/**
- * お気に入りボタンの状態を更新する関数。
- */
 function updateFavoriteButtons() {
-    // myapp/views/favorite_views.py から渡される favorite_ids を使用
-    // この変数はテンプレート内で定義されていることを想定
     if (typeof favorite_ids !== 'undefined' && favorite_ids) {
-        // 一覧画面のボタンを更新
         document.querySelectorAll('.btn-outline-success[data-playground-id]').forEach(function(button) {
             var playgroundId = button.getAttribute('data-playground-id');
             var isFavorite = favorite_ids.includes(playgroundId);
-
-            if (isFavorite) {
-                button.textContent = 'お気に入り解除';
-            } else {
-                button.textContent = 'お気に入りに追加';
-            }
+            button.textContent = isFavorite ? 'お気に入り解除' : 'お気に入りに追加';
         });
     }
 }
-
-// タブがアクティブになった時に地図を初期化
-$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-    if (e.target.id === 'map-tab') {
-        initMap();
-
-        // 地図タブがアクティブになったときにイベントリスナーを再登録
-        $('#reviewModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); // ボタンを取得
-            var playgroundId = button.data('playground-id');
-            var playgroundName = button.data('playground-name');
-
-            var modal = $(this);
-            modal.find('#playgroundId').val(playgroundId);
-            modal.find('.modal-title').text(playgroundName + 'への口コミ');
-        });
-    }
-    if (e.target.id === 'mypage-tab') {
-        initFavoritesMap();
-    }
-});
-
-// ページ読み込み時にお気に入り表示を更新
-document.addEventListener("DOMContentLoaded", function(){
-    updateFavoritesDisplay();
-    updateFavoriteButtons();
-});
 
 document.addEventListener("DOMContentLoaded", function () {
-    // 地図タブがアクティブになったときにイベントリスナーを再登録
+    // タブがアクティブになった時に地図を初期化
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         if (e.target.id === 'map-tab') {
             initMap();
-            updateFavoriteButtonsOnMap(); // 初期表示時にボタンの状態を更新
-
-            $('#reviewModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget); // ボタンを取得
-                var playgroundId = button.data('playground-id');
-                var playgroundName = button.data('playground-name');
-
-                var modal = $(this);
-                modal.find('#playgroundId').val(playgroundId);
-                modal.find('.modal-title').text(playgroundName + 'への口コミ');
-            });
         }
     });
 
+    // お気に入りページの地図を初期化
+    if (document.getElementById('mypage-map-container')) {
+        initFavoritesMap();
+    }
+
     // モーダルが開かれるときに施設情報を設定
     $('#reviewModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget); // ボタンを取得
+        var button = $(event.relatedTarget);
         var playgroundId = button.data('playground-id');
         var playgroundName = button.data('playground-name');
-
         var modal = $(this);
         modal.find('#playgroundId').val(playgroundId);
         modal.find('.modal-title').text(playgroundName + 'への口コミ');
@@ -380,18 +227,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 口コミフォームの送信処理
     $('#reviewForm').on('submit', function (event) {
-        event.preventDefault(); // デフォルトの送信を防止
-
-        var formData = $(this).serialize(); // フォームデータを取得
+        event.preventDefault();
+        var formData = $(this).serialize();
         var playgroundId = $('#playgroundId').val();
-
         $.ajax({
             url: `/playground/${playgroundId}/add_review/`,
             method: 'POST',
             data: formData,
             success: function (response) {
-                alert(response.message); // 成功メッセージを表示
-                $('#reviewModal').modal('hide'); // モーダルを閉じる
+                alert(response.message);
+                $('#reviewModal').modal('hide');
             },
             error: function (xhr) {
                 alert('口コミの投稿に失敗しました。');
@@ -399,9 +244,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // ページ読み込み時にお気に入り表示を更新
+    // ページ読み込み時にお気に入り表示とボタンを更新
     updateFavoritesDisplay();
     updateFavoriteButtons();
-    updateFavoriteButtonsOnMap(); // 初期表示時に地図上のボタンの状態を更新
-
+    updateFavoriteButtonsOnMap();
 });

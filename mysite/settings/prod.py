@@ -15,7 +15,6 @@ from .base import (
     STATIC_ROOT,
     DEFAULT_AUTO_FIELD,
     CRONJOBS,
-    GOOGLE_MAPS_API_KEY,
 )
 import os
 

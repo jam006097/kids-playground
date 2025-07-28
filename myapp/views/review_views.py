@@ -15,9 +15,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # .envファイルから環境変数を読み込む
 load_dotenv()
 
-# APIのURLとGoogle Maps APIキーを環境変数から取得
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
-
 # ロギングの設定
 logging.basicConfig(
     level=logging.INFO,

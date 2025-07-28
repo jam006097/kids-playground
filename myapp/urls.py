@@ -1,6 +1,5 @@
 from django.urls import path
 from myapp.views.playground_views import PlaygroundListView
-from myapp.views.search_views import SearchPlaceView
 from myapp.views.auth_views import UserLoginView, UserLogoutView, UserRegisterView
 from myapp.views.favorite_views import (
     AddFavoriteView,
@@ -13,7 +12,6 @@ app_name = "myapp"
 
 urlpatterns = [
     path("", PlaygroundListView.as_view(), name="index"),
-    path("search_place", SearchPlaceView.as_view(), name="search_place"),
     path("login/", UserLoginView.as_view(), name="login"),
     path("logout/", UserLogoutView.as_view(), name="logout"),
     path("register/", UserRegisterView.as_view(), name="register"),

@@ -42,7 +42,7 @@
             {% endfor %}
         </div>
         <h2>お気に入りの施設地図</h2>
-        <div id="mypage-map-container" class="mb-4" style="height: 500px; width: 100%;"></div>
+        <div id="mypage-map-container" class="mb-4" style="height: 800px; width: 100%;"></div>
     </div>
     
     <!-- モーダル要素をページ内に配置 -->
@@ -77,7 +77,14 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initFavoritesMap" async defer></script>
+    <!-- Leaflet.jsのCSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+    <!-- Leaflet.jsのJS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
     <script>
         var playgrounds_json = '{{ playgrounds_json|escapejs }}';
     </script>

@@ -15,42 +15,6 @@ function initMap() {
 
     var map = new google.maps.Map(document.getElementById('map-container'), mapOptions);
 
-    // 位置情報の利用を許可するか確認
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var userLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-
-            // ユーザーの位置情報を中心に設定
-            map.setCenter(userLocation);
-
-            // ユーザーの位置が鹿児島県外の場合、鹿児島県の中心座標に戻す
-            var geocoder = new google.maps.Geocoder();
-            geocoder.geocode({'location': userLocation}, function(results, status) {
-                if (status === 'OK') {
-                    var addressComponents = results[0].address_components;
-                    var isKagoshima = addressComponents.some(function(component) {
-                        return component.long_name === '鹿児島県';
-                    });
-
-                    if (!isKagoshima) {
-                        map.setCenter(KAGOSHIMA_CENTER);
-                    }
-                } else {
-                    console.error('Geocode was not successful for the following reason: ' + status);
-                }
-            });
-        }, function() {
-            // 位置情報の利用を許可しない場合、鹿児島県の中心座標を使用
-            handleLocationError(true, map, KAGOSHIMA_CENTER);
-        });
-    } else {
-        // ブラウザが位置情報をサポートしていない場合、鹿児島県の中心座標を使用
-        handleLocationError(false, map, KAGOSHIMA_CENTER);
-    }
-
     // 各施設の緯度経度を使用して、地図上にマーカーを追加
     var markers = [];
     playgrounds.forEach(function(playground) {
@@ -85,29 +49,12 @@ function initMap() {
                     disableAutoPan: true  // 情報ウィンドウを開いた際に表示位置が変更されないようにする
                 });
 
-                // 情報ウィンドウの状態を管理するフラグ
-                var isInfoWindowOpen = true;
-
-                // 情報ウィンドウを常に表示
-                infowindow.open(map, marker);
-
-                // domreadyイベントでお気に入りボタンの状態を更新する
-                google.maps.event.addListener(infowindow, 'domready', function () {
-                    updateFavoriteButtonsOnMap();
-                });
-
-                // 情報ウィンドウが閉じられたときのイベントリスナーを追加
-                google.maps.event.addListener(infowindow, 'closeclick', function () {
-                    isInfoWindowOpen = false;
-                });
-
                 // マーカーをクリックしたときに情報ウィンドウを表示
                 marker.addListener('click', function() {
                     infowindow.open(map, marker);
-                    isInfoWindowOpen = true;
                 });
 
-                markers.push({marker: marker, infowindow: infowindow, isInfoWindowOpen: isInfoWindowOpen});
+                markers.push({marker: marker, infowindow: infowindow});
             }
         });
 

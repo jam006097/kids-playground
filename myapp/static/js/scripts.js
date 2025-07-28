@@ -51,18 +51,19 @@ function initMap() {
         handleLocationError(false, map, KAGOSHIMA_CENTER);
     }
 
-    // 各施設の住所をジオコーディングし、地図上にマーカーを追加
+    // 各施設の緯度経度を使用して、地図上にマーカーを追加
     var markers = [];
     playgrounds.forEach(function(playground) {
-        var geocoder = new google.maps.Geocoder();
-        geocoder.geocode({'address': playground.address}, function(results, status) {
-            if (status === 'OK') {
-                // マーカーを地図上に追加
-                var marker = new google.maps.Marker({
-                    map: map,
-                    position: results[0].geometry.location,
-                    title: playground.name
-                });
+        // 緯度経度情報が存在するか確認
+        if (playground.latitude && playground.longitude) {
+            var position = {lat: parseFloat(playground.latitude), lng: parseFloat(playground.longitude)};
+
+            // マーカーを地図上に追加
+            var marker = new google.maps.Marker({
+                map: map,
+                position: position,
+                title: playground.name
+            });
 
                 // 情報ウィンドウの内容を設定
                 var infowindow = new google.maps.InfoWindow({
@@ -107,12 +108,8 @@ function initMap() {
                 });
 
                 markers.push({marker: marker, infowindow: infowindow, isInfoWindowOpen: isInfoWindowOpen});
-            } else {
-                console.error('Geocode was not successful for the following reason: ' + status);
-                alert('Geocode was not successful for the following reason: ' + status);
             }
         });
-    });
 
     // ズームレベルが変更されたときのイベントリスナーを追加
     map.addListener('zoom_changed', function() {
@@ -178,14 +175,15 @@ function initFavoritesMap() {
     if (typeof playgrounds_json !== 'undefined' && playgrounds_json) {
         var favorites = JSON.parse(playgrounds_json);
         favorites.forEach(function(playground) {
-            var geocoder = new google.maps.Geocoder();
-            geocoder.geocode({'address': playground.address}, function(results, status) {
-                if (status === 'OK') {
-                    var marker = new google.maps.Marker({
-                        map: map,
-                        position: results[0].geometry.location,
-                        title: playground.name
-                    });
+            // 緯度経度情報が存在するか確認
+            if (playground.latitude && playground.longitude) {
+                var position = {lat: parseFloat(playground.latitude), lng: parseFloat(playground.longitude)};
+
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: position,
+                    title: playground.name
+                });
                     var infowindow = new google.maps.InfoWindow({
                         content: `
                         <div>
@@ -208,11 +206,8 @@ function initFavoritesMap() {
                         infowindow.open(map, marker);
                     });
                     favMarkers.push({marker: marker, infowindow: infowindow});
-                } else {
-                    console.error('Geocode error: ' + status);
                 }
             });
-        });
     }
 }
 

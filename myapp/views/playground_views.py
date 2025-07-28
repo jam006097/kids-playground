@@ -65,7 +65,11 @@ class PlaygroundListView(ListView):
 
         # 公園データをJSON形式に変換
         playgrounds_json = json.dumps(
-            list(playgrounds.values("id", "name", "address", "phone"))
+            list(
+                playgrounds.values(
+                    "id", "name", "address", "phone", "latitude", "longitude"
+                )
+            )
         )
 
         favorite_ids = []

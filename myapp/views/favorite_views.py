@@ -87,7 +87,13 @@ class FavoriteListView(LoginRequiredMixin, TemplateView):
         # お気に入り公園データをJSON形式に変換
         playgrounds_json = json.dumps(
             [
-                {"name": p.name, "address": p.address, "phone": p.phone}
+                {
+                    "name": p.name,
+                    "address": p.address,
+                    "phone": p.phone,
+                    "latitude": p.latitude,
+                    "longitude": p.longitude,
+                }
                 for p in favorite_playgrounds
             ]
         )

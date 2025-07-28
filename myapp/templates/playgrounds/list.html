@@ -102,8 +102,7 @@
 <script>
     // Djangoテンプレートから渡されたデータをJavaScriptで使用できるようにする
     var playgrounds = JSON.parse('{{ playgrounds_json|escapejs }}');
-    var favoriteIds = JSON.parse('{{ favorite_ids|escapejs }}');
-    var favorites = JSON.parse('{{ favorites_json|escapejs }}');  // 追加：お気に入り施設データを定義
+    var favorite_ids = JSON.parse('{{ favorite_ids|escapejs }}');
 </script>
 <script src="{% static 'js/scripts.js' %}"></script>
 {% endblock %}

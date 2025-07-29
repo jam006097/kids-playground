@@ -87,7 +87,7 @@ class PlaygroundListView(ListView):
                 "total_count": total_count,
                 "filtered_count": filtered_count,
                 "playgrounds_json": playgrounds_json,
-                "favorite_ids": favorite_ids,
+                "favorite_ids": json.dumps(favorite_ids),
             }
         )
         return context

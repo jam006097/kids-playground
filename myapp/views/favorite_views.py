@@ -85,6 +85,7 @@ class FavoriteListView(LoginRequiredMixin, TemplateView):
         playgrounds_json = json.dumps(
             [
                 {
+                    "id": p.id,
                     "name": p.name,
                     "address": p.address,
                     "phone": p.phone,
@@ -98,7 +99,7 @@ class FavoriteListView(LoginRequiredMixin, TemplateView):
         context.update(
             {
                 "favorites": favorite_playgrounds,
-                "favorite_ids": favorite_ids,
+                "favorite_ids": json.dumps(favorite_ids),
                 "playgrounds_json": playgrounds_json,
             }
         )

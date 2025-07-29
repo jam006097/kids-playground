@@ -5,42 +5,60 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="my-4">マイページ</h1>
+    <h1 class="my-4">お気に入り施設</h1>
     <p>ようこそ、{{ user.username }}さん！</p>
-    <h2>お気に入りの施設</h2>
-    <div class="row">
-        {% for playground in favorites %}
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">{{ playground.name }}</h5>
-                    <p class="card-text">{{ playground.address }}</p>
-                    <p class="card-text">{{ playground.phone }}</p>
-                    <!-- お気に入り登録ボタン -->
-                    <button class="btn btn-outline-success" data-playground-id="{{ playground.id }}" onclick="toggleFavorite(this, '{{ playground.id }}')">
-                        {% if playground.id|stringformat:"s" in favorite_ids %}
-                            お気に入り解除
-                        {% else %}
-                            お気に入りに追加
-                        {% endif %}
-                    </button>
-                    <!-- 口コミを書くボタン -->
-                    <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#reviewModal"
-                            data-playground-id="{{ playground.id }}" data-playground-name="{{ playground.name }}">
-                        口コミを書く
-                    </button>
-                    <!-- 口コミを見るボタン -->
-                    <a href="{% url 'myapp:view_reviews' playground.id %}" class="btn btn-outline-info mt-2">口コミを見る</a>
+
+    <!-- タブメニュー -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="true">一覧</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="map-tab" data-toggle="tab" href="#map" role="tab" aria-controls="map" aria-selected="false">地図</a>
+        </li>
+    </ul>
+
+    <!-- タブコンテンツ -->
+    <div class="tab-content" id="myTabContent">
+        <!-- 一覧タブ -->
+        <div class="tab-pane fade show active" id="list" role="tabpanel" aria-labelledby="list-tab">
+            <div class="row mt-4">
+                {% for playground in favorites %}
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ playground.name }}</h5>
+                            <p class="card-text">{{ playground.address }}</p>
+                            <p class="card-text">{{ playground.phone }}</p>
+                            <!-- お気に入り登録ボタン -->
+                            <button class="btn btn-outline-success" data-playground-id="{{ playground.id }}" onclick="toggleFavorite(this, '{{ playground.id }}')">
+                                {% if playground.id|stringformat:"s" in favorite_ids %}
+                                    お気に入り解除
+                                {% else %}
+                                    お気に入りに追加
+                                {% endif %}
+                            </button>
+                            <!-- 口コミを書くボタン -->
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#reviewModal"
+                                    data-playground-id="{{ playground.id }}" data-playground-name="{{ playground.name }}">
+                                口コミを書く
+                            </button>
+                            <!-- 口コミを見るボタン -->
+                            <a href="{% url 'myapp:view_reviews' playground.id %}" class="btn btn-outline-info mt-2">口コミを見る</a>
+                        </div>
+                    </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
-        {% endfor %}
+        <!-- 地図タブ -->
+        <div class="tab-pane fade" id="map" role="tabpanel" aria-labelledby="map-tab">
+            <div id="mypage-map-container" class="mb-4" style="height: 800px; width: 100%;"></div>
+        </div>
     </div>
-    <h2>お気に入りの施設地図</h2>
-    <div id="mypage-map-container" class="mb-4" style="height: 800px; width: 100%;"></div>
 </div>
 
-<!-- モーダル要素をページ内に配置 -->
+<!-- モーダル要素 -->
 <div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -80,7 +98,8 @@ crossorigin=""/>
 integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
 crossorigin=""></script>
 <script>
-    var playgrounds_json = '{{ playgrounds_json|escapejs }}';
+    var playgrounds = JSON.parse('{{ playgrounds_json|safe }}');
+    var favorite_ids = JSON.parse('{{ favorite_ids|safe }}');
 </script>
 <script src="{% static 'js/scripts.js' %}"></script>
 {% endblock %}

@@ -83,7 +83,11 @@ class FavoriteListView(LoginRequiredMixin, ListView):
         favorites = context["favorites"]
         favorite_ids = [str(p.id) for p in favorites]
         playgrounds_json = json.dumps(
-            list(favorites.values("id", "name", "address", "phone", "latitude", "longitude"))
+            list(
+                favorites.values(
+                    "id", "name", "address", "phone", "latitude", "longitude"
+                )
+            )
         )
 
         context.update(

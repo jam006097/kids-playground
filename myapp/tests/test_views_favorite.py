@@ -29,7 +29,9 @@ class FavoriteViewsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertTrue(
-            Favorite.objects.filter(user=self.user, playground=self.playground1).exists()
+            Favorite.objects.filter(
+                user=self.user, playground=self.playground1
+            ).exists()
         )
 
     # お気に入り削除ビューのテスト
@@ -41,7 +43,9 @@ class FavoriteViewsTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertFalse(
-            Favorite.objects.filter(user=self.user, playground=self.playground1).exists()
+            Favorite.objects.filter(
+                user=self.user, playground=self.playground1
+            ).exists()
         )
 
     # お気に入り一覧ページのテスト
@@ -58,9 +62,9 @@ class FavoriteViewsTest(TestCase):
         self.client.login(username="testuser", password="testpassword")
         Favorite.objects.create(user=self.user, playground=self.playground1)
         Favorite.objects.create(user=self.user, playground=self.playground2)
-        
+
         response = self.client.get(self.favorites_url, {"city": "Kagoshima"})
-        
+
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "favorites/list.html")
         self.assertEqual(len(response.context["favorites"]), 1)

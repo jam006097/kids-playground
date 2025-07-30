@@ -8,7 +8,7 @@ import json
 import logging
 import os
 from dotenv import load_dotenv
-from django.views.generic import ListView, View, CreateView, TemplateView
+from django.views.generic import ListView, View, CreateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -60,45 +60,35 @@ class RemoveFavoriteView(LoginRequiredMixin, View):
         return JsonResponse({"status": "ok"})
 
 
-class FavoriteListView(LoginRequiredMixin, TemplateView):
+class FavoriteListView(LoginRequiredMixin, ListView):
     """
     お気に入り一覧ページビュー。
     ログインしているユーザーのみがアクセス可能。
     ユーザーのお気に入り公園一覧を表示する。
     """
 
+    model = Playground
     template_name = "favorites/list.html"
+    context_object_name = "favorites"
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(favorite__user=self.request.user)
+        self.selected_city = self.request.GET.get("city")
+        if self.selected_city:
+            queryset = queryset.filter(address__icontains=self.selected_city)
+        return queryset
 
     def get_context_data(self, **kwargs):
-        """
-        テンプレートに渡すコンテキストデータを取得する。
-        ユーザーのお気に入り公園情報を追加する。
-        """
         context = super().get_context_data(**kwargs)
-        # ユーザーのお気に入り公園を取得
-        favorites = Favorite.objects.filter(user=self.request.user).select_related(
-            "playground"
-        )
-        favorite_playgrounds = [favorite.playground for favorite in favorites]
-        favorite_ids = [str(p.id) for p in favorite_playgrounds]
-        # お気に入り公園データをJSON形式に変換
+        favorites = context["favorites"]
+        favorite_ids = [str(p.id) for p in favorites]
         playgrounds_json = json.dumps(
-            [
-                {
-                    "id": p.id,
-                    "name": p.name,
-                    "address": p.address,
-                    "phone": p.phone,
-                    "latitude": p.latitude,
-                    "longitude": p.longitude,
-                }
-                for p in favorite_playgrounds
-            ]
+            list(favorites.values("id", "name", "address", "phone", "latitude", "longitude"))
         )
-        # コンテキストを更新
+
         context.update(
             {
-                "favorites": favorite_playgrounds,
+                "selected_city": self.selected_city,
                 "favorite_ids": json.dumps(favorite_ids),
                 "playgrounds_json": playgrounds_json,
             }

@@ -8,6 +8,15 @@
     <h1 class="my-4">お気に入り施設</h1>
     <p>ようこそ、{{ user.username }}さん！</p>
 
+    <!-- 検索フォーム -->
+    <form method="get" class="form-inline mb-4">
+        <div class="form-group">
+            <label for="city" class="mr-2">市町村名:</label>
+            <input type="text" name="city" id="city" class="form-control mr-2" placeholder="市町村名で検索できます" value="{{ selected_city|default_if_none:'' }}">
+            <button type="submit" class="btn btn-primary">検索</button>
+        </div>
+    </form>
+
     <!-- タブメニュー -->
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">

@@ -93,9 +93,6 @@ LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/accounts/login/"
 
-# メール設定（開発用）
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
 # ユーザー登録・認証の設定
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_USERNAME_REQUIRED = False

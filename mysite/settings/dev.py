@@ -1,21 +1,4 @@
-from .base import (
-    BASE_DIR,
-    SECRET_KEY,
-    INSTALLED_APPS,
-    MIDDLEWARE,
-    ROOT_URLCONF,
-    TEMPLATES,
-    WSGI_APPLICATION,
-    AUTH_PASSWORD_VALIDATORS,
-    LANGUAGE_CODE,
-    TIME_ZONE,
-    USE_I18N,
-    USE_TZ,
-    STATIC_URL,
-    STATIC_ROOT,
-    DEFAULT_AUTO_FIELD,
-    CRONJOBS,
-)
+from .base import *
 import os
 
 DEBUG = True
@@ -31,3 +14,6 @@ DATABASES = {
         "PORT": "3306",
     }
 }
+
+# Email settings for development
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

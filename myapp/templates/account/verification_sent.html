@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}メール認証のご案内{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h1 class="my-4 text-center">メールアドレスをご確認ください</h1>
+        <div class="card">
+            <div class="card-body">
+                <p class="text-center">ご登録いただいたメールアドレス宛に、認証メールを送信しました。メールに記載されているリンクをクリックして、会員登録を完了してください。数分経ってもメールが届かない場合は、お手数ですがお問い合わせください。</p>
+                <div class="text-center mt-4">
+                    <a href="{% url 'account_login' %}" class="btn btn-primary">ログインページへ戻る</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -6,12 +6,37 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <h1 class="my-4 text-center">{% trans "Log In" %}</h1>
+        <h1 class="my-4 text-center">{% trans "ログイン" %}</h1>
         <div class="card">
             <div class="card-body">
                 <form class="login" method="POST" action="{% url 'account_login' %}?next=/">
                     {% csrf_token %}
-                    {{ form.as_p }}
+                    {% for error in form.non_field_errors %}
+                    <div class="alert alert-danger p-2" role="alert">{{ error }}</div>
+                    {% endfor %}
+
+                    <div class="form-group">
+                        <label for="{{ form.login.id_for_label }}">{{ form.login.label }}</label>
+                        <input type="email" name="login" id="{{ form.login.id_for_label }}" class="form-control" value="{{ form.login.value|default:'' }}" required>
+                        {% for error in form.login.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                        <input type="password" name="password" id="{{ form.password.id_for_label }}" class="form-control" required>
+                        {% for error in form.password.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    {% if form.remember %}
+                    <div class="form-group form-check">
+                        <input type="checkbox" name="remember" class="form-check-input" id="{{ form.remember.id_for_label }}">
+                        <label class="form-check-label" for="{{ form.remember.id_for_label }}">{{ form.remember.label }}</label>
+                    </div>
+                    {% endif %}
                     {% if redirect_field_value %}
                     <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
                     {% endif %}
@@ -19,7 +44,7 @@
                 </form>
 
                 <div class="mt-3 text-center">
-                    <a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+                    <a href="{% url 'account_reset_password' %}">{% trans "パスワードをお忘れですか？" %}</a>
                 </div>
 
             </div>

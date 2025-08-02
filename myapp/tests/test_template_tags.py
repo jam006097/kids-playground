@@ -1,12 +1,13 @@
 from django.test import TestCase
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from myapp.models import Playground, Favorite
 from myapp.templatetags.playground_tags import is_favorite
 
+User = get_user_model()
 
 class TemplateTagsTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username="testuser", password="password")
+        self.user = User.objects.create_user(email="testuser@example.com", password="password")
         self.playground = Playground.objects.create(name="Test Park")
 
     def test_is_favorite_tag(self):

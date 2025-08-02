@@ -1,14 +1,15 @@
 from django.test import TestCase
 from django.urls import reverse
 from bs4 import BeautifulSoup
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from myapp.models import Playground, Favorite
 
+User = get_user_model()
 
 class TemplateRenderTest(TestCase):
     def setUp(self):
         """テスト用のデータを作成"""
-        self.user = User.objects.create_user(username="testuser", password="password")
+        self.user = User.objects.create_user(email="testuser@example.com", password="password")
         self.playground1 = Playground.objects.create(
             name="Test Park 1", address="Address 1"
         )
@@ -22,7 +23,7 @@ class TemplateRenderTest(TestCase):
         """
         お気に入り状態に応じてボタンのテキストが正しく表示されるかテスト
         """
-        self.client.login(username="testuser", password="password")
+        self.client.login(email="testuser@example.com", password="password")
         response = self.client.get(reverse("myapp:index"))
         self.assertEqual(response.status_code, 200)
 

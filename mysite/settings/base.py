@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "myapp",
+    "users",
     "bootstrap4",
     "django_crontab",
     # allauth
@@ -82,6 +83,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # Default primary key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+AUTH_USER_MODEL = 'users.CustomUser'
+
 # --- allauth 設定 ---
 AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
@@ -90,15 +93,19 @@ AUTHENTICATION_BACKENDS = (
 
 SITE_ID = 1
 LOGIN_REDIRECT_URL = "/"
-ACCOUNT_LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/accounts/login/"
 
-# ユーザー登録・認証の設定
-ACCOUNT_AUTHENTICATION_METHOD = "email"
+# django-allauth（カスタムユーザーモデル用）設定
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = "optional"
-ACCOUNT_SIGNUP_EMAIL_ENTER_ON_REDIRECT = False
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
+
+
 
 # cron設定
 CRONJOBS = [("0 0 1 * *", "myapp.management.commands.fetch_playgrounds")]

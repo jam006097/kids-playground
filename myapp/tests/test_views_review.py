@@ -1,15 +1,16 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from myapp.models import Playground, Review
 
+User = get_user_model()
 
 class ReviewViewsTest(TestCase):
     # テストのセットアップ
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword"
+            email="testuser@example.com", password="testpassword"
         )
         self.playground = Playground.objects.create(
             name="Test Park", address="Test Address", phone="123-456-7890"
@@ -23,7 +24,7 @@ class ReviewViewsTest(TestCase):
 
     # レビュー追加ビューのテスト
     def test_add_review_view(self):
-        self.client.login(username="testuser", password="testpassword")
+        self.client.login(email="testuser@example.com", password="testpassword")
         response = self.client.post(
             self.add_review_url, {"content": "Great park!", "rating": 5}
         )

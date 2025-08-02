@@ -1,6 +1,6 @@
 # myapp/models.py - Djangoモデルの定義
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 
 
 class Playground(models.Model):
@@ -35,7 +35,7 @@ class Favorite(models.Model):
         playground: お気に入りの施設
     """
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     playground = models.ForeignKey(Playground, on_delete=models.CASCADE)
 
     class Meta:
@@ -56,10 +56,10 @@ class Review(models.Model):
     playground = models.ForeignKey(
         Playground, on_delete=models.CASCADE, related_name="reviews"
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
     rating = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.playground.name} - {self.rating}"
+        return f"{self.user.email} - {self.playground.name} - {self.rating}"

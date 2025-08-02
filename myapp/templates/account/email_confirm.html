@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}メールアドレスの確認{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h1 class="my-4 text-center">メールアドレスの確認</h1>
+        <div class="card">
+            <div class="card-body">
+                {% if confirmation %}
+                    <p class="text-center">「{{ confirmation.email_address.email }}」があなたのメールアドレスであることを確認してください。</p>
+                    <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-block">確認する</button>
+                    </form>
+                {% else %}
+                    <p class="text-center">このメール確認リンクは有効期限が切れているか、無効です。<br>お手数ですが、<a href="{% url 'account_email' %}">新しいメール確認リクエストを発行してください</a>。</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

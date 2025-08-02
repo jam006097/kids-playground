@@ -18,26 +18,6 @@ class TemplateRenderTest(TestCase):
         # playground1をお気に入りに追加
         Favorite.objects.create(user=self.user, playground=self.playground1)
 
-    def test_login_page_renders_correctly(self):
-        """
-        GETリクエストに対してlogin.htmlが正しくレンダリングされるかテスト
-        """
-        response = self.client.get(reverse("myapp:login"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "registration/login.html")
-        soup = BeautifulSoup(response.content, "html.parser")
-        self.assertIsNotNone(soup.find("h1", text="ログイン"))
-
-    def test_register_page_renders_correctly(self):
-        """
-        GETリクエストに対してregister.htmlが正しくレンダリングされるかテスト
-        """
-        response = self.client.get(reverse("myapp:register"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "registration/register.html")
-        soup = BeautifulSoup(response.content, "html.parser")
-        self.assertIsNotNone(soup.find("h1", text="ユーザー登録"))
-
     def test_favorite_button_display_logic(self):
         """
         お気に入り状態に応じてボタンのテキストが正しく表示されるかテスト

@@ -20,17 +20,17 @@
                             {% endif %}
                         </li>
                         <li class="nav-item">
-                            <form action="{% url 'myapp:logout' %}" method="post" class="d-inline">
+                            <form action="{% url 'account_logout' %}" method="post" class="d-inline">
                                 {% csrf_token %}
                                 <button type="submit" class="nav-link btn btn-link">ログアウト</button>
                             </form>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'myapp:login' %}">ログイン</a>
+                            <a class="nav-link" href="{% url 'account_login' %}">ログイン</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'myapp:register' %}">会員登録</a>
+                            <a class="nav-link" href="{% url 'account_signup' %}">会員登録</a>
                         </li>
                     {% endif %}
                 </ul>

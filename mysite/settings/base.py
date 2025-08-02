@@ -18,9 +18,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
     "myapp",
     "bootstrap4",
     "django_crontab",
+    # allauth
+    "allauth",
+    "allauth.account",
 ]
 
 MIDDLEWARE = [
@@ -31,6 +35,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # allauth middleware
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "mysite.urls"
@@ -64,8 +70,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # I18N
-LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
+LANGUAGE_CODE = "ja"
+TIME_ZONE = "Asia/Tokyo"
 USE_I18N = True
 USE_TZ = True
 
@@ -76,9 +82,26 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # Default primary key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# リダイレクトURL
-LOGIN_REDIRECT_URL = "myapp:index"
-LOGOUT_REDIRECT_URL = "myapp:login"
+# --- allauth 設定 ---
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+SITE_ID = 1
+LOGIN_REDIRECT_URL = "/"
+ACCOUNT_LOGIN_REDIRECT_URL = "/"
+ACCOUNT_LOGOUT_REDIRECT_URL = "/accounts/login/"
+
+# メール設定（開発用）
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# ユーザー登録・認証の設定
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_SIGNUP_EMAIL_ENTER_ON_REDIRECT = False
 
 # cron設定
 CRONJOBS = [("0 0 1 * *", "myapp.management.commands.fetch_playgrounds")]

@@ -14,7 +14,7 @@ class FavoriteManager {
 
         button.disabled = true;
 
-        fetch(url, {
+        return fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

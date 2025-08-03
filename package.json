@@ -1,0 +1,21 @@
+{
+  "name": "kidsplayground",
+  "version": "1.0.0",
+  "description": "## 概要 児童支援施設の一覧表示・地図表示・会員登録・お気に入り登録などができるWebアプリケーションです。",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.0",
+    "babel-jest": "^30.0.5",
+    "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

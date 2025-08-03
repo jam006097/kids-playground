@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}メールアドレスの管理{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group">
+            <a href="{% url 'accounts:mypage' %}" class="list-group-item list-group-item-action">マイページ</a>
+            <a href="{% url 'account_email' %}" class="list-group-item list-group-item-action active">メールアドレスの管理</a>
+            <a href="{% url 'account_change_password' %}" class="list-group-item list-group-item-action">パスワードの変更</a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <h1 class="my-4">メールアドレスの管理</h1>
+        <p>以下のメールアドレスがアカウントに登録されています:</p>
+
+        {% if user.emailaddress_set.all %}
+        <form action="{% url 'account_email' %}" class="email_list" method="post">
+            {% csrf_token %}
+            <fieldset class="blockLabels">
+                {% for emailaddress in user.emailaddress_set.all %}
+                <div class="form-check mb-2">
+                    <input type="radio" name="email" id="email_radio_{{ forloop.counter }}" value="{{ emailaddress.email }}" {% if emailaddress.primary %}checked{% endif %} {% if not emailaddress.verified %}disabled{% endif %} class="form-check-input">
+                    <label for="email_radio_{{ forloop.counter }}" class="form-check-label">
+                        {{ emailaddress.email }}
+                        {% if emailaddress.primary %}
+                        <span class="badge badge-success">プライマリ</span>
+                        {% endif %}
+                        {% if not emailaddress.verified %}
+                        <span class="badge badge-warning">未確認</span>
+                        {% else %}
+                        <span class="badge badge-info">確認済み</span>
+                        {% endif %}
+                    </label>
+                </div>
+                {% endfor %}
+
+                <div class="d-flex mt-3">
+                    <button type="submit" name="action_primary" class="btn btn-primary mr-2">プライマリにする</button>
+                    <button type="submit" name="action_send" class="btn btn-secondary mr-2">確認メールを再送</button>
+                    <button type="submit" name="action_remove" class="btn btn-danger">削除</button>
+                </div>
+            </fieldset>
+        </form>
+        {% else %}
+        <p>メールアドレスは登録されていません。</p>
+        {% endif %}
+
+        <h2 class="mt-5">新しいメールアドレスの追加</h2>
+        <form method="post" action="{% url 'account_email' %}" class="add_email">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" name="action_add" class="btn btn-success">メールアドレスを追加</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+(function() {
+  var message = "選択されたメールアドレスを削除してもよろしいですか？";
+  var actions = document.getElementsByName('action_remove');
+  if (actions.length) {
+    actions[0].addEventListener("click", function(e) {
+      if (! confirm(message)) {
+        e.preventDefault();
+      }
+    });
+  }
+})();
+</script>
+{% endblock %}

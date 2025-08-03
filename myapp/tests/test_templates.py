@@ -51,3 +51,21 @@ class TemplateRenderTest(TestCase):
         self.assertIsNotNone(button1, "ボタンが見つかりません")
         self.assertTrue(button1.has_attr("disabled"), "disabled属性がありません")
         self.assertEqual(button1.get("title"), "ログインするとお気に入り機能が使えます")
+
+    def test_mypage_link_in_header_for_logged_in_user(self):
+        """ログイン済みのユーザーのヘッダーにマイページリンクが表示されるかテスト"""
+        self.client.login(email="testuser@example.com", password="password")
+        response = self.client.get(reverse("myapp:index"))
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, "html.parser")
+        mypage_link = soup.find("a", href=reverse("accounts:mypage"))
+        self.assertIsNotNone(mypage_link)
+        self.assertIn("マイページ", mypage_link.text)
+
+    def test_mypage_link_not_in_header_for_anonymous_user(self):
+        """未ログインのユーザーのヘッダーにマイページリンクが表示されないかテスト"""
+        response = self.client.get(reverse("myapp:index"))
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, "html.parser")
+        mypage_link = soup.find("a", href=reverse("accounts:mypage"))
+        self.assertIsNone(mypage_link)

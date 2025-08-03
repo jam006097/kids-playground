@@ -1,10 +1,22 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block title %}マイページ{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="my-4">マイページ</h1>
-    <p>ようこそ、{{ user.email }}さん！</p>
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group">
+            <a href="{% url 'accounts:mypage' %}" class="list-group-item list-group-item-action active">マイページ</a>
+            <a href="{% url 'account_email' %}" class="list-group-item list-group-item-action">メールアドレスの管理</a>
+            <a href="{% url 'account_change_password' %}" class="list-group-item list-group-item-action">パスワードの変更</a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <h1 class="my-4">マイページ</h1>
+        <p>ようこそ、{{ user.email }}さん！</p>
+        <p>ここでは、あなたのプロフィール情報やお気に入り施設、投稿したレビューなどを管理できます。</p>
+        <p>左側のメニューから、各機能にアクセスしてください。</p>
+    </div>
 </div>
 {% endblock %}

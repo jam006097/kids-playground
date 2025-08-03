@@ -13,16 +13,30 @@ class CustomUserAdmin(UserAdmin):
     # ユーザー編集画面のフィールド
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Permissions", {"fields": ("is_staff", "is_active", "is_superuser", "groups", "user_permissions")}),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "is_staff",
+                    "is_active",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
 
     # ユーザー追加画面のフィールド
     add_fieldsets = (
-        (None, {
-            "classes": ("wide",),
-            "fields": ("email", "password", "password2"),
-        }),
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("email", "password", "password2"),
+            },
+        ),
     )
 
     search_fields = ("email",)

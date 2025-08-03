@@ -6,7 +6,9 @@ from django.core.exceptions import ValidationError
 
 class CustomUserCreationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, label="Password")
-    password2 = forms.CharField(widget=forms.PasswordInput, label="Password confirmation")
+    password2 = forms.CharField(
+        widget=forms.PasswordInput, label="Password confirmation"
+    )
 
     class Meta:
         model = get_user_model()

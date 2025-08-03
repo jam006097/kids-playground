@@ -5,9 +5,12 @@ from myapp.templatetags.playground_tags import is_favorite
 
 User = get_user_model()
 
+
 class TemplateTagsTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(email="testuser@example.com", password="password")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="password"
+        )
         self.playground = Playground.objects.create(name="Test Park")
 
     def test_is_favorite_tag(self):

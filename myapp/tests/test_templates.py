@@ -6,10 +6,13 @@ from myapp.models import Playground, Favorite
 
 User = get_user_model()
 
+
 class TemplateRenderTest(TestCase):
     def setUp(self):
         """テスト用のデータを作成"""
-        self.user = User.objects.create_user(email="testuser@example.com", password="password")
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="password"
+        )
         self.playground1 = Playground.objects.create(
             name="Test Park 1", address="Address 1"
         )

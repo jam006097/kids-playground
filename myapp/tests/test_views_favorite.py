@@ -5,6 +5,7 @@ from myapp.models import Playground, Favorite
 
 User = get_user_model()
 
+
 class FavoriteViewsTest(TestCase):
     # テストのセットアップ
     def setUp(self):

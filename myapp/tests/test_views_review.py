@@ -5,6 +5,7 @@ from myapp.models import Playground, Review
 
 User = get_user_model()
 
+
 class ReviewViewsTest(TestCase):
     # テストのセットアップ
     def setUp(self):

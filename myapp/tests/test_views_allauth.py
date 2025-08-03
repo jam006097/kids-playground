@@ -7,6 +7,7 @@ import re
 
 User = get_user_model()
 
+
 class AllauthViewsTest(TestCase):
     """
     django-allauthによって提供されるビューが正しく機能するかをテストする。
@@ -20,8 +21,6 @@ class AllauthViewsTest(TestCase):
         site.domain = "testserver"
         site.name = "testserver"
         site.save()
-
-    
 
     def test_user_signup_sends_email(self):
         """
@@ -52,9 +51,7 @@ class AllauthViewsTest(TestCase):
         from django.core import mail
 
         # テストユーザーを作成
-        User.objects.create_user(
-            email="test@example.com", password="oldpassword"
-        )
+        User.objects.create_user(email="test@example.com", password="oldpassword")
 
         self.assertEqual(len(mail.outbox), 0)
 

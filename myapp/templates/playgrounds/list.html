@@ -46,9 +46,9 @@
                                 口コミを書く
                             </button>
                             {% else %}
-                            <button class="btn btn-outline-secondary" onclick="alert('口コミを投稿するにはログインが必要です。')">
+                            <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-secondary">
                                 口コミを書く
-                            </button>
+                            </a>
                             {% endif %}
                             <!-- 口コミを見るボタン -->
                             <a href="{% url 'myapp:view_reviews' playground.id %}" class="btn btn-outline-info mt-2">口コミを見る</a>

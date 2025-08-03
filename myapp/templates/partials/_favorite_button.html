@@ -10,7 +10,7 @@
     {% endif %}
 </button>
 {% else %}
-<button class="btn btn-outline-success" data-playground-id="{{ playground.id }}" disabled title="ログインするとお気に入り機能が使えます">
+<a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-success">
     お気に入りに追加
-</button>
+</a>
 {% endif %}

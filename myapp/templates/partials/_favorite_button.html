@@ -1,7 +1,7 @@
 {% load playground_tags %}
 
 {% if user.is_authenticated %}
-<button class="btn btn-outline-success" data-playground-id="{{ playground.id }}" onclick="toggleFavorite(this, '{{ playground.id }}')">
+<button class="btn btn-outline-success" data-playground-id="{{ playground.id }}" data-action="toggle-favorite">
     {% is_favorite playground user as is_fav %}
     {% if is_fav %}
         お気に入り解除

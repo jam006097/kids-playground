@@ -5,25 +5,11 @@ from myapp.models import Playground, Favorite, Review
 import urllib.request
 import urllib.parse
 import json
-import logging
 import os
-from dotenv import load_dotenv
+
 from django.views.generic import ListView, View, CreateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
-
-# .envファイルから環境変数を読み込む
-load_dotenv()
-
-# ロギングの設定
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s",
-    handlers=[
-        logging.FileHandler("app.log"),  # ログをファイルに保存
-        logging.StreamHandler(),  # コンソールにもログを表示
-    ],
-)
 
 
 class AddFavoriteView(LoginRequiredMixin, View):

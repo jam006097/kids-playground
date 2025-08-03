@@ -76,6 +76,9 @@ class FavoriteListView(LoginRequiredMixin, ListView):
         self.selected_city = self.request.GET.get("city")
         if self.selected_city:
             queryset = queryset.filter(address__icontains=self.selected_city)
+        
+        # フィルタリング後の件数を取得
+        self.filtered_count = queryset.count()
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -95,6 +98,8 @@ class FavoriteListView(LoginRequiredMixin, ListView):
                 "selected_city": self.selected_city,
                 "favorite_ids": json.dumps(favorite_ids),
                 "playgrounds_json": playgrounds_json,
+                "filtered_count": self.filtered_count, # 追加
+                "total_count": Favorite.objects.filter(user=self.request.user).count(), # 追加
             }
         )
         return context

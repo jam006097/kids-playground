@@ -6,7 +6,6 @@
 {% block content %}
 <div class="container">
     <h1 class="my-4">お気に入り施設</h1>
-    <p>ようこそ、{{ user.username }}さん！</p>
 
     <!-- 検索フォーム -->
     <form method="get" class="form-inline mb-4">
@@ -16,6 +15,9 @@
             <button type="submit" class="btn btn-primary">検索</button>
         </div>
     </form>
+
+    <!-- 検索結果の件数表示 -->
+    <p>{{ filtered_count }} / {{ total_count }} 件を表示しています。</p>
 
     <!-- タブメニュー -->
     <ul class="nav nav-tabs" id="myTab" role="tablist">

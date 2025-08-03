@@ -1,0 +1,6 @@
+<div class="list-group">
+    <a href="{% url 'accounts:mypage' %}" class="list-group-item list-group-item-action {% if request.path == '/accounts/mypage/' %}active{% endif %}">マイページ</a>
+    <a href="{% url 'accounts:name_change' %}" class="list-group-item list-group-item-action {% if request.path == '/accounts/name/' %}active{% endif %}">アカウント名の変更</a>
+    <a href="{% url 'account_email' %}" class="list-group-item list-group-item-action {% if request.path == '/accounts/email/' %}active{% endif %}">メールアドレスの管理</a>
+    <a href="{% url 'account_change_password' %}" class="list-group-item list-group-item-action {% if request.path == '/accounts/password/change/' %}active{% endif %}">パスワードの変更</a>
+</div>

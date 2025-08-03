@@ -43,3 +43,20 @@ class ReviewViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "reviews/view_reviews.html")
         self.assertEqual(len(response.context["reviews"]), 1)
+
+    def test_review_displays_account_name(self):
+        """口コミにアカウント名が表示されることをテスト"""
+        self.client.login(email="testuser@example.com", password="testpassword")
+        Review.objects.create(
+            user=self.user, playground=self.playground, content="Test review", rating=5
+        )
+
+        # 初期状態（名無し）の確認
+        response = self.client.get(self.review_list_url)
+        self.assertContains(response, "名無し")
+
+        # アカウント名変更後の確認
+        new_name = "テストユーザー"
+        self.client.post(reverse("accounts:name_change"), {"account_name": new_name})
+        response = self.client.get(self.review_list_url)
+        self.assertContains(response, new_name)

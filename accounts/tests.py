@@ -27,3 +27,33 @@ class MyPageTest(TestCase):
         response = self.client.get(reverse("account_email"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "メールアドレスの管理")
+
+    def test_mypage_displays_account_name_and_link(self):
+        """マイページにアカウント名と変更ページへのリンクが表示されることをテスト"""
+        response = self.client.get(reverse("accounts:mypage"))
+        self.assertContains(response, self.user.account_name)
+        self.assertNotContains(response, '<input type="text" name="account_name"')
+        self.assertContains(response, f'href="{reverse("accounts:name_change")}"')
+
+
+class AccountNameChangeViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="testuser@example.com", password="password"
+        )
+        self.client.login(email="testuser@example.com", password="password")
+        self.url = reverse("accounts:name_change")
+
+    def test_view_displays_form(self):
+        """アカウント名変更ページにフォームが表示されることをテスト"""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<form method="post"')
+
+    def test_update_account_name(self):
+        """アカウント名が更新され、マイページにリダイレクトされることをテスト"""
+        new_name = "新しい名前"
+        response = self.client.post(self.url, {"account_name": new_name})
+        self.assertRedirects(response, reverse("accounts:mypage"))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.account_name, new_name)

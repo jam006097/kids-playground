@@ -6,11 +6,7 @@
 {% block content %}
 <div class="row">
     <div class="col-md-3">
-        <div class="list-group">
-            <a href="{% url 'accounts:mypage' %}" class="list-group-item list-group-item-action">マイページ</a>
-            <a href="{% url 'account_email' %}" class="list-group-item list-group-item-action active">メールアドレスの管理</a>
-            <a href="{% url 'account_change_password' %}" class="list-group-item list-group-item-action">パスワードの変更</a>
-        </div>
+        {% include "accounts/_left_menu.html" %}
     </div>
     <div class="col-md-9">
         <h1 class="my-4">メールアドレスの管理</h1>

@@ -42,6 +42,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     """
 
     email = models.EmailField("email address", unique=True)
+    account_name = models.CharField("アカウント名", max_length=50, default="名無し")
     is_staff = models.BooleanField("staff status", default=False)
     is_active = models.BooleanField("active", default=True)
     date_joined = models.DateTimeField("date joined", default=timezone.now)

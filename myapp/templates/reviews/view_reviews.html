@@ -16,7 +16,7 @@
         <ul class="list-group">
             {% for review in reviews %}
             <li class="list-group-item">
-                <strong>{{ review.user.username }}</strong> (評価: {{ review.rating }})<br>
+                <strong>{{ review.user.account_name }}</strong> (評価: {{ review.rating }})<br>
                 {{ review.content }}
                 <small class="text-muted d-block">投稿日: {{ review.created_at|date:"Y年m月d日 H:i" }}</small>
             </li>

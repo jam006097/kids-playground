@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "users",
     "bootstrap4",
     "django_crontab",
+    "accounts",
     # allauth
     "allauth",
     "allauth.account",

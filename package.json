@@ -9,11 +9,18 @@
   "devDependencies": {
     "@babel/preset-env": "^7.28.0",
     "babel-jest": "^30.0.5",
+    "eslint": "^9.32.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jest": "^29.0.1",
+    "eslint-plugin-prettier": "^5.5.3",
     "jest": "^30.0.5",
-    "jest-environment-jsdom": "^30.0.5"
+    "jest-environment-jsdom": "^30.0.5",
+    "prettier": "^3.6.2"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint \"myapp/**/*.js\"",
+    "format": "prettier --write \"myapp/**/*.js\""
   },
   "keywords": [],
   "author": "",

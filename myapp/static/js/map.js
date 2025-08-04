@@ -1,25 +1,32 @@
 class MapManager {
-    constructor() {
-        this.KAGOSHIMA_CENTER = [31.5602, 130.5581];
-        this.DEFAULT_ZOOM_LEVEL = 10;
+  constructor() {
+    this.KAGOSHIMA_CENTER = [31.5602, 130.5581];
+    this.DEFAULT_ZOOM_LEVEL = 10;
+  }
+
+  initMap(playgrounds) {
+    if (window.mapInstance) {
+      window.mapInstance.remove();
     }
 
-    initMap(playgrounds) {
-        if (window.mapInstance) {
-            window.mapInstance.remove();
-        }
+    window.mapInstance = L.map('map-container').setView(
+      this.KAGOSHIMA_CENTER,
+      this.DEFAULT_ZOOM_LEVEL,
+    );
 
-        window.mapInstance = L.map('map-container').setView(this.KAGOSHIMA_CENTER, this.DEFAULT_ZOOM_LEVEL);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(window.mapInstance);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(window.mapInstance);
-
-        playgrounds.forEach(playground => {
-            if (playground.latitude && playground.longitude) {
-                var position = [parseFloat(playground.latitude), parseFloat(playground.longitude)];
-                var marker = L.marker(position).addTo(window.mapInstance);
-                var popupContent = `
+    playgrounds.forEach((playground) => {
+      if (playground.latitude && playground.longitude) {
+        var position = [
+          parseFloat(playground.latitude),
+          parseFloat(playground.longitude),
+        ];
+        var marker = L.marker(position).addTo(window.mapInstance);
+        var popupContent = `
                     <div>
                         <strong>${playground.name}</strong><br>
                         住所: ${playground.address}<br>
@@ -34,30 +41,37 @@ class MapManager {
                         <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
                     </div>
                 `;
-                marker.bindPopup(popupContent);
-            }
-        });
+        marker.bindPopup(popupContent);
+      }
+    });
 
-        setTimeout(() => this.updateFavoriteButtonsOnMap(window.favorite_ids), 500);
+    setTimeout(() => this.updateFavoriteButtonsOnMap(window.favorite_ids), 500);
+  }
+
+  initFavoritesMap(playgrounds) {
+    if (window.favMapInstance) {
+      window.favMapInstance.remove();
     }
 
-    initFavoritesMap(playgrounds) {
-        if (window.favMapInstance) {
-            window.favMapInstance.remove();
-        }
+    var map = L.map('mypage-map-container').setView(
+      this.KAGOSHIMA_CENTER,
+      this.DEFAULT_ZOOM_LEVEL,
+    );
+    window.favMapInstance = map;
 
-        var map = L.map('mypage-map-container').setView(this.KAGOSHIMA_CENTER, this.DEFAULT_ZOOM_LEVEL);
-        window.favMapInstance = map;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        playgrounds.forEach(playground => {
-            if (playground.latitude && playground.longitude) {
-                var position = [parseFloat(playground.latitude), parseFloat(playground.longitude)];
-                var marker = L.marker(position).addTo(map);
-                var popupContent = `
+    playgrounds.forEach((playground) => {
+      if (playground.latitude && playground.longitude) {
+        var position = [
+          parseFloat(playground.latitude),
+          parseFloat(playground.longitude),
+        ];
+        var marker = L.marker(position).addTo(map);
+        var popupContent = `
                     <div>
                         <strong>${playground.name}</strong><br>
                         住所: ${playground.address}<br>
@@ -71,18 +85,20 @@ class MapManager {
                         <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
                     </div>
                 `;
-                marker.bindPopup(popupContent);
-            }
-        });
-    }
+        marker.bindPopup(popupContent);
+      }
+    });
+  }
 
-    updateFavoriteButtonsOnMap(favorite_ids) {
-            document.querySelectorAll('.btn-outline-success[data-playground-id]').forEach(button => {
-                const playgroundId = button.getAttribute('data-playground-id');
-                const isFavorite = favorite_ids.includes(playgroundId);
-                button.textContent = isFavorite ? 'お気に入り解除' : 'お気に入りに追加';
-            });
-        }
-    }
+  updateFavoriteButtonsOnMap(favorite_ids) {
+    document
+      .querySelectorAll('.btn-outline-success[data-playground-id]')
+      .forEach((button) => {
+        const playgroundId = button.getAttribute('data-playground-id');
+        const isFavorite = favorite_ids.includes(playgroundId);
+        button.textContent = isFavorite ? 'お気に入り解除' : 'お気に入りに追加';
+      });
+  }
+}
 
 export { MapManager };

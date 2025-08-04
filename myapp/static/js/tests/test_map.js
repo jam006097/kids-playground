@@ -1,152 +1,197 @@
-import { MapManager } from '../map.js';
-import { L, mockMap, mockTileLayer, mockMarker } from 'leaflet'; // Leafletのモックをインポート
+import { MapManager } from '@mapManager';
 
 describe('MapManager', () => {
   let mapManager;
-  let mockPlaygrounds;
+  let mockMap;
+  let mockTileLayer;
+  let mockMarker;
+  let mockDocumentQuerySelectorAll;
+  let setTimeoutSpy;
 
   beforeEach(() => {
-    // Clear module cache to re-load map.js for each test
-    jest.resetModules();
-    const { MapManager } = require('../map.js'); // map.jsを再読み込み
+    // LeafletのLオブジェクトをモック
+    mockMarker = {
+      addTo: jest.fn().mockReturnThis(),
+      bindPopup: jest.fn(),
+    };
+    mockTileLayer = {
+      addTo: jest.fn().mockReturnThis(),
+    };
+    mockMap = {
+      setView: jest.fn(),
+      remove: jest.fn(),
+      addLayer: jest.fn(),
+    };
+
+    global.L = {
+      map: jest.fn(() => mockMap),
+      tileLayer: jest.fn(() => mockTileLayer),
+      marker: jest.fn(() => mockMarker),
+    };
+
+    // DOM要素をモック
+    mockDocumentQuerySelectorAll = jest.fn(() => [{
+      getAttribute: jest.fn(name => {
+        if (name === 'data-playground-id') return '1';
+        return null;
+      }),
+      textContent: '',
+    }, ]);
+    Object.defineProperty(global.document, 'querySelectorAll', {
+      value: mockDocumentQuerySelectorAll,
+      writable: true,
+    });
+
+    // windowオブジェクトのモック
+    global.window.mapInstance = undefined;
+    global.window.favMapInstance = undefined;
+    global.window.favorite_ids = [];
+
+    // setTimeoutをモック
+    jest.useFakeTimers();
+    setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+
     mapManager = new MapManager();
-    mockPlaygrounds = [
-      {
-        id: '1',
-        name: '公園A',
-        address: '住所A',
-        phone: '111',
-        latitude: '31.5',
-        longitude: '130.5',
-      },
-      {
-        id: '2',
-        name: '公園B',
-        address: '住所B',
-        phone: '222',
-        latitude: '31.6',
-        longitude: '130.6',
-      },
-    ];
-
-    // window.mapInstanceとwindow.favMapInstanceをクリア
-    window.mapInstance = undefined;
-    window.favMapInstance = undefined;
-    window.favorite_ids = []; // favorite_idsもクリア
-
-    // Leafletのモックをグローバルに設定
-    global.L = L; // Lはjest.mockで定義したモックオブジェクト
-
-    // Leafletのモックをクリア
-    L.map.mockClear();
-    mockMap.setView.mockClear();
-    mockMap.remove.mockClear();
-    L.tileLayer.mockClear();
-    mockTileLayer.addTo.mockClear();
-    L.marker.mockClear();
-    mockMarker.addTo.mockClear();
-    mockMarker.bindPopup.mockClear();
-
-    // DOM要素の準備
-    document.body.innerHTML = `
-            <div id="map-container" style="width: 100px; height: 100px;"></div>
-            <div id="mypage-map-container" style="width: 100px; height: 100px;"></div>
-            <button class="btn-outline-success" data-playground-id="1">お気に入りに追加</button>
-            <button class="btn-outline-success" data-playground-id="2">お気に入りに追加</button>
-        `;
   });
 
-  // シナリオ: initMapが地図を初期化し、マーカーを追加する
-  test('initMapが地図を初期化し、マーカーを追加する', () => {
-    mapManager.initMap(mockPlaygrounds);
-
-    // 検証: L.mapが正しいコンテナIDとビュー設定で呼び出されたこと
-    expect(L.map).toHaveBeenCalledWith('map-container');
-    expect(mockMap.setView).toHaveBeenCalledWith(
-      mapManager.KAGOSHIMA_CENTER,
-      mapManager.DEFAULT_ZOOM_LEVEL,
-    );
-
-    // 検証: L.tileLayerが呼び出され、地図に追加されたこと
-    expect(L.tileLayer).toHaveBeenCalledWith(
-      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      expect.any(Object),
-    );
-    expect(mockTileLayer.addTo).toHaveBeenCalledWith(mockMap);
-
-    // 検証: 各プレイグラウンドに対してL.markerが呼び出され、地図に追加されたこと
-    expect(L.marker).toHaveBeenCalledTimes(mockPlaygrounds.length);
-    expect(mockMarker.addTo).toHaveBeenCalledTimes(mockPlaygrounds.length);
-
-    // 検証: マーカーのポップアップが正しい内容でバインドされたこと
-    expect(mockMarker.bindPopup).toHaveBeenCalledTimes(mockPlaygrounds.length);
-    expect(mockMarker.bindPopup).toHaveBeenCalledWith(
-      expect.stringContaining('公園A'),
-    );
-    expect(mockMarker.bindPopup).toHaveBeenCalledWith(
-      expect.stringContaining('公園B'),
-    );
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+    jest.restoreAllMocks(); // spyOnで作成したモックを元に戻す
   });
 
-  // シナリオ: initMapが既存の地図インスタンスを削除する
-  test('initMapが既存の地図インスタンスを削除する', () => {
-    window.mapInstance = mockMap; // 既存のインスタンスをモックに設定
-    mapManager.initMap(mockPlaygrounds);
-    expect(mockMap.remove).toHaveBeenCalled();
+  test('MapManagerが正しく初期化されること', () => {
+    expect(mapManager.KAGOSHIMA_CENTER).toEqual([31.5602, 130.5581]);
+    expect(mapManager.DEFAULT_ZOOM_LEVEL).toBe(10);
   });
 
-  // シナリオ: initFavoritesMapが地図を初期化し、マーカーを追加する
-  test('initFavoritesMapが地図を初期化し、マーカーを追加する', () => {
-    mapManager.initFavoritesMap(mockPlaygrounds);
+  describe('initMap', () => {
+    const mockPlaygrounds = [{
+      id: '1',
+      name: '公園A',
+      address: '住所A',
+      phone: '111',
+      latitude: '31.5',
+      longitude: '130.5'
+    }, {
+      id: '2',
+      name: '公園B',
+      address: '住所B',
+      phone: '222',
+      latitude: '31.6',
+      longitude: '130.6'
+    }, ];
 
-    // 検証: L.mapが正しいコンテナIDとビュー設定で呼び出されたこと
-    expect(L.map).toHaveBeenCalledWith('mypage-map-container');
-    expect(mockMap.setView).toHaveBeenCalledWith(
-      mapManager.KAGOSHIMA_CENTER,
-      mapManager.DEFAULT_ZOOM_LEVEL,
-    );
+    test('地図が初期化され、L.mapが適切な引数で呼び出されること', () => {
+      mapManager.initMap(mockPlaygrounds);
+      expect(global.L.map).toHaveBeenCalledWith('map-container');
+      expect(mockMap.setView).toHaveBeenCalledWith(
+        mapManager.KAGOSHIMA_CENTER,
+        mapManager.DEFAULT_ZOOM_LEVEL,
+      );
+      expect(mockTileLayer.addTo).toHaveBeenCalledWith(window.mapInstance); // window.mapInstanceを渡す
+    });
 
-    // 検証: L.tileLayerが呼び出され、地図に追加されたこと
-    expect(L.tileLayer).toHaveBeenCalledWith(
-      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      expect.any(Object),
-    );
-    expect(mockTileLayer.addTo).toHaveBeenCalledWith(mockMap);
+    test('遊び場が与えられた場合、各遊び場に対してマーカーが追加され、ポップアップがバインドされること', () => {
+      mapManager.initMap(mockPlaygrounds);
 
-    // 検証: 各プレイグラウンドに対してL.markerが呼び出され、地図に追加されたこと
-    expect(L.marker).toHaveBeenCalledTimes(mockPlaygrounds.length);
-    expect(mockMarker.addTo).toHaveBeenCalledTimes(mockPlaygrounds.length);
+      expect(global.L.marker).toHaveBeenCalledTimes(mockPlaygrounds.length);
+      expect(mockMarker.addTo).toHaveBeenCalledTimes(mockPlaygrounds.length);
+      expect(mockMarker.bindPopup).toHaveBeenCalledTimes(mockPlaygrounds.length);
 
-    // 検証: マーカーのポップアップが正しい内容でバインドされたこと
-    expect(mockMarker.bindPopup).toHaveBeenCalledTimes(mockPlaygrounds.length);
-    expect(mockMarker.bindPopup).toHaveBeenCalledWith(
-      expect.stringContaining('公園A'),
-    );
-    expect(mockMarker.bindPopup).toHaveBeenCalledWith(
-      expect.stringContaining('公園B'),
-    );
+      expect(global.L.marker).toHaveBeenCalledWith([31.5, 130.5]);
+      expect(global.L.marker).toHaveBeenCalledWith([31.6, 130.6]);
+
+      expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.stringContaining('公園A'));
+      expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.stringContaining('公園B'));
+    });
+
+    test('window.mapInstanceが既に存在する場合、removeが呼び出されること', () => {
+      global.window.mapInstance = mockMap;
+      mapManager.initMap(mockPlaygrounds);
+      expect(mockMap.remove).toHaveBeenCalled();
+    });
+
+    test('setTimeoutが呼び出されること', () => {
+      mapManager.initMap(mockPlaygrounds);
+      expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 500);
+    });
   });
 
-  // シナリオ: initFavoritesMapが既存のお気に入り地図インスタンスを削除する
-  test('initFavoritesMapが既存のお気に入り地図インスタンスを削除する', () => {
-    window.favMapInstance = mockMap; // 既存のインスタンスをモックに設定
-    mapManager.initFavoritesMap(mockPlaygrounds);
-    expect(mockMap.remove).toHaveBeenCalled();
+  describe('initFavoritesMap', () => {
+    const mockPlaygrounds = [{
+      id: '1',
+      name: 'お気に入り公園A',
+      address: 'お気に入り住所A',
+      phone: '333',
+      latitude: '32.0',
+      longitude: '131.0'
+    }, ];
+
+    test('お気に入り地図が初期化され、L.mapが適切な引数で呼び出されること', () => {
+      mapManager.initFavoritesMap(mockPlaygrounds);
+      expect(global.L.map).toHaveBeenCalledWith('mypage-map-container');
+      expect(mockMap.setView).toHaveBeenCalledWith(
+        mapManager.KAGOSHIMA_CENTER,
+        mapManager.DEFAULT_ZOOM_LEVEL,
+      );
+      expect(mockTileLayer.addTo).toHaveBeenCalledWith(window.favMapInstance); // window.favMapInstanceを渡す
+    });
+
+    test('遊び場が与えられた場合、各遊び場に対してマーカーが追加され、ポップアップがバインドされること', () => {
+      mapManager.initFavoritesMap(mockPlaygrounds);
+
+      expect(global.L.marker).toHaveBeenCalledTimes(mockPlaygrounds.length);
+      expect(mockMarker.addTo).toHaveBeenCalledTimes(mockPlaygrounds.length);
+      expect(mockMarker.bindPopup).toHaveBeenCalledTimes(mockPlaygrounds.length);
+
+      expect(global.L.marker).toHaveBeenCalledWith([32.0, 131.0]);
+      expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.stringContaining('お気に入り公園A'));
+    });
+
+    test('window.favMapInstanceが既に存在する場合、removeが呼び出されること', () => {
+      global.window.favMapInstance = mockMap;
+      mapManager.initFavoritesMap(mockPlaygrounds);
+      expect(mockMap.remove).toHaveBeenCalled();
+    });
   });
 
-  // シナリオ: updateFavoriteButtonsOnMapがボタンのテキストを更新する
-  test('updateFavoriteButtonsOnMapがボタンのテキストを更新する', () => {
-    // 準備: お気に入りIDのリスト
-    window.favorite_ids = ['1'];
+  describe('updateFavoriteButtonsOnMap', () => {
+    let mockButton1, mockButton2;
 
-    // 実行: updateFavoriteButtonsOnMapを呼び出す
-    mapManager.updateFavoriteButtonsOnMap(window.favorite_ids);
+    beforeEach(() => {
+      mockButton1 = {
+        getAttribute: jest.fn(name => {
+          if (name === 'data-playground-id') return '1';
+          return null;
+        }),
+        textContent: '',
+      };
+      mockButton2 = {
+        getAttribute: jest.fn(name => {
+          if (name === 'data-playground-id') return '2';
+          return null;
+        }),
+        textContent: '',
+      };
+      mockDocumentQuerySelectorAll.mockReturnValue([mockButton1, mockButton2]);
+    });
 
-    // 検証: ボタンのテキストが正しく更新されたこと
-    const button1 = document.querySelector('[data-playground-id="1"]');
-    const button2 = document.querySelector('[data-playground-id="2"]');
+    test('お気に入りIDに基づいてボタンのテキストが正しく更新されること', () => {
+      const favoriteIds = ['1'];
+      mapManager.updateFavoriteButtonsOnMap(favoriteIds);
 
-    expect(button1.textContent).toBe('お気に入り解除');
-    expect(button2.textContent).toBe('お気に入りに追加');
+      expect(mockButton1.textContent).toBe('お気に入り解除');
+      expect(mockButton2.textContent).toBe('お気に入りに追加');
+    });
+
+    test('お気に入りIDが空の場合、すべてのボタンが「お気に入りに追加」になること', () => {
+      const favoriteIds = [];
+      mapManager.updateFavoriteButtonsOnMap(favoriteIds);
+
+      expect(mockButton1.textContent).toBe('お気に入りに追加');
+      expect(mockButton2.textContent).toBe('お気に入りに追加');
+    });
   });
 });

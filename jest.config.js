@@ -7,6 +7,7 @@ module.exports = {
     '^leaflet$': '<rootDir>/__mocks__/leafletMock.js',
     '^jquery$': '<rootDir>/__mocks__/jqueryMock.js',
     '^../myapp/static/js/utils.js$': '<rootDir>/myapp/static/js/utils.js',
+    '^@mapManager$': '<rootDir>/myapp/static/js/map.js',
   },
   testMatch: [
     '**/__tests__/**/*.js',

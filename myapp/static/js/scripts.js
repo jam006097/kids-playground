@@ -5,7 +5,7 @@ import { ReviewManager } from './review.js';
 document.addEventListener('DOMContentLoaded', function () {
   const mapManager = new MapManager();
   const favoriteManager = new FavoriteManager();
-  const reviewManager = new ReviewManager();
+  const reviewManager = new ReviewManager($);
 
   // ページに応じて適切な地図のイベントリスナーを設定
   if (document.getElementById('map-container')) {

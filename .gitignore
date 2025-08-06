@@ -73,3 +73,9 @@ Desktop.ini
 # Others
 *.bak
 *.swp
+
+# Node
+node_modules/
+
+# Test
+.pytest_cache/

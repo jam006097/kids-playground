@@ -3,8 +3,6 @@ import { ReviewManager } from '../review.js';
 describe('ReviewManager', () => {
   let mockJQuery;
   let mockAlert; // Still need this for mocking global alert
-  let reviewManager;
-  let eventHandlers; // beforeEachで初期化
 
   let mockReviewModalElement;
   let mockReviewFormElement;
@@ -23,8 +21,6 @@ describe('ReviewManager', () => {
   });
 
   beforeEach(() => {
-    eventHandlers = {}; // 各テストの前に初期化
-
     // Specific mocks for #reviewModal, #reviewForm, and #playgroundId
     mockReviewModalElement = createMockElement();
     mockReviewFormElement = createMockElement();
@@ -94,7 +90,7 @@ describe('ReviewManager', () => {
 
     // ReviewManagerのインスタンスを作成する前にスパイを設定
     jest.spyOn(ReviewManager.prototype, 'initReviewHandlers');
-    reviewManager = new ReviewManager(mockJQuery); // Remove mockAlert from constructor
+    new ReviewManager(mockJQuery); // Remove mockAlert from constructor
 
     // Manually populate eventHandlers after initReviewHandlers is called
     // This is handled by the on mocks directly now
@@ -117,8 +113,8 @@ describe('ReviewManager', () => {
         relatedTarget: {
           dataset: {
             'playground-id': '456',
-            'playground-name': '別の公園'
-          }
+            'playground-name': '別の公園',
+          },
         },
         currentTarget: mockReviewModalElement, // Add currentTarget for the modal element
       };
@@ -129,7 +125,9 @@ describe('ReviewManager', () => {
       expect(mockPlaygroundIdElement.val).toHaveBeenCalledWith('456');
 
       expect(mockReviewModalElement.find).toHaveBeenCalledWith('.modal-title');
-      expect(mockModalTitleElement.text).toHaveBeenCalledWith('別の公園への口コミ');
+      expect(mockModalTitleElement.text).toHaveBeenCalledWith(
+        '別の公園への口コミ',
+      );
     });
   });
 
@@ -150,7 +148,7 @@ describe('ReviewManager', () => {
     test('AJAXリクエストが成功した場合、alertが呼び出されモーダルが閉じられること', async () => {
       mockJQuery.ajax.mockImplementationOnce((options) => {
         options.success({
-          message: '口コミが投稿されました。'
+          message: '口コミが投稿されました。',
         });
       });
 
@@ -159,11 +157,13 @@ describe('ReviewManager', () => {
       };
       mockReviewFormElement.submitHandler(mockEvent);
 
-      expect(mockJQuery.ajax).toHaveBeenCalledWith(expect.objectContaining({
-        url: '/playground/123/add_review/',
-        method: 'POST',
-        data: 'formData&csrfmiddlewaretoken=mockCsrfToken',
-      }));
+      expect(mockJQuery.ajax).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: '/playground/123/add_review/',
+          method: 'POST',
+          data: 'formData&csrfmiddlewaretoken=mockCsrfToken',
+        }),
+      );
       expect(global.alert).toHaveBeenCalledWith('口コミが投稿されました。'); // Use global.alert
       expect(mockReviewModalElement.modal).toHaveBeenCalledWith('hide');
     });
@@ -178,11 +178,13 @@ describe('ReviewManager', () => {
       };
       mockReviewFormElement.submitHandler(mockEvent);
 
-      expect(mockJQuery.ajax).toHaveBeenCalledWith(expect.objectContaining({
-        url: '/playground/123/add_review/',
-        method: 'POST',
-        data: 'formData&csrfmiddlewaretoken=mockCsrfToken',
-      }));
+      expect(mockJQuery.ajax).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: '/playground/123/add_review/',
+          method: 'POST',
+          data: 'formData&csrfmiddlewaretoken=mockCsrfToken',
+        }),
+      );
       expect(global.alert).toHaveBeenCalledWith('口コミの投稿に失敗しました。'); // Use global.alert
     });
   });

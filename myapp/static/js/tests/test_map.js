@@ -30,13 +30,15 @@ describe('MapManager', () => {
     };
 
     // DOM要素をモック
-    mockDocumentQuerySelectorAll = jest.fn(() => [{
-      getAttribute: jest.fn(name => {
-        if (name === 'data-playground-id') return '1';
-        return null;
-      }),
-      textContent: '',
-    }, ]);
+    mockDocumentQuerySelectorAll = jest.fn(() => [
+      {
+        getAttribute: jest.fn((name) => {
+          if (name === 'data-playground-id') return '1';
+          return null;
+        }),
+        textContent: '',
+      },
+    ]);
     Object.defineProperty(global.document, 'querySelectorAll', {
       value: mockDocumentQuerySelectorAll,
       writable: true,
@@ -66,21 +68,24 @@ describe('MapManager', () => {
   });
 
   describe('initMap', () => {
-    const mockPlaygrounds = [{
-      id: '1',
-      name: '公園A',
-      address: '住所A',
-      phone: '111',
-      latitude: '31.5',
-      longitude: '130.5'
-    }, {
-      id: '2',
-      name: '公園B',
-      address: '住所B',
-      phone: '222',
-      latitude: '31.6',
-      longitude: '130.6'
-    }, ];
+    const mockPlaygrounds = [
+      {
+        id: '1',
+        name: '公園A',
+        address: '住所A',
+        phone: '111',
+        latitude: '31.5',
+        longitude: '130.5',
+      },
+      {
+        id: '2',
+        name: '公園B',
+        address: '住所B',
+        phone: '222',
+        latitude: '31.6',
+        longitude: '130.6',
+      },
+    ];
 
     test('地図が初期化され、L.mapが適切な引数で呼び出されること', () => {
       mapManager.initMap(mockPlaygrounds);
@@ -97,13 +102,19 @@ describe('MapManager', () => {
 
       expect(global.L.marker).toHaveBeenCalledTimes(mockPlaygrounds.length);
       expect(mockMarker.addTo).toHaveBeenCalledTimes(mockPlaygrounds.length);
-      expect(mockMarker.bindPopup).toHaveBeenCalledTimes(mockPlaygrounds.length);
+      expect(mockMarker.bindPopup).toHaveBeenCalledTimes(
+        mockPlaygrounds.length,
+      );
 
       expect(global.L.marker).toHaveBeenCalledWith([31.5, 130.5]);
       expect(global.L.marker).toHaveBeenCalledWith([31.6, 130.6]);
 
-      expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.stringContaining('公園A'));
-      expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.stringContaining('公園B'));
+      expect(mockMarker.bindPopup).toHaveBeenCalledWith(
+        expect.stringContaining('公園A'),
+      );
+      expect(mockMarker.bindPopup).toHaveBeenCalledWith(
+        expect.stringContaining('公園B'),
+      );
     });
 
     test('window.mapInstanceが既に存在する場合、removeが呼び出されること', () => {
@@ -120,14 +131,16 @@ describe('MapManager', () => {
   });
 
   describe('initFavoritesMap', () => {
-    const mockPlaygrounds = [{
-      id: '1',
-      name: 'お気に入り公園A',
-      address: 'お気に入り住所A',
-      phone: '333',
-      latitude: '32.0',
-      longitude: '131.0'
-    }, ];
+    const mockPlaygrounds = [
+      {
+        id: '1',
+        name: 'お気に入り公園A',
+        address: 'お気に入り住所A',
+        phone: '333',
+        latitude: '32.0',
+        longitude: '131.0',
+      },
+    ];
 
     test('お気に入り地図が初期化され、L.mapが適切な引数で呼び出されること', () => {
       mapManager.initFavoritesMap(mockPlaygrounds);
@@ -144,10 +157,14 @@ describe('MapManager', () => {
 
       expect(global.L.marker).toHaveBeenCalledTimes(mockPlaygrounds.length);
       expect(mockMarker.addTo).toHaveBeenCalledTimes(mockPlaygrounds.length);
-      expect(mockMarker.bindPopup).toHaveBeenCalledTimes(mockPlaygrounds.length);
+      expect(mockMarker.bindPopup).toHaveBeenCalledTimes(
+        mockPlaygrounds.length,
+      );
 
       expect(global.L.marker).toHaveBeenCalledWith([32.0, 131.0]);
-      expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.stringContaining('お気に入り公園A'));
+      expect(mockMarker.bindPopup).toHaveBeenCalledWith(
+        expect.stringContaining('お気に入り公園A'),
+      );
     });
 
     test('window.favMapInstanceが既に存在する場合、removeが呼び出されること', () => {
@@ -162,14 +179,14 @@ describe('MapManager', () => {
 
     beforeEach(() => {
       mockButton1 = {
-        getAttribute: jest.fn(name => {
+        getAttribute: jest.fn((name) => {
           if (name === 'data-playground-id') return '1';
           return null;
         }),
         textContent: '',
       };
       mockButton2 = {
-        getAttribute: jest.fn(name => {
+        getAttribute: jest.fn((name) => {
           if (name === 'data-playground-id') return '2';
           return null;
         }),

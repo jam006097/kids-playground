@@ -36,7 +36,7 @@ class ReviewManager {
           alert(response.message); // Direct call to global alert
           self.$('#reviewModal').modal('hide');
         },
-        error: (xhr) => {
+        error: () => {
           alert('口コミの投稿に失敗しました。'); // Direct call to global alert
         },
       });

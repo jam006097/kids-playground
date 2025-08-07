@@ -1,5 +1,7 @@
 from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
+from typing import Any, Dict, cast
+from django.db.models.query import QuerySet
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from myapp.models import Playground, Favorite, Review
 import urllib.request
@@ -36,19 +38,19 @@ class PlaygroundListView(ListView):
     template_name = "playgrounds/list.html"
     context_object_name = "playgrounds"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Playground]:
         """
         クエリセットを取得する。
         リクエストに'city'パラメータがあれば、その都市でフィルタリングする。
         """
-        queryset = super().get_queryset()
+        queryset = cast(QuerySet[Playground], super().get_queryset())
         self.selected_city = self.request.GET.get("city")
         if self.selected_city:
             # 都市名で部分一致検索
             queryset = queryset.filter(address__icontains=self.selected_city)
         return queryset
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """
         テンプレートに渡すコンテキストデータを取得する。
         公園の総数、フィルタリングされた公園の数、お気に入り公園の情報を追加する。
@@ -69,16 +71,16 @@ class PlaygroundListView(ListView):
             )
         )
 
-        favorite_ids = []
+        favorite_ids: list[str] = []
         # ユーザーが認証済みの場合、お気に入り公園の情報を取得
         if self.request.user.is_authenticated:
             # お気に入り公園のIDリストを取得
-            favorite_ids = list(
+            favorite_ids_int = list(
                 Favorite.objects.filter(user=self.request.user).values_list(
                     "playground_id", flat=True
                 )
             )
-            favorite_ids = [str(id) for id in favorite_ids]
+            favorite_ids = [str(id) for id in favorite_ids_int]
 
         # コンテキストを更新
         context.update(

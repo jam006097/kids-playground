@@ -1,6 +1,10 @@
 # myapp/models.py - Djangoモデルの定義
+from __future__ import annotations
 from django.db import models
 from django.conf import settings
+from typing import Any
+import datetime
+from users.models import CustomUser
 
 
 class Playground(models.Model):
@@ -15,15 +19,15 @@ class Playground(models.Model):
         longitude: 経度
     """
 
-    id = models.AutoField(primary_key=True)  # ID
-    prefecture = models.CharField(max_length=100)  # 都道府県
-    name = models.CharField(max_length=200)  # 施設名
-    address = models.CharField(max_length=300)  # 住所
-    phone = models.CharField(max_length=30, null=True)  # 電話番号
-    latitude = models.FloatField(null=True)  # 緯度
-    longitude = models.FloatField(null=True)  # 経度
+    id: int = models.AutoField(primary_key=True)  # type: ignore
+    prefecture: str = models.CharField(max_length=100)  # type: ignore
+    name: str = models.CharField(max_length=200)  # type: ignore
+    address: str = models.CharField(max_length=300)  # type: ignore
+    phone: str | None = models.CharField(max_length=30, null=True)  # type: ignore
+    latitude: float | None = models.FloatField(null=True)  # type: ignore
+    longitude: float | None = models.FloatField(null=True)  # type: ignore
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -35,8 +39,8 @@ class Favorite(models.Model):
         playground: お気に入りの施設
     """
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    playground = models.ForeignKey(Playground, on_delete=models.CASCADE)
+    user: "CustomUser" = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # type: ignore
+    playground: "Playground" = models.ForeignKey(Playground, on_delete=models.CASCADE)  # type: ignore
 
     class Meta:
         unique_together = ("user", "playground")
@@ -53,13 +57,13 @@ class Review(models.Model):
         created_at: 口コミ投稿日時
     """
 
-    playground = models.ForeignKey(
+    playground: "Playground" = models.ForeignKey(  # type: ignore
         Playground, on_delete=models.CASCADE, related_name="reviews"
     )
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    content = models.TextField()
-    rating = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    user: "CustomUser" = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # type: ignore
+    content: str = models.TextField()  # type: ignore
+    rating: int = models.PositiveIntegerField()  # type: ignore
+    created_at: datetime.datetime = models.DateTimeField(auto_now_add=True)  # type: ignore
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.user.email} - {self.playground.name} - {self.rating}"

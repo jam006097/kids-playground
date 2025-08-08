@@ -1,5 +1,7 @@
 from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpRequest
+from typing import Any, Dict, cast
+from django.db.models.query import QuerySet
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from myapp.models import Playground, Favorite, Review
 import urllib.request
@@ -12,18 +14,8 @@ from django.views.generic import ListView, View, CreateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-# .envファイルから環境変数を読み込む
-load_dotenv()
 
-# ロギングの設定
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s",
-    handlers=[
-        logging.FileHandler("app.log"),  # ログをファイルに保存
-        logging.StreamHandler(),  # コンソールにもログを表示
-    ],
-)
+from users.models import CustomUser
 
 
 class AddReviewView(LoginRequiredMixin, View):
@@ -32,26 +24,35 @@ class AddReviewView(LoginRequiredMixin, View):
     ログインしているユーザーのみがアクセス可能。
     """
 
-    def post(self, request, playground_id, *args, **kwargs):
+    def post(
+        self, request: HttpRequest, playground_id: int, *args: Any, **kwargs: Any
+    ) -> JsonResponse:
         """
         POSTリクエストを処理し、指定された公園にレビューを追加する。
         """
         content = request.POST.get("content")
         rating = request.POST.get("rating")
 
+        if content is None or rating is None:
+            return JsonResponse(
+                {"status": "error", "message": "content and rating are required"},
+                status=400,
+            )
+
         # 公園オブジェクトを取得
         playground = get_object_or_404(Playground, id=playground_id)
 
         # レビューを作成
+        user = cast(CustomUser, request.user)
         Review.objects.create(
-            playground=playground, user=request.user, content=content, rating=rating
+            playground=playground, user=user, content=content, rating=rating
         )
 
         return JsonResponse(
             {"status": "success", "message": "口コミが投稿されました！"}
         )
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
         GETリクエストは無効。
         """
@@ -70,7 +71,7 @@ class ReviewListView(ListView):
     template_name = "reviews/view_reviews.html"
     context_object_name = "reviews"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Review]:
         """
         クエリセットを取得する。
         URLから公園IDを取得し、その公園のレビューをフィルタリングして返す。
@@ -79,7 +80,7 @@ class ReviewListView(ListView):
         self.playground = get_object_or_404(Playground, id=playground_id)
         return Review.objects.filter(playground=self.playground).select_related("user")
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """
         テンプレートに渡すコンテキストデータを取得する。
         現在の公園情報を追加する。

@@ -107,8 +107,8 @@ integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0v
 crossorigin=""></script>
 <script>
     // Djangoテンプレートから渡されたデータをJavaScriptで使用できるようにする
-    var playgrounds = JSON.parse('{{ playgrounds_json|safe }}');
-    var favorite_ids = JSON.parse('{{ favorite_ids|safe }}');
+    window.playgrounds = JSON.parse('{{ playgrounds_json|safe }}');
+    window.favorite_ids = JSON.parse('{{ favorite_ids|safe }}');
 </script>
 <script type="module" src="{% static 'js/utils.js' %}"></script>
 <script type="module" src="{% static 'js/map.js' %}"></script>

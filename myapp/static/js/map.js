@@ -4,6 +4,27 @@ class MapManager {
     this.DEFAULT_ZOOM_LEVEL = 10;
   }
 
+  createPopupContent(playground) {
+    const isFavorite = window.favorite_ids.includes(String(playground.id));
+    const buttonText = isFavorite ? 'お気に入り解除' : 'お気に入りに追加';
+
+    return `
+            <div>
+                <strong>${playground.name}</strong><br>
+                住所: ${playground.address}<br>
+                電話番号: ${playground.phone}<br>
+                <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" data-action="toggle-favorite">
+                    ${buttonText}
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal"
+                        data-playground-id="${playground.id}" data-playground-name="${playground.name}">
+                    口コミを書く
+                </button>
+                <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
+            </div>
+        `;
+  }
+
   initMap(playgrounds) {
     if (window.mapInstance) {
       window.mapInstance.remove();
@@ -26,22 +47,7 @@ class MapManager {
           parseFloat(playground.longitude),
         ];
         var marker = L.marker(position).addTo(window.mapInstance);
-        var popupContent = `
-                    <div>
-                        <strong>${playground.name}</strong><br>
-                        住所: ${playground.address}<br>
-                        電話番号: ${playground.phone}<br>
-                        <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" data-action="toggle-favorite">
-                            お気に入りに追加
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" 
-                                data-playground-id="${playground.id}" data-playground-name="${playground.name}">
-                            口コミを書く
-                        </button>
-                        <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
-                    </div>
-                `;
-        marker.bindPopup(popupContent);
+        marker.bindPopup(() => this.createPopupContent(playground)); // ここを修正
       }
     });
 
@@ -71,21 +77,7 @@ class MapManager {
           parseFloat(playground.longitude),
         ];
         var marker = L.marker(position).addTo(map);
-        var popupContent = `
-                    <div>
-                        <strong>${playground.name}</strong><br>
-                        住所: ${playground.address}<br>
-                        電話番号: ${playground.phone}<br>
-                        <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" data-action="toggle-favorite">
-                            お気に入り解除
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal" data-playground-id="${playground.id}" data-playground-name="${playground.name}">
-                            口コミを書く
-                        </button>
-                        <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
-                    </div>
-                `;
-        marker.bindPopup(popupContent);
+        marker.bindPopup(() => this.createPopupContent(playground)); // ここを修正
       }
     });
   }

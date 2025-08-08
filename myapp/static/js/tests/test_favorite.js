@@ -34,6 +34,9 @@ describe('FavoriteManager', () => {
     // エラーハンドリングテストのためにalertとconsole.errorをスパイ
     jest.spyOn(window, 'alert').mockImplementation(() => {});
     jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    // window.favorite_idsを初期化
+    window.favorite_ids = [];
   });
 
   afterEach(() => {
@@ -90,6 +93,34 @@ describe('FavoriteManager', () => {
     expect(mockButton.disabled).toBe(false);
     // 検証: alertが呼び出されていないこと
     expect(window.alert).not.toHaveBeenCalled();
+  });
+
+  // シナリオ: window.favorite_idsが更新されることを確認する
+  describe('window.favorite_idsの更新', () => {
+    beforeEach(() => {
+      // グローバルなwindow.favorite_idsを初期化
+      window.favorite_ids = ['999']; // 既存のお気に入り
+    });
+
+    test('お気に入り追加時にwindow.favorite_idsにIDが追加される', async () => {
+      // 実行
+      await favoriteManager.toggleFavorite(mockButton, '123');
+      // 検証
+      expect(window.favorite_ids).toContain('123');
+      expect(window.favorite_ids).toContain('999'); // 既存のIDが残っていること
+    });
+
+    test('お気に入り削除時にwindow.favorite_idsからIDが削除される', async () => {
+      // 準備: ボタンとwindow.favorite_idsをお気に入り済みの状態にする
+      mockButton.textContent = 'お気に入り解除';
+      window.favorite_ids.push('123');
+
+      // 実行
+      await favoriteManager.toggleFavorite(mockButton, '123');
+      // 検証
+      expect(window.favorite_ids).not.toContain('123');
+      expect(window.favorite_ids).toContain('999'); // 他のIDが残っていること
+    });
   });
 
   // シナリオ: APIエラーが発生した場合

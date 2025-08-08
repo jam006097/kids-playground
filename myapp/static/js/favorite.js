@@ -28,6 +28,19 @@ class FavoriteManager {
           button.textContent = isFavorite
             ? 'お気に入りに追加'
             : 'お気に入り解除';
+
+          // 地図ポップアップ用のお気に入りIDリストを更新
+          if (!isFavorite) {
+            // お気に入りに追加
+            window.favorite_ids.push(String(playgroundId));
+          } else {
+            // お気に入りから削除
+            const index = window.favorite_ids.indexOf(String(playgroundId));
+            if (index > -1) {
+              window.favorite_ids.splice(index, 1);
+            }
+          }
+
           if (window.location.pathname.includes('/favorites/')) {
             location.reload();
           }

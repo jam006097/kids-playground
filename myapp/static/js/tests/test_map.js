@@ -109,12 +109,8 @@ describe('MapManager', () => {
       expect(global.L.marker).toHaveBeenCalledWith([31.5, 130.5]);
       expect(global.L.marker).toHaveBeenCalledWith([31.6, 130.6]);
 
-      expect(mockMarker.bindPopup).toHaveBeenCalledWith(
-        expect.stringContaining('公園A'),
-      );
-      expect(mockMarker.bindPopup).toHaveBeenCalledWith(
-        expect.stringContaining('公園B'),
-      );
+      expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.any(Function));
+      expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.any(Function));
     });
 
     test('window.mapInstanceが既に存在する場合、removeが呼び出されること', () => {
@@ -162,9 +158,7 @@ describe('MapManager', () => {
       );
 
       expect(global.L.marker).toHaveBeenCalledWith([32.0, 131.0]);
-      expect(mockMarker.bindPopup).toHaveBeenCalledWith(
-        expect.stringContaining('お気に入り公園A'),
-      );
+      expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.any(Function));
     });
 
     test('window.favMapInstanceが既に存在する場合、removeが呼び出されること', () => {
@@ -209,6 +203,31 @@ describe('MapManager', () => {
 
       expect(mockButton1.textContent).toBe('お気に入りに追加');
       expect(mockButton2.textContent).toBe('お気に入りに追加');
+    });
+  });
+
+  describe('ポップアップ内のお気に入り状態の動的更新', () => {
+    const mockPlayground = {
+      id: '1',
+      name: '公園A',
+      address: '住所A',
+      phone: '111',
+      latitude: '31.5',
+      longitude: '130.5',
+    };
+
+    test('お気に入り登録後、再度ポップアップを開くと状態が「お気に入り解除」に更新されていること', () => {
+      // 1. 初期状態ではお気に入りではない
+      window.favorite_ids = [];
+      let popupContent = mapManager.createPopupContent(mockPlayground);
+      expect(popupContent).toContain('お気に入りに追加');
+
+      // 2. お気に入りに登録する（FavoriteManagerの動作を模倣）
+      window.favorite_ids.push('1');
+
+      // 3. 再度ポップアップの内容を生成すると、状態が更新されている
+      popupContent = mapManager.createPopupContent(mockPlayground);
+      expect(popupContent).toContain('お気に入り解除');
     });
   });
 });

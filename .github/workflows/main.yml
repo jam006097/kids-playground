@@ -83,6 +83,8 @@ jobs:
         context: .
         push: true
         tags: ghcr.io/${{ env.REPO_NAME_LOWER }}:latest # ここを修正
+        username: jam006097 # ここをあなたのGitHubユーザー名に直接変更
+        password: ${{ secrets.GHCR_PAT }}
 
     - name: Deploy to Render
       env:

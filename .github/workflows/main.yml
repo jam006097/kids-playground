@@ -10,6 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     environment: production # 環境名を指定 (GitHub Secretsと連携)
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: kina
+          POSTGRES_PASSWORD: Kaim2308!
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval=10s --health-timeout=5s --health-retries=10
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -24,9 +35,9 @@ jobs:
         pip cache purge
         pip install -r requirements.txt
 
-
     - name: Run Python tests
       run: |
+        export DATABASE_URL="postgres://kina:Kaim2308!@127.0.0.1:5432/test_db"
         pytest --ds=mysite.settings.dev
 
     - name: Set up Node.js

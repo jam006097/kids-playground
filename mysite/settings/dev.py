@@ -5,17 +5,6 @@ import sys
 DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "mydatabase",
-        "USER": "myuser",
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": "localhost",
-        "PORT": "3306",
-    }
-}
-
 # ローカルでの手動テスト時のみ実際にメールを送信する
 if "runserver" in sys.argv:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

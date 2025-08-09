@@ -5,14 +5,7 @@ DEBUG = False
 ALLOWED_HOSTS = ["jam006097.pythonanywhere.com"]
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "jam006097$kids",
-        "USER": "jam006097",
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": "jam006097.mysql.pythonanywhere-services.com",
-        "PORT": "3306",
-    }
+    "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
 }
 
 # Email settings for production

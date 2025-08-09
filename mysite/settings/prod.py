@@ -5,9 +5,7 @@ import dj_database_url
 DEBUG = False
 ALLOWED_HOSTS = ["jam006097.pythonanywhere.com"]
 
-DATABASES = {
-    "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
-}
+DATABASES = {"default": dj_database_url.config(default=os.getenv("DATABASE_URL"))}
 
 # Email settings for production
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

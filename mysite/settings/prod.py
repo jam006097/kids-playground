@@ -1,5 +1,6 @@
 from .base import *
 import os
+import dj_database_url
 
 DEBUG = False
 ALLOWED_HOSTS = ["jam006097.pythonanywhere.com"]

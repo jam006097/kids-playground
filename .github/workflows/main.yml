@@ -71,19 +71,18 @@ jobs:
         npm run lint
         npm run format -- --check # --check で変更せずにチェックのみ行う
 
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Set lowercase repository name
+      id: repo_name_lower
+      run: |
+        LOWER_REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+        echo "REPO_NAME_LOWER=$LOWER_REPO_NAME" >> $GITHUB_ENV
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ env.REPO_NAME_LOWER }}:latest # 例: ghcr.io/your-username/your-repo-name:latest
+        tags: ghcr.io/${{ env.REPO_NAME_LOWER }}:latest # ここを修正
 
     - name: Deploy to Render
       env:

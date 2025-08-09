@@ -36,9 +36,10 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run Python tests
+      env:
+        DATABASE_URL: "postgres://kina:Kaim2308!@127.0.0.1:5432/test_db"
+        SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
       run: |
-        export DATABASE_URL="postgres://kina:Kaim2308!@127.0.0.1:5432/test_db"
-        export SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}"
         pytest --ds=mysite.settings.dev
 
     - name: Set up Node.js

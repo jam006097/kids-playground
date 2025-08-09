@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: production # 環境名を指定 (GitHub Secretsと連携)
 
+    permissions:
+      contents: read
+      packages: write # GHCRへの書き込み権限
+
     services:
       postgres:
         image: postgres:16
@@ -51,11 +55,13 @@ jobs:
       run: npm install
 
     - name: Run JavaScript tests
-      run: npm test
+      run: |
+        npm run format
+        npm run lint
+        npm run format -- --check # --check で変更せずにチェックのみ行う
 
     - name: Lint and Format Check (Python)
       run: |
-        black .
         black . --check
         flake8 .
 
@@ -71,10 +77,6 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Set lowercase repository name
-      id: repo_name_lower
-      run: echo "REPO_NAME_LOWER=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5

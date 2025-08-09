@@ -24,8 +24,7 @@ jobs:
 
     - name: Run Python tests
       run: |
-        export DJANGO_SETTINGS_MODULE=mysite.settings.dev
-        pytest
+        pytest --ds=mysite.settings.dev
 
     - name: Set up Node.js
       uses: actions/setup-node@v4

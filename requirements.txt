@@ -25,6 +25,7 @@ requests==2.32.3
 schedule==1.2.2
 soupsieve==2.6
 sqlparse==0.5.3
+dj-database-url==2.1.0
 urllib3==2.3.0
 mypy==1.10.0
 django-stubs==5.0.0

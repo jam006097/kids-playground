@@ -1,0 +1,69 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main # mainブランチへのプッシュでトリガー
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: production # 環境名を指定 (GitHub Secretsと連携)
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install Python dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run Python tests
+      run: pytest
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Node.js dependencies
+      run: npm install
+
+    - name: Run JavaScript tests
+      run: npm test
+
+    - name: Lint and Format Check (Python)
+      run: |
+        black . --check
+        flake8 .
+
+    - name: Lint and Format Check (JavaScript)
+      run: |
+        npm run lint
+        npm run format -- --check # --check で変更せずにチェックのみ行う
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: ghcr.io/${{ github.repository }}:latest # 例: ghcr.io/your-username/your-repo-name:latest
+
+    - name: Deploy to Render
+      env:
+        RENDER_SERVICE_ID: srv-d2b9l895pdvs73ci8550 # これはenvブロックに残す
+      run: |
+        curl -X POST -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+             -H "Content-Type: application/json" \
+             "https://api.render.com/deploy/srv-${{ env.RENDER_SERVICE_ID }}?image=ghcr.io/${{ github.repository }}:latest"

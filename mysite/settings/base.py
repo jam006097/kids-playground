@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import dj_database_url
 
 # BASE_DIRの定義
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -60,6 +61,10 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "mysite.wsgi.application"
+
+DATABASES = {
+    "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
+}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

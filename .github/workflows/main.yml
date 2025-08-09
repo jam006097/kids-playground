@@ -23,7 +23,9 @@ jobs:
       run: pip install -r requirements.txt
 
     - name: Run Python tests
-      run: pytest
+      run: |
+        export DJANGO_SETTINGS_MODULE=mysite.settings.dev
+        pytest
 
     - name: Set up Node.js
       uses: actions/setup-node@v4

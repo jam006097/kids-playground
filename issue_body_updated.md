@@ -11,7 +11,7 @@
 *   Djangoの設定ファイルがPostgreSQLを使用するように設定されていること。
 *   `Dockerfile`がPostgreSQL関連の依存関係をインストールし、アプリケーションがPostgreSQLに接続できること。
 *   GitHub ActionsのCIパイプラインがPostgreSQLサービスを使用して正常にテストを実行できること。
-*   RenderにデプロイされたアプリケーションがPostgreSQLデータベースに正常に接続し、動作すること。
+*      RenderにデプロイされたアプリケーションがPostgreSQLデータベースに正常に接続し、動作すること。
 
 **タスクリスト:**
 
@@ -35,7 +35,7 @@
 - [x] **データベースのマイグレーション**
     - [x] `python manage.py makemigrations` を実行
     - [x] `python manage.py migrate` を実行
-- [ ] **動作確認**
-    - [ ] ローカル環境でアプリケーションが正常に動作することを確認
+- [x] **動作確認**
+    - [x] ローカル環境でアプリケーションが正常に動作することを確認
     - [ ] GitHub ActionsのCIパイプラインが成功することを確認
     - [ ] Renderにデプロイされたアプリケーションが正常に動作することを確認

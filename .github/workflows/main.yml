@@ -55,6 +55,7 @@ jobs:
 
     - name: Lint and Format Check (Python)
       run: |
+        black .
         black . --check
         flake8 .
 

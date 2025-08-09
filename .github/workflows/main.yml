@@ -11,7 +11,7 @@ jobs:
     environment: production # 環境名を指定 (GitHub Secretsと連携)
 
     permissions:
-      contents: read
+      contents: write
       packages: write # GHCRへの書き込み権限
 
     services:

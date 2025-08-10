@@ -32,3 +32,4 @@ mypy==1.10.0
 django-stubs==5.0.0
 django-allauth==0.61.1
 pytest-dotenv==0.5.2
+gunicorn==22.0.0

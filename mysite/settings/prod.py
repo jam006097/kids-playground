@@ -3,7 +3,7 @@ import os
 import dj_database_url
 
 DEBUG = False
-ALLOWED_HOSTS = ["jam006097.pythonanywhere.com"]
+ALLOWED_HOSTS = ["kidsplayground.onrender.com"]
 
 DATABASES = {"default": dj_database_url.config(default=os.getenv("DATABASE_URL"))}
 

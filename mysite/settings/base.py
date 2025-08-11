@@ -32,6 +32,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -83,6 +84,9 @@ USE_TZ = True
 # Static files
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+# WhiteNoiseの設定を追加
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline # ワークフローの名前
 
 on:
   push:
@@ -7,93 +7,93 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # 実行環境
     environment: production # 環境名を指定 (GitHub Secretsと連携)
 
-    permissions:
-      contents: write
-      packages: write # GHCRへの書き込み権限
+    permissions: # GITHUB_TOKENの権限を設定
+      contents: write # リポジトリへの書き込み権限 (GHCRプッシュに必要)
+      packages: write # GHCRへの書き込み権限 (これがないとプッシュできません！)
 
-    services:
+    services: # テスト用PostgreSQLサービス
       postgres:
         image: postgres:16
         env:
-          POSTGRES_USER: kina
-          POSTGRES_PASSWORD: Kaim2308!
-          POSTGRES_DB: test_db
+          POSTGRES_USER: kina # テスト用DBのユーザー名
+          POSTGRES_PASSWORD: Kaim2308! # テスト用DBのパスワード
+          POSTGRES_DB: test_db # テスト用DB名
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval=10s --health-timeout=5s --health-retries=10
 
     steps:
-    - name: Checkout code
+    - name: Checkout code # コードをチェックアウト
       uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Set up Python # Python環境をセットアップ
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
+        python-version: '3.11' # DockerfileのPythonバージョンと合わせると良い
 
-    - name: Install Python dependencies
+    - name: Install Python dependencies # Pythonの依存ライブラリをインストール
       run: |
-        pip cache purge
+        pip cache purge # キャッシュをクリアして、確実にインストール
         pip install -r requirements.txt
 
-    - name: Run Python tests
-      env:
-        DATABASE_URL: "postgres://kina:Kaim2308!@127.0.0.1:5432/test_db"
-        SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+    - name: Run Python tests # Pythonのテストを実行
+      env: # テスト用の環境変数を設定
+        DATABASE_URL: "postgres://kina:Kaim2308!@127.0.0.1:5432/test_db" # テスト用DBの接続情報
+        SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }} # GitHub Secretsから秘密の鍵を渡す
       run: |
         pytest --ds=mysite.settings.dev
 
-    - name: Set up Node.js
+    - name: Set up Node.js # Node.js環境をセットアップ (JSテスト用)
       uses: actions/setup-node@v4
       with:
         node-version: '20'
 
-    - name: Install Node.js dependencies
+    - name: Install Node.js dependencies # Node.jsの依存ライブラリをインストール
       run: npm install
 
-    - name: Run JavaScript tests
+    - name: Run JavaScript tests # JavaScriptのテストを実行
       run: |
-        npm run format
-        npm run lint
-        npm run format -- --check # --check で変更せずにチェックのみ行う
+        npm run format # まずフォーマットを適用
+        npm run lint # その後Lintチェック
+        npm run format -- --check # フォーマットが正しく適用されたか最終チェック
 
-    - name: Lint and Format Check (Python)
+    - name: Lint and Format Check (Python) # PythonのLintとフォーマットチェック
       run: |
         black . --check
         flake8 .
 
-    - name: Lint and Format Check (JavaScript)
+    - name: Lint and Format Check (JavaScript) # JavaScriptのLintとフォーマットチェック
       run: |
         npm run format
         npm run lint
         npm run format -- --check # --check で変更せずにチェックのみ行う
 
-    - name: Set lowercase repository name
+    - name: Set lowercase repository name # リポジトリ名を小文字に変換して環境変数に保存
       id: repo_name_lower
       run: |
         LOWER_REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
         echo "REPO_NAME_LOWER=$LOWER_REPO_NAME" >> $GITHUB_ENV
 
-    - name: Log in to GitHub Container Registry
+    - name: Log in to GitHub Container Registry # GHCRへのログイン
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
-        username: ${{ github.actor }} # ここを修正
-        password: ${{ secrets.GHCR_PAT }} # ここはそのまま
+        username: ${{ github.actor }} # ワークフローを実行したユーザー名
+        password: ${{ secrets.GHCR_PAT }} # GHCR_PATを使用！
 
-    - name: Build and push Docker image
+    - name: Build and push Docker image # Dockerイメージのビルドとプッシュ
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ env.REPO_NAME_LOWER }}:latest # ここを修正
+        tags: ghcr.io/${{ env.REPO_NAME_LOWER }}:latest # 小文字に変換したリポジトリ名を使用
 
-    - name: Deploy to Render
+    - name: Deploy to Render # Renderへのデプロイをトリガー
       env:
-        RENDER_SERVICE_ID: srv-d2b9l895pdvs73ci8550 # これはenvブロックに残す
+        RENDER_SERVICE_ID: srv-d2b9l895pdvs73ci8550 # あなたのRenderサービスID
       run: |
         curl -X POST -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
              -H "Content-Type: application/json" \

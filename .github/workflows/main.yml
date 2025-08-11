@@ -18,8 +18,8 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_USER: kina # テスト用DBのユーザー名
-          POSTGRES_PASSWORD: Kaim2308! # テスト用DBのパスワード
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER_TEST }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD_TEST }}
           POSTGRES_DB: test_db # テスト用DB名
         ports:
           - 5432:5432

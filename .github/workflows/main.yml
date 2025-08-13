@@ -71,12 +71,6 @@ jobs:
         npm run lint
         npm run format -- --check # --check で変更せずにチェックのみ行う
 
-    - name: Set lowercase repository name # リポジトリ名を小文字に変換して環境変数に保存
-      id: repo_name_lower
-      run: |
-        LOWER_REPO_NAME=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-        echo "REPO_NAME_LOWER=$LOWER_REPO_NAME" >> $GITHUB_ENV
-
     - name: Log in to GitHub Container Registry # GHCRへのログイン
       uses: docker/login-action@v3
       with:
@@ -89,7 +83,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ env.REPO_NAME_LOWER }}:latest # 小文字に変換したリポジトリ名を使用
+        tags: ghcr.io/${{ github.repository }}:latest # 小文字に変換したリポジトリ名を使用
 
     - name: Deploy to Render # Renderへのデプロイをトリガー
       env:

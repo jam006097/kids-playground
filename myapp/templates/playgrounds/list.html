@@ -9,8 +9,8 @@
     <!-- 検索フォーム -->
     <form method="get" class="form-inline mb-4">
         <div class="form-group">
-            <label for="city" class="mr-2">市町村名:</label>
-            <input type="text" name="city" id="city" class="form-control mr-2" placeholder="市町村名で検索できます" value="{{ selected_city|default_if_none:'' }}">
+            <label for="city" class="mr-2">住所:</label>
+            <input type="text" name="city" id="city" class="form-control mr-2" placeholder="住所で検索できます" value="{{ selected_city|default_if_none:'' }}">
             <button type="submit" class="btn btn-primary">検索</button>
         </div>
     </form>

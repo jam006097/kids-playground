@@ -151,3 +151,25 @@ sequenceDiagram
 ```
 
 ---
+
+## 例：ランキングページを表示する場合
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Web as Webブラウザ
+    participant View as RankingListView
+    participant Manager as PlaygroundManager
+    participant DB as DB
+
+    User->>Web: ランキングページを開く (/ranking/)
+    Web->>View: GETリクエスト送信
+    View->>Manager: get_by_rating_rank() を呼び出し
+    Manager->>DB: 口コミの平均評価で施設を取得
+    DB-->>Manager: 施設リストを返却
+    Manager-->>View: ソート済み施設リストを返却
+    View-->>Web: ランキングHTMLを返却
+    Web-->>User: ランキングページを表示
+```
+
+---

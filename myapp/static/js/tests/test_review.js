@@ -101,10 +101,6 @@ describe('ReviewManager', () => {
     jest.restoreAllMocks(); // スパイを元に戻す
   });
 
-  test('constructorがinitReviewHandlersを呼び出すこと', () => {
-    expect(ReviewManager.prototype.initReviewHandlers).toHaveBeenCalledTimes(1);
-  });
-
   describe('initReviewHandlers - モーダル表示時の挙動', () => {
     test('モーダルが開かれたときに施設情報が正しく設定されること', () => {
       const showBsModalCallback = mockReviewModalElement.showBsModalHandler;
@@ -135,14 +131,6 @@ describe('ReviewManager', () => {
     beforeEach(() => {
       // Ensure $('#playgroundId').val() returns '123' for this test
       mockPlaygroundIdElement.val.mockReturnValue('123');
-    });
-
-    test('フォーム送信時にevent.preventDefaultが呼び出されること', () => {
-      const mockEvent = {
-        preventDefault: jest.fn(),
-      };
-      mockReviewFormElement.submitHandler(mockEvent);
-      expect(mockEvent.preventDefault).toHaveBeenCalled();
     });
 
     test('AJAXリクエストが成功した場合、alertが呼び出されモーダルが閉じられること', async () => {

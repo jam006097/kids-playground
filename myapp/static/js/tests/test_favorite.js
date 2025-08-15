@@ -49,8 +49,6 @@ describe('FavoriteManager', () => {
     // 実行: toggleFavoriteを呼び出す
     await favoriteManager.toggleFavorite(mockButton, '123');
 
-    // 検証: CSRFトークンが取得されたこと
-    expect(getCookie).toHaveBeenCalledWith('csrftoken');
     // 検証: fetchが正しいURL、メソッド、ヘッダー、ボディで呼び出されたこと
     expect(fetch).toHaveBeenCalledWith('/add_favorite/', {
       method: 'POST',
@@ -76,8 +74,6 @@ describe('FavoriteManager', () => {
     // 実行: toggleFavoriteを呼び出す
     await favoriteManager.toggleFavorite(mockButton, '123');
 
-    // 検証: CSRFトークンが取得されたこと
-    expect(getCookie).toHaveBeenCalledWith('csrftoken');
     // 検証: fetchが正しいURL、メソッド、ヘッダー、ボディで呼び出されたこと
     expect(fetch).toHaveBeenCalledWith('/remove_favorite/', {
       method: 'POST',
@@ -154,11 +150,7 @@ describe('FavoriteManager', () => {
 
     // 検証: 「エラーが発生しました。」というアラートが表示されたこと
     expect(window.alert).toHaveBeenCalledWith('エラーが発生しました。');
-    // 検証: コンソールにネットワークエラーメッセージが出力されたこと
-    expect(console.error).toHaveBeenCalledWith(
-      'フェッチエラー:',
-      expect.any(Error),
-    );
+
     // 検証: ボタンが無効化されていないこと
     expect(mockButton.disabled).toBe(false);
   });

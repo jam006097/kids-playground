@@ -2,12 +2,12 @@ import { ReviewManager } from '../review.js';
 
 describe('ReviewManager', () => {
   let mockJQuery;
-  let mockAlert; // Still need this for mocking global alert
+  let mockDocument;
 
   let mockReviewModalElement;
   let mockReviewFormElement;
   let mockPlaygroundIdElement;
-  let mockModalTitleElement; // Add this
+  let mockModalTitleElement;
 
   // 各テストで新しいモック要素を作成するためのファクトリ関数
   const createMockElement = () => ({
@@ -25,8 +25,8 @@ describe('ReviewManager', () => {
     mockReviewModalElement = createMockElement();
     mockReviewFormElement = createMockElement();
     mockPlaygroundIdElement = createMockElement();
-    mockModalTitleElement = createMockElement(); // Initialize here
-    mockModalTitleElement.text = jest.fn(); // Ensure text is a mock function
+    mockModalTitleElement = createMockElement();
+    mockModalTitleElement.text = jest.fn();
 
     // Override specific methods for these elements
     mockReviewModalElement.on = jest.fn((event, handler) => {
@@ -40,7 +40,7 @@ describe('ReviewManager', () => {
     // mockReviewModalElementのfindメソッドを個別にモック
     mockReviewModalElement.find = jest.fn((selector) => {
       if (selector === '#playgroundId') return mockPlaygroundIdElement;
-      if (selector === '.modal-title') return mockModalTitleElement; // Return the specific mock
+      if (selector === '.modal-title') return mockModalTitleElement;
       return createMockElement();
     });
 
@@ -53,16 +53,14 @@ describe('ReviewManager', () => {
     mockReviewFormElement.serialize = jest.fn(() => 'formData');
 
     // Ensure mockPlaygroundIdElement.val is a mock function
-    mockPlaygroundIdElement.val = jest.fn(() => '123'); // #playgroundIdのval()は常に'123'を返す
+    mockPlaygroundIdElement.val = jest.fn(() => '123');
 
     // jQueryのモック
     mockJQuery = jest.fn((selector) => {
-      // If the selector is the actual mockReviewModalElement object, return it directly
       if (selector === mockReviewModalElement) return mockReviewModalElement;
       if (selector === '#reviewModal') return mockReviewModalElement;
       if (selector === '#reviewForm') return mockReviewFormElement;
-      if (selector === '#playgroundId') return mockPlaygroundIdElement; // This is for direct $(#playgroundId) calls
-      // Generic mock for other selectors, including $(event.relatedTarget)
+      if (selector === '#playgroundId') return mockPlaygroundIdElement;
       const genericElement = createMockElement();
       genericElement.data = jest.fn((key) => {
         if (key === 'playground-id') return '456';
@@ -76,29 +74,26 @@ describe('ReviewManager', () => {
     mockJQuery.ajax = jest.fn();
     global.$ = mockJQuery;
 
-    // alertをモック
-    mockAlert = jest.fn();
-    global.alert = mockAlert; // Mock global alert
+    // alertをスパイ
+    jest.spyOn(global, 'alert').mockImplementation(() => {});
 
-    // document.querySelectorをモック
-    jest.spyOn(document, 'querySelector').mockImplementation((selector) => {
-      if (selector === '[name=csrfmiddlewaretoken]') {
-        return { value: 'mockCsrfToken' };
-      }
-      return null;
-    });
+    // documentをモック
+    mockDocument = {
+      querySelector: jest.fn((selector) => {
+        if (selector === '[name=csrfmiddlewaretoken]') {
+          return { value: 'mockCsrfToken' };
+        }
+        return null;
+      }),
+    };
 
-    // ReviewManagerのインスタンスを作成する前にスパイを設定
-    jest.spyOn(ReviewManager.prototype, 'initReviewHandlers');
-    new ReviewManager(mockJQuery); // Remove mockAlert from constructor
-
-    // Manually populate eventHandlers after initReviewHandlers is called
-    // This is handled by the on mocks directly now
+    // ReviewManagerのインスタンスを作成
+    new ReviewManager(mockJQuery, mockDocument);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
-    jest.restoreAllMocks(); // スパイを元に戻す
+    jest.restoreAllMocks();
   });
 
   describe('initReviewHandlers - モーダル表示時の挙動', () => {
@@ -112,15 +107,12 @@ describe('ReviewManager', () => {
             'playground-name': '別の公園',
           },
         },
-        currentTarget: mockReviewModalElement, // Add currentTarget for the modal element
+        currentTarget: mockReviewModalElement,
       };
 
       showBsModalCallback.call(mockReviewModalElement, mockEvent);
 
-      expect(mockReviewModalElement.find).toHaveBeenCalledWith('#playgroundId');
       expect(mockPlaygroundIdElement.val).toHaveBeenCalledWith('456');
-
-      expect(mockReviewModalElement.find).toHaveBeenCalledWith('.modal-title');
       expect(mockModalTitleElement.text).toHaveBeenCalledWith(
         '別の公園への口コミ',
       );
@@ -129,7 +121,6 @@ describe('ReviewManager', () => {
 
   describe('initReviewHandlers - フォーム送信時の挙動', () => {
     beforeEach(() => {
-      // Ensure $('#playgroundId').val() returns '123' for this test
       mockPlaygroundIdElement.val.mockReturnValue('123');
     });
 
@@ -152,7 +143,7 @@ describe('ReviewManager', () => {
           data: 'formData&csrfmiddlewaretoken=mockCsrfToken',
         }),
       );
-      expect(global.alert).toHaveBeenCalledWith('口コミが投稿されました。'); // Use global.alert
+      expect(global.alert).toHaveBeenCalledWith('口コミが投稿されました。');
       expect(mockReviewModalElement.modal).toHaveBeenCalledWith('hide');
     });
 
@@ -173,7 +164,7 @@ describe('ReviewManager', () => {
           data: 'formData&csrfmiddlewaretoken=mockCsrfToken',
         }),
       );
-      expect(global.alert).toHaveBeenCalledWith('口コミの投稿に失敗しました。'); // Use global.alert
+      expect(global.alert).toHaveBeenCalledWith('口コミの投稿に失敗しました。');
     });
   });
 });

@@ -1,5 +1,6 @@
 class MapManager {
-  constructor() {
+  constructor(L_instance = L) {
+    this.L = L_instance;
     this.KAGOSHIMA_CENTER = [31.5602, 130.5581];
     this.DEFAULT_ZOOM_LEVEL = 10;
   }
@@ -30,12 +31,12 @@ class MapManager {
       window.mapInstance.remove();
     }
 
-    window.mapInstance = L.map('map-container').setView(
+    window.mapInstance = this.L.map('map-container').setView(
       this.KAGOSHIMA_CENTER,
       this.DEFAULT_ZOOM_LEVEL,
     );
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    this.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(window.mapInstance);
@@ -46,7 +47,7 @@ class MapManager {
           parseFloat(playground.latitude),
           parseFloat(playground.longitude),
         ];
-        var marker = L.marker(position).addTo(window.mapInstance);
+        var marker = this.L.marker(position).addTo(window.mapInstance);
         marker.bindPopup(() => this.createPopupContent(playground)); // ここを修正
       }
     });
@@ -59,13 +60,13 @@ class MapManager {
       window.favMapInstance.remove();
     }
 
-    var map = L.map('mypage-map-container').setView(
+    var map = this.L.map('mypage-map-container').setView(
       this.KAGOSHIMA_CENTER,
       this.DEFAULT_ZOOM_LEVEL,
     );
     window.favMapInstance = map;
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    this.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
@@ -76,7 +77,7 @@ class MapManager {
           parseFloat(playground.latitude),
           parseFloat(playground.longitude),
         ];
-        var marker = L.marker(position).addTo(map);
+        var marker = this.L.marker(position).addTo(map);
         marker.bindPopup(() => this.createPopupContent(playground)); // ここを修正
       }
     });

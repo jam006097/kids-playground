@@ -9,21 +9,17 @@ global.fetch = jest.fn(() =>
   }),
 );
 
-// getCookie関数をモックする
-jest.mock('../utils.js', () => ({
-  getCookie: jest.fn(() => 'mockcsrftoken'),
-}));
-
 describe('FavoriteManager', () => {
   let favoriteManager;
   let mockButton;
 
   beforeEach(() => {
     // 各テストの前にFavoriteManagerの新しいインスタンスを作成
-    favoriteManager = new FavoriteManager();
-    // fetchとgetCookieのモックをクリア
+    favoriteManager = new FavoriteManager(getCookie);
+    // fetchのモックをクリア
     fetch.mockClear();
-    getCookie.mockClear();
+    // csrftokenをクッキーに設定
+    document.cookie = 'csrftoken=mockcsrftoken';
 
     // 各テスト用にモックのボタン要素を作成
     mockButton = document.createElement('button');

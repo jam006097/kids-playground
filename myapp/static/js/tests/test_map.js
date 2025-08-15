@@ -1,10 +1,11 @@
-import { MapManager } from '@mapManager';
+import { MapManager } from '../map.js';
 
 describe('MapManager', () => {
   let mapManager;
   let mockMap;
   let mockTileLayer;
   let mockMarker;
+  let mockL;
   let mockDocumentQuerySelectorAll;
   let setTimeoutSpy;
 
@@ -23,7 +24,7 @@ describe('MapManager', () => {
       addLayer: jest.fn(),
     };
 
-    global.L = {
+    mockL = {
       map: jest.fn(() => mockMap),
       tileLayer: jest.fn(() => mockTileLayer),
       marker: jest.fn(() => mockMarker),
@@ -53,7 +54,7 @@ describe('MapManager', () => {
     jest.useFakeTimers();
     setTimeoutSpy = jest.spyOn(global, 'setTimeout');
 
-    mapManager = new MapManager();
+    mapManager = new MapManager(mockL);
   });
 
   afterEach(() => {
@@ -87,9 +88,9 @@ describe('MapManager', () => {
       },
     ];
 
-    test('地図が初期化され、L.mapが適切な引数で呼び出されること', () => {
+    test('地図が初期化され、適切な引数で呼び出されること', () => {
       mapManager.initMap(mockPlaygrounds);
-      expect(global.L.map).toHaveBeenCalledWith('map-container');
+      expect(mockL.map).toHaveBeenCalledWith('map-container');
       expect(mockMap.setView).toHaveBeenCalledWith(
         mapManager.KAGOSHIMA_CENTER,
         mapManager.DEFAULT_ZOOM_LEVEL,
@@ -100,14 +101,14 @@ describe('MapManager', () => {
     test('遊び場が与えられた場合、各遊び場に対してマーカーが追加され、ポップアップがバインドされること', () => {
       mapManager.initMap(mockPlaygrounds);
 
-      expect(global.L.marker).toHaveBeenCalledTimes(mockPlaygrounds.length);
+      expect(mockL.marker).toHaveBeenCalledTimes(mockPlaygrounds.length);
       expect(mockMarker.addTo).toHaveBeenCalledTimes(mockPlaygrounds.length);
       expect(mockMarker.bindPopup).toHaveBeenCalledTimes(
         mockPlaygrounds.length,
       );
 
-      expect(global.L.marker).toHaveBeenCalledWith([31.5, 130.5]);
-      expect(global.L.marker).toHaveBeenCalledWith([31.6, 130.6]);
+      expect(mockL.marker).toHaveBeenCalledWith([31.5, 130.5]);
+      expect(mockL.marker).toHaveBeenCalledWith([31.6, 130.6]);
 
       expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.any(Function));
       expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.any(Function));
@@ -136,9 +137,9 @@ describe('MapManager', () => {
       },
     ];
 
-    test('お気に入り地図が初期化され、L.mapが適切な引数で呼び出されること', () => {
+    test('お気に入り地図が初期化され、適切な引数で呼び出されること', () => {
       mapManager.initFavoritesMap(mockPlaygrounds);
-      expect(global.L.map).toHaveBeenCalledWith('mypage-map-container');
+      expect(mockL.map).toHaveBeenCalledWith('mypage-map-container');
       expect(mockMap.setView).toHaveBeenCalledWith(
         mapManager.KAGOSHIMA_CENTER,
         mapManager.DEFAULT_ZOOM_LEVEL,
@@ -149,13 +150,13 @@ describe('MapManager', () => {
     test('遊び場が与えられた場合、各遊び場に対してマーカーが追加され、ポップアップがバインドされること', () => {
       mapManager.initFavoritesMap(mockPlaygrounds);
 
-      expect(global.L.marker).toHaveBeenCalledTimes(mockPlaygrounds.length);
+      expect(mockL.marker).toHaveBeenCalledTimes(mockPlaygrounds.length);
       expect(mockMarker.addTo).toHaveBeenCalledTimes(mockPlaygrounds.length);
       expect(mockMarker.bindPopup).toHaveBeenCalledTimes(
         mockPlaygrounds.length,
       );
 
-      expect(global.L.marker).toHaveBeenCalledWith([32.0, 131.0]);
+      expect(mockL.marker).toHaveBeenCalledWith([32.0, 131.0]);
       expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.any(Function));
     });
 

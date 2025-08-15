@@ -1,14 +1,14 @@
-import { getCookie } from './utils.js';
+import { getCookie as defaultGetCookie } from './utils.js';
 
 class FavoriteManager {
-  constructor() {
-    // Constructor can be used for initialization if needed
+  constructor(getCookie = defaultGetCookie) {
+    this.getCookie = getCookie;
   }
 
   toggleFavorite(button, playgroundId) {
     if (button.disabled) return;
 
-    const csrfToken = getCookie('csrftoken');
+    const csrfToken = this.getCookie('csrftoken');
     const isFavorite = button.textContent.includes('解除');
     const url = isFavorite ? '/remove_favorite/' : '/add_favorite/';
 

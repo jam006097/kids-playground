@@ -1,11 +1,12 @@
 class ReviewManager {
-  constructor(jQuery) {
+  constructor(jQuery, documentObj = document) {
     this.$ = jQuery;
+    this.document = documentObj;
     this.initReviewHandlers();
   }
 
   getCsrfToken() {
-    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    return this.document.querySelector('[name=csrfmiddlewaretoken]').value;
   }
 
   initReviewHandlers() {

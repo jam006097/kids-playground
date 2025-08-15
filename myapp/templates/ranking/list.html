@@ -1,0 +1,61 @@
+
+{% extends 'base.html' %}
+
+{% block title %}施設ランキング{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">施設ランキング</h1>
+
+    <!-- タブメニュー -->
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link {% if not request.GET.sort or request.GET.sort == 'rating' %}active{% endif %}" href="{% url 'myapp:ranking' %}?sort=rating">評価順</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.GET.sort == 'review_count' %}active{% endif %}" href="{% url 'myapp:ranking' %}?sort=review_count">口コミ数順</a>
+        </li>
+    </ul>
+
+    <!-- ランキングリスト -->
+    <div class="list-group">
+        {% for p in playgrounds %}
+            <a href="#" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">
+                        <span class="rank-badge">
+                            {% if forloop.counter == 1 %}🥇
+                            {% elif forloop.counter == 2 %}🥈
+                            {% elif forloop.counter == 3 %}🥉
+                            {% else %}{{ forloop.counter }}
+                            {% endif %}
+                        </span>
+                        {{ p.name }}
+                    </h5>
+                    <small>
+                        {% if not request.GET.sort or request.GET.sort == 'rating' %}
+                            評価: {{ p.avg_rating|floatformat:2 }} ★
+                        {% else %}
+                            口コミ: {{ p.review_count }} 件
+                        {% endif %}
+                    </small>
+                </div>
+                <p class="mb-1">{{ p.address }}</p>
+            </a>
+        {% empty %}
+            <p class="text-center">表示できる施設がありません。</p>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
+
+<style>
+.rank-badge {
+    font-size: 1.2em;
+    margin-right: 10px;
+    min-width: 30px;
+    display: inline-block;
+    text-align: center;
+}
+</style>

@@ -2,9 +2,30 @@
 from __future__ import annotations
 from django.db import models
 from django.conf import settings
+from django.db.models import Avg, Count, QuerySet
 from typing import Any
 import datetime
 from users.models import CustomUser
+
+
+class PlaygroundManager(models.Manager["Playground"]):
+    def get_by_rating_rank(self) -> QuerySet["Playground"]:
+        """評価の平均点が高い順に施設を返す"""
+        return (
+            self.get_queryset()
+            .annotate(avg_rating=Avg("reviews__rating"))
+            .filter(avg_rating__isnull=False)
+            .order_by("-avg_rating")
+        )
+
+    def get_by_review_count_rank(self) -> QuerySet["Playground"]:
+        """口コミの件数が多い順に施設を返す"""
+        return (
+            self.get_queryset()
+            .annotate(review_count=Count("reviews"))
+            .filter(review_count__gt=0)
+            .order_by("-review_count")
+        )
 
 
 class Playground(models.Model):
@@ -26,6 +47,8 @@ class Playground(models.Model):
     phone: str | None = models.CharField(max_length=30, null=True)  # type: ignore
     latitude: float | None = models.FloatField(null=True)  # type: ignore
     longitude: float | None = models.FloatField(null=True)  # type: ignore
+
+    objects: "PlaygroundManager" = PlaygroundManager()
 
     def __str__(self) -> str:
         return self.name

@@ -6,11 +6,13 @@ from myapp.views.favorite_views import (
     FavoriteListView,
 )
 from myapp.views.review_views import AddReviewView, ReviewListView
+from myapp.views.ranking_views import RankingListView
 
 app_name = "myapp"
 
 urlpatterns = [
     path("", PlaygroundListView.as_view(), name="index"),
+    path("ranking/", RankingListView.as_view(), name="ranking"),
     path("favorites/", FavoriteListView.as_view(), name="favorites"),
     path("add_favorite/", AddFavoriteView.as_view(), name="add_favorite"),
     path("remove_favorite/", RemoveFavoriteView.as_view(), name="remove_favorite"),

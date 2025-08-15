@@ -7,7 +7,6 @@ describe('MapManager', () => {
   let mockMarker;
   let mockL;
   let mockDocumentQuerySelectorAll;
-  let setTimeoutSpy;
 
   beforeEach(() => {
     // LeafletのLオブジェクトをモック
@@ -52,7 +51,6 @@ describe('MapManager', () => {
 
     // setTimeoutをモック
     jest.useFakeTimers();
-    setTimeoutSpy = jest.spyOn(global, 'setTimeout');
 
     mapManager = new MapManager(mockL);
   });
@@ -118,10 +116,6 @@ describe('MapManager', () => {
       global.window.mapInstance = mockMap;
       mapManager.initMap(mockPlaygrounds);
       expect(mockMap.remove).toHaveBeenCalled();
-    });
-
-    test('setTimeoutが呼び出されること', () => {
-      mapManager.initMap(mockPlaygrounds);
     });
   });
 

@@ -15,10 +15,12 @@ classDiagram
         +float latitude
         +float longitude
         +PlaygroundManager objects
+        --
+        Playgroundモデルは、子供が遊べる施設（遊び場）の情報を格納するためのモデルです。
     }
     class RankingListView {
         <<View>>
-        +model = Playground
+        +model = Playground (遊び場)
         +template_name = "ranking/list.html"
         +get_queryset() QuerySet[Playground]
     }

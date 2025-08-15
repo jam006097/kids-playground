@@ -1,25 +1,15 @@
-# 児童支援施設ポートフォリオ
+#  子供が遊べる施設のまとめサイト
 
 ## 概要
-児童支援施設の一覧表示・地図表示・会員登録・お気に入り登録などができるWebアプリケーションです。
+子供が遊べる施設や子育て支援施設を検索・表示し、お気に入り登録や口コミ投稿ができるWebアプリケーションです。
 
 - サイトURL: https://jam006097.pythonanywhere.com/
 
-## 環境変数の設定
-Google Mapsの地図表示機能を利用するため、Google Maps APIキーが必要です。
 
-1. プロジェクトルートに`.env`ファイルを作成し、以下のように記載してください。
-   ```env
-    SECRET_KEY=Django_YOUR_SECRET_KEY
-    GOOGLE_MAPS_API_KEY=your_google_maps_api_key
-    DB_PASSWORD=your_db_password
-   ```
-2. APIキーはGoogle Cloud Platformで取得できます。
-3. `.env`ファイルはセキュリティのため、必ず.gitignoreに追加してください。
 
 ## 主な機能
 
-- **施設情報**こどもがあそべる施設情報を一覧・地図で表示
+- **施設情報**: 全国の公園、児童館、子育て支援センターなど、子供が遊べる施設情報を一覧・地図で表示
 - **検索**: 住所や施設名での検索
 - **口コミ**: 施設ごとの口コミ投稿・表示
 - **お気に入り**: 気になる施設をお気に入り登録
@@ -29,7 +19,7 @@ Google Mapsの地図表示機能を利用するため、Google Maps APIキーが
 ## 技術スタック
 - 言語: Python, JavaScript, HTML, CSS
 - フレームワーク: Django, Bootstrap
-- データベース: MySQL
+- データベース: PostgreSQL (環境変数 DATABASE_URL に依存)
 - ソース管理: Git, GitHub
 
 ## セットアップ手順
@@ -47,7 +37,7 @@ Google Mapsの地図表示機能を利用するため、Google Maps APIキーが
    ```bash
    pip install -r requirements.txt
    ```
-4. DB設定（`settings/base.py`などでMySQL接続情報を設定）
+4. DB設定（.envファイルに DATABASE_URL を設定。例: DATABASE_URL="postgres://user:password@host:port/dbname"）
 5. マイグレーション実行
    ```bash
    python manage.py migrate

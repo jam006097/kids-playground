@@ -19,7 +19,7 @@ sequenceDiagram
 
 ---
 
-## 例：ユーザーがレビューを投稿する場合
+## 例：ユーザーが口コミを投稿する場合
 
 ```mermaid
 sequenceDiagram
@@ -28,17 +28,17 @@ sequenceDiagram
     participant View as Django View
     participant DB as DB
 
-    User->>Web: レビュー投稿フォームに入力し送信
-    Web->>View: レビュー投稿リクエスト送信
+    User->>Web: 口コミ投稿フォームに入力し送信
+    Web->>View: 口コミ投稿リクエスト送信
     View->>DB: Reviewレコード作成
     DB-->>View: 登録結果返却
     View-->>Web: レスポンス（成功/失敗）
-    Web-->>User: レビュー投稿完了メッセージ表示
+    Web-->>User: 口コミ投稿完了メッセージ表示
 ```
 
 ---
 
-## 例：ユーザーが施設を検索する場合
+## 例：ユーザーが遊び場を検索する場合
 
 ```mermaid
 sequenceDiagram
@@ -106,7 +106,7 @@ sequenceDiagram
 
     User->>Web: マイページを開く
     Web->>View: マイページ表示リクエスト送信
-    View->>DB: お気に入り・レビュー情報取得
+    View->>DB: お気に入り・口コミ情報取得
     DB-->>View: 取得結果返却
     View-->>Web: マイページHTML返却
     Web-->>User: マイページ表示
@@ -114,7 +114,7 @@ sequenceDiagram
 
 ---
 
-## 例：ユーザーがレビューを削除・編集する場合
+## 例：ユーザーが口コミを削除・編集する場合
 
 ```mermaid
 sequenceDiagram
@@ -123,7 +123,7 @@ sequenceDiagram
     participant View as Django View
     participant DB as DB
 
-    User->>Web: レビュー削除/編集ボタンをクリック
+    User->>Web: 口コミ削除/編集ボタンをクリック
     Web->>View: 削除/編集リクエスト送信
     View->>DB: Reviewレコード削除/更新
     DB-->>View: 結果返却

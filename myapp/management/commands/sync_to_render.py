@@ -33,7 +33,7 @@ class Command(BaseCommand):
             self.stdout.write(
                 "\nステップ1: ローカルデータベースからバックアップを作成します..."
             )
-            dump_command = f"docker exec -t {local_db_container} pg_dump -U {local_db_user} -d {local_db_name} -F p"
+            dump_command = f"docker exec -t {local_db_container} pg_dump -U {local_db_user} -d {local_db_name} -F p --no-owner"
             with open(backup_file, "w") as f:
                 subprocess.run(dump_command.split(), stdout=f, check=True)
             self.stdout.write(
@@ -42,13 +42,28 @@ class Command(BaseCommand):
                 )
             )
 
+            # Remove \restrict and \unrestrict lines from backup file
+            with open(backup_file, "r") as f:
+                lines = f.readlines()
+            with open(backup_file, "w") as f:
+                for line in lines:
+                    if not line.startswith("\\restrict") and not line.startswith("\\unrestrict"):
+                        f.write(line)
+
             self.stdout.write(
-                "\nステップ2: Renderデータベースへデータをリストアします..."
+                "\nステップ2: Renderデータベースの既存テーブルを削除します..."
+            )
+            drop_command = f'psql "{render_db_url}" -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"'
+            subprocess.run(drop_command, shell=True, check=True, capture_output=True)
+            self.stdout.write(self.style.SUCCESS(" -> テーブル削除完了"))
+
+            self.stdout.write(
+                "\nステップ3: Renderデータベースへデータをリストアします..."
             )
             # psqlはシェルのリダイレクト<を使うため、shell=Trueで実行
-            restore_command = f'psql "{render_db_url}" < {backup_file}'
+            restore_command = f'psql "{render_db_url}" --echo-all -v ON_ERROR_STOP=1 < {backup_file}'
             # shell=Trueの場合、コマンド全体を文字列として渡す
-            subprocess.run(restore_command, shell=True, check=True, capture_output=True)
+            subprocess.run(restore_command, shell=True, check=True)
             self.stdout.write(self.style.SUCCESS(" -> リストア処理が完了しました。"))
 
         except subprocess.CalledProcessError as e:
@@ -70,7 +85,7 @@ class Command(BaseCommand):
                     "エラーが発生したため、中間ファイル 'backup.sql' は削除されませんでした。内容を確認してください。"
                 )
             )
-            return  # finally節を実行するために、ここで終了
+            return
 
         except FileNotFoundError:
             self.stdout.write(
@@ -80,15 +95,14 @@ class Command(BaseCommand):
             )
             return
 
-        finally:
-            # 正常終了した場合のみバックアップファイルを削除
-            if "e" not in locals() and os.path.exists(backup_file):
-                self.stdout.write(
-                    "\nステップ3: 一時バックアップファイルを削除します..."
-                )
-                os.remove(backup_file)
-                self.stdout.write(
-                    self.style.SUCCESS(" -> バックアップファイルを削除しました。")
-                )
+        # 正常終了した場合のみバックアップファイルを削除
+        if os.path.exists(backup_file):
+            self.stdout.write(
+                "\nステップ4: 一時バックアップファイルを削除します..."
+            )
+            os.remove(backup_file)
+            self.stdout.write(
+                self.style.SUCCESS(" -> バックアップファイルを削除しました。")
+            )
 
         self.stdout.write(self.style.SUCCESS("\n🎉 データ移行がすべて完了しました！"))

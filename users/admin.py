@@ -7,7 +7,7 @@ from .models import CustomUser
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
-    model = CustomUser
+    model = CustomUser  # type: ignore
     list_display = ["email", "is_staff", "is_active"]
 
     # ユーザー編集画面のフィールド

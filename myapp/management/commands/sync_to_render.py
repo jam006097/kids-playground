@@ -9,14 +9,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # .env ファイルを明示的に読み込む
-        # このスクリプトは manage.py から呼ばれるため、プロジェクトルートの .env を探す
         project_root = os.path.dirname(
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         )
         load_dotenv(os.path.join(project_root, ".env"))
 
         # 設定
-        local_db_container = "kidsplayground-postgres"
+        local_db_container = "kidsplayground_postgres"
         local_db_user = "kina"
         local_db_name = "kidsplayground_db"
         backup_file = "backup.sql"
@@ -31,14 +30,8 @@ class Command(BaseCommand):
         try:
             self.stdout.write(self.style.SUCCESS("--- データ移行プロセス開始 ---"))
 
-            self.stdout.write("ステップ1: Dockerコンテナを起動します...")
-            subprocess.run(
-                ["docker", "start", local_db_container], check=True, capture_output=True
-            )
-            self.stdout.write(self.style.SUCCESS(" -> コンテナ起動完了"))
-
             self.stdout.write(
-                "\nステップ2: ローカルデータベースからバックアップを作成します..."
+                "\nステップ1: ローカルデータベースからバックアップを作成します..."
             )
             dump_command = f"docker exec -t {local_db_container} pg_dump -U {local_db_user} -d {local_db_name} -F p"
             with open(backup_file, "w") as f:
@@ -50,7 +43,7 @@ class Command(BaseCommand):
             )
 
             self.stdout.write(
-                "\nステップ3: Renderデータベースへデータをリストアします..."
+                "\nステップ2: Renderデータベースへデータをリストアします..."
             )
             # psqlはシェルのリダイレクト<を使うため、shell=Trueで実行
             restore_command = f'psql "{render_db_url}" < {backup_file}'
@@ -91,7 +84,7 @@ class Command(BaseCommand):
             # 正常終了した場合のみバックアップファイルを削除
             if "e" not in locals() and os.path.exists(backup_file):
                 self.stdout.write(
-                    "\nステップ4: 一時バックアップファイルを削除します..."
+                    "\nステップ3: 一時バックアップファイルを削除します..."
                 )
                 os.remove(backup_file)
                 self.stdout.write(

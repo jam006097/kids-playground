@@ -88,13 +88,22 @@ class FavoriteListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         favorites = context["favorites"]
         favorite_ids = [str(p.id) for p in favorites]
-        playgrounds_json = json.dumps(
-            list(
-                favorites.values(
-                    "id", "name", "address", "phone", "latitude", "longitude"
-                )
+        # 公園データをJSON形式に変換
+        # formatted_phone プロパティを含めるために手動でデータを構築
+        playgrounds_data = []
+        for playground in favorites:  # ここは 'favorites' をループ
+            playgrounds_data.append(
+                {
+                    "id": playground.id,
+                    "name": playground.name,
+                    "address": playground.address,
+                    "phone": playground.phone,  # 元の電話番号も保持
+                    "formatted_phone": playground.formatted_phone,  # フォーマット済み電話番号
+                    "latitude": playground.latitude,
+                    "longitude": playground.longitude,
+                }
             )
-        )
+        playgrounds_json = json.dumps(playgrounds_data)
 
         context.update(
             {

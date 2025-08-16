@@ -13,9 +13,7 @@ app_name = "myapp"
 
 urlpatterns = [
     path("", PlaygroundListView.as_view(), name="index"),
-    path(
-        "facilities/<int:pk>/", FacilityDetailView.as_view(), name="facility_detail"
-    ),  
+    path("facilities/<int:pk>/", FacilityDetailView.as_view(), name="facility_detail"),
     path("ranking/", RankingListView.as_view(), name="ranking"),
     path("favorites/", FavoriteListView.as_view(), name="favorites"),
     path("add_favorite/", AddFavoriteView.as_view(), name="add_favorite"),

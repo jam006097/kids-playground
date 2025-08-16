@@ -13,7 +13,7 @@ class MapManager {
             <div>
                 <strong>${playground.name}</strong><br>
                 住所: ${playground.address}<br>
-                電話番号: ${playground.phone}<br>
+                電話番号: ${playground.formatted_phone}<br>
                 <a href="/facilities/${playground.id}/" class="btn btn-outline-primary btn-sm mt-2">詳細を見る</a>
                 <button class="btn btn-outline-success btn-sm mt-2" data-playground-id="${playground.id}" data-action="toggle-favorite">
                     ${buttonText}

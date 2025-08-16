@@ -47,13 +47,21 @@ class PlaygroundListView(ListView):
         filtered_count = playgrounds.count()
 
         # 公園データをJSON形式に変換
-        playgrounds_json = json.dumps(
-            list(
-                playgrounds.values(
-                    "id", "name", "address", "phone", "latitude", "longitude"
-                )
+        # formatted_phone プロパティを含めるために手動でデータを構築
+        playgrounds_data = []
+        for playground in playgrounds:
+            playgrounds_data.append(
+                {
+                    "id": playground.id,
+                    "name": playground.name,
+                    "address": playground.address,
+                    "phone": playground.phone,  # 元の電話番号も保持
+                    "formatted_phone": playground.formatted_phone,  # フォーマット済み電話番号
+                    "latitude": playground.latitude,
+                    "longitude": playground.longitude,
+                }
             )
-        )
+        playgrounds_json = json.dumps(playgrounds_data)
 
         favorite_ids: list[str] = []
         # ユーザーが認証済みの場合、お気に入り公園の情報を取得

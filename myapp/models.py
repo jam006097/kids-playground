@@ -6,6 +6,7 @@ from django.db.models import Avg, Count, QuerySet
 from typing import Any
 import datetime
 from users.models import CustomUser
+import re
 
 
 class PlaygroundManager(models.Manager["Playground"]):
@@ -70,6 +71,21 @@ class Playground(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def formatted_phone(self) -> str:
+        """電話番号をハイフンで区切ってフォーマットするプロパティ"""
+        if not self.phone:
+            return ""
+        # 数字以外の文字をすべて削除
+        digits_only = re.sub(r"[^0-9]", "", str(self.phone))
+
+        if len(digits_only) == 10:  # 例: 0901234567 -> 090-123-4567
+            return f"{digits_only[:3]}-{digits_only[3:6]}-{digits_only[6:]}"
+        elif len(digits_only) == 11:  # 例: 09012345678 -> 090-1234-5678
+            return f"{digits_only[:3]}-{digits_only[3:7]}-{digits_only[7:]}"
+        else:
+            return self.phone  # その他の桁数の場合はそのまま返す
 
 
 class Favorite(models.Model):

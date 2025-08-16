@@ -19,7 +19,6 @@
                 <li class="list-group-item"><strong>営業時間:</strong> {{ playground.opening_hours }}</li>
                 <li class="list-group-item"><strong>料金:</strong> {% if playground.fee %}{{ playground.fee }}{% else %}不明{% endif %}</li>
                 <li class="list-group-item"><strong>対象年齢:</strong> {% if playground.target_age %}{{ playground.target_age }}{% else %}不明{% endif %}</li>
-                <li class="list-group-item"><strong>特記事項:</strong> {% if playground.notes_for_infants %}{{ playground.notes_for_infants }}{% else %}なし{% endif %}</li>
                 <li class="list-group-item"><strong>駐車場:</strong> {% if playground.parking_available %}あり{% else %}なし{% endif %}</li>
                 <li class="list-group-item"><strong>雨の日の利用:</strong> {% if playground.indoor_play_area %}可能{% else %}不可{% endif %}</li>
                 <li class="list-group-item"><strong>子供用トイレ:</strong> {% if playground.kids_toilet_available %}あり{% else %}なし{% endif %}</li>

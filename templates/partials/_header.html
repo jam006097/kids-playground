@@ -15,6 +15,9 @@
                         <a class="nav-link" href="{% url 'myapp:index' %}">トップページ</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'myapp:about' %}">このサイトについて</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'myapp:ranking' %}">ランキング</a>
                     </li>
                     {% if user.is_authenticated %}

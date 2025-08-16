@@ -72,14 +72,14 @@ class Playground(models.Model):
     )  # type: ignore
 
     PARKING_CHOICES = [
-        ('NO', 'なし'),
-        ('FREE', '無料'),
-        ('PAID', '有料'),
+        ("NO", "なし"),
+        ("FREE", "無料"),
+        ("PAID", "有料"),
     ]
     parking_info: models.CharField = models.CharField(  # type: ignore
         max_length=10,
         choices=PARKING_CHOICES,
-        default='NO',
+        default="NO",
         null=True,
         blank=True,
     )

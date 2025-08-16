@@ -4,6 +4,7 @@ from django.db import migrations
 import re
 import datetime
 
+
 def parse_time(time_str):
     """
     'HH:MM' or 'HH時MM分' or 'H時' format string to datetime.time object.
@@ -11,31 +12,32 @@ def parse_time(time_str):
     if not time_str:
         return None
     time_str = time_str.strip()
-    
+
     # HH:MM format
-    match = re.match(r'(\d{1,2}):(\d{2})', time_str)
+    match = re.match(r"(\d{1,2}):(\d{2})", time_str)
     if match:
         hour, minute = map(int, match.groups())
         if 0 <= hour <= 23 and 0 <= minute <= 59:
             return datetime.time(hour, minute)
 
     # HH時MM分 or HH時 format
-    match = re.match(r'(\d{1,2})時(?:(\d{2})分)?', time_str)
+    match = re.match(r"(\d{1,2})時(?:(\d{2})分)?", time_str)
     if match:
         hour, minute_str = match.groups()
         hour = int(hour)
         minute = int(minute_str) if minute_str else 0
         if 0 <= hour <= 23 and 0 <= minute <= 59:
             return datetime.time(hour, minute)
-            
+
     return None
 
+
 def migrate_data(apps, schema_editor):
-    Playground = apps.get_model('myapp', 'Playground')
+    Playground = apps.get_model("myapp", "Playground")
     for playground in Playground.objects.all():
         # opening_hours to opening_time, closing_time
         if playground.opening_hours:
-            parts = re.split(r'[-〜~]', playground.opening_hours)
+            parts = re.split(r"[-〜~]", playground.opening_hours)
             if len(parts) == 2:
                 playground.opening_time = parse_time(parts[0])
                 playground.closing_time = parse_time(parts[1])
@@ -44,7 +46,7 @@ def migrate_data(apps, schema_editor):
 
         # target_age to target_age_start, target_age_end
         if playground.target_age:
-            numbers = re.findall(r'\d+', playground.target_age)
+            numbers = re.findall(r"\d+", playground.target_age)
             if len(numbers) == 1:
                 playground.target_age_start = int(numbers[0])
             elif len(numbers) >= 2:
@@ -57,23 +59,24 @@ def migrate_data(apps, schema_editor):
             if "無料" in playground.fee:
                 playground.fee_decimal = 0
             else:
-                numbers = re.findall(r'\d+', playground.fee.replace(',', ''))
+                numbers = re.findall(r"\d+", playground.fee.replace(",", ""))
                 if numbers:
                     playground.fee_decimal = int(numbers[0])
 
         # parking_available to parking_info
         if playground.parking_available:
             # 既存のデータでは有料・無料の区別がないため、一旦 'FREE' に倒す
-            playground.parking_info = 'FREE'
+            playground.parking_info = "FREE"
         else:
-            playground.parking_info = 'NO'
-            
+            playground.parking_info = "NO"
+
         playground.save()
+
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('myapp', '0008_playground_closing_time_playground_fee_decimal_and_more'),
+        ("myapp", "0008_playground_closing_time_playground_fee_decimal_and_more"),
     ]
 
     operations = [

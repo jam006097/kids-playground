@@ -50,7 +50,9 @@ class Command(BaseCommand):
                 lines = f.readlines()
             with open(backup_file, "w") as f:
                 for line in lines:
-                    if not line.startswith("\\restrict") and not line.startswith("\\unrestrict"):
+                    if not line.startswith("\\restrict") and not line.startswith(
+                        "\\unrestrict"
+                    ):
                         f.write(line)
 
             self.stdout.write(
@@ -64,7 +66,9 @@ class Command(BaseCommand):
                 "\nステップ3: Renderデータベースへデータをリストアします..."
             )
             # psqlはシェルのリダイレクト<を使うため、shell=Trueで実行
-            restore_command = f'psql "{render_db_url}" --echo-all -v ON_ERROR_STOP=1 < {backup_file}'
+            restore_command = (
+                f'psql "{render_db_url}" --echo-all -v ON_ERROR_STOP=1 < {backup_file}'
+            )
             # shell=Trueの場合、コマンド全体を文字列として渡す
             subprocess.run(restore_command, shell=True, check=True)
             self.stdout.write(self.style.SUCCESS(" -> リストア処理が完了しました。"))
@@ -100,9 +104,7 @@ class Command(BaseCommand):
 
         # 正常終了した場合のみバックアップファイルを削除
         if os.path.exists(backup_file):
-            self.stdout.write(
-                "\nステップ4: 一時バックアップファイルを削除します..."
-            )
+            self.stdout.write("\nステップ4: 一時バックアップファイルを削除します...")
             os.remove(backup_file)
             self.stdout.write(
                 self.style.SUCCESS(" -> バックアップファイルを削除しました。")

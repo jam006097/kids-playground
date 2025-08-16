@@ -50,7 +50,6 @@ class Playground(models.Model):
     longitude: float | None = models.FloatField(null=True)  # type: ignore
 
     description: str | None = models.TextField(blank=True, null=True, default="")  # type: ignore
-    opening_hours: str = models.CharField(max_length=200, default="")  # type: ignore
     website: str = models.URLField(max_length=200, default="")  # type: ignore
 
     nursing_room_available: bool = models.BooleanField(default=False)  # type: ignore
@@ -60,16 +59,61 @@ class Playground(models.Model):
     lunch_allowed: bool = models.BooleanField(default=False)  # type: ignore
 
     google_map_url: str | None = models.URLField(max_length=500, blank=True, null=True)  # type: ignore
-    parking_available: bool = models.BooleanField(default=False)  # type: ignore
     indoor_play_area: bool = models.BooleanField(default=False)  # type: ignore
     kids_toilet_available: bool = models.BooleanField(default=False)  # type: ignore
-    target_age: str | None = models.CharField(max_length=100, blank=True, null=True)  # type: ignore
-    fee: str | None = models.CharField(max_length=100, blank=True, null=True)  # type: ignore
+
+    # New fields
+    opening_time: datetime.time | None = models.TimeField(null=True, blank=True)
+    closing_time: datetime.time | None = models.TimeField(null=True, blank=True)
+    target_age_start: int | None = models.IntegerField(null=True, blank=True)
+    target_age_end: int | None = models.IntegerField(null=True, blank=True)
+    fee_decimal: float | None = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    PARKING_CHOICES = [
+        ('NO', 'なし'),
+        ('FREE', '無料'),
+        ('PAID', '有料'),
+    ]
+    parking_info: str | None = models.CharField(
+        max_length=10,
+        choices=PARKING_CHOICES,
+        default='NO',
+        null=True,
+        blank=True,
+    )
 
     objects: "PlaygroundManager" = PlaygroundManager()
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def formatted_opening_hours(self) -> str:
+        if self.opening_time and self.closing_time:
+            return f"{self.opening_time.strftime('%H:%M')} - {self.closing_time.strftime('%H:%M')}"
+        elif self.opening_time:
+            return f"{self.opening_time.strftime('%H:%M')}"
+        return "情報なし"
+
+    @property
+    def formatted_target_age(self) -> str:
+        if self.target_age_start is not None and self.target_age_end is not None:
+            return f"{self.target_age_start}歳 - {self.target_age_end}歳"
+        elif self.target_age_start is not None:
+            return f"{self.target_age_start}歳から"
+        return "情報なし"
+
+    @property
+    def formatted_fee(self) -> str:
+        if self.fee_decimal is not None:
+            if self.fee_decimal == 0:
+                return "無料"
+            return f"{int(self.fee_decimal)}円"
+        return "情報なし"
+
+    @property
+    def formatted_parking(self) -> str:
+        return self.get_parking_info_display()
 
     @property
     def formatted_phone(self) -> str:

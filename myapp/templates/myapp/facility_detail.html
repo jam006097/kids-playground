@@ -16,10 +16,10 @@
                 <li class="list-group-item"><strong>電話番号:</strong> {{ playground.phone|format_phone_number }}</li>
                 <li class="list-group-item"><strong>ウェブサイト:</strong> {% if playground.website %}<a href="{{ playground.website }}" target="_blank">{{ playground.website }}</a>{% else %}なし{% endif %}</li>
                 <li class="list-group-item"><strong>Google Map:</strong> {% if playground.google_map_url %}<a href="{{ playground.google_map_url }}" target="_blank">地図を見る</a>{% else %}なし{% endif %}</li>
-                <li class="list-group-item"><strong>営業時間:</strong> {{ playground.opening_hours }}</li>
-                <li class="list-group-item"><strong>料金:</strong> {% if playground.fee %}{{ playground.fee }}{% else %}不明{% endif %}</li>
-                <li class="list-group-item"><strong>対象年齢:</strong> {% if playground.target_age %}{{ playground.target_age }}{% else %}不明{% endif %}</li>
-                <li class="list-group-item"><strong>駐車場:</strong> {% if playground.parking_available %}あり{% else %}なし{% endif %}</li>
+                <li class="list-group-item"><strong>営業時間:</strong> {{ playground.formatted_opening_hours }}</li>
+                <li class="list-group-item"><strong>料金:</strong> {{ playground.formatted_fee }}</li>
+                <li class="list-group-item"><strong>対象年齢:</strong> {{ playground.formatted_target_age }}</li>
+                <li class="list-group-item"><strong>駐車場:</strong> {{ playground.formatted_parking }}</li>
                 <li class="list-group-item"><strong>雨の日の利用:</strong> {% if playground.indoor_play_area %}可能{% else %}不可{% endif %}</li>
                 <li class="list-group-item"><strong>子供用トイレ:</strong> {% if playground.kids_toilet_available %}あり{% else %}なし{% endif %}</li>
                 <li class="list-group-item"><strong>ベビーカー:</strong> {% if playground.stroller_accessible %}アクセス可{% else %}アクセス不可{% endif %}</li>

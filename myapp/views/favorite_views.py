@@ -101,6 +101,10 @@ class FavoriteListView(LoginRequiredMixin, ListView):
                     "formatted_phone": playground.formatted_phone,  # フォーマット済み電話番号
                     "latitude": playground.latitude,
                     "longitude": playground.longitude,
+                    "opening_hours": playground.formatted_opening_hours,
+                    "target_age": playground.formatted_target_age,
+                    "fee": playground.formatted_fee,
+                    "parking": playground.formatted_parking,
                 }
             )
         playgrounds_json = json.dumps(playgrounds_data)

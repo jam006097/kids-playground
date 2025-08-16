@@ -33,7 +33,10 @@ class Command(BaseCommand):
             self.stdout.write(
                 "\nステップ1: ローカルデータベースからバックアップを作成します..."
             )
-            dump_command = f"docker exec -t {local_db_container} pg_dump -U {local_db_user} -d {local_db_name} -F p --no-owner"
+            dump_command = (
+                f"docker exec -t {local_db_container} pg_dump -U {local_db_user} "
+                f"-d {local_db_name} -F p --no-owner"
+            )
             with open(backup_file, "w") as f:
                 subprocess.run(dump_command.split(), stdout=f, check=True)
             self.stdout.write(

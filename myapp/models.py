@@ -63,18 +63,20 @@ class Playground(models.Model):
     kids_toilet_available: bool = models.BooleanField(default=False)  # type: ignore
 
     # New fields
-    opening_time: datetime.time | None = models.TimeField(null=True, blank=True)
-    closing_time: datetime.time | None = models.TimeField(null=True, blank=True)
-    target_age_start: int | None = models.IntegerField(null=True, blank=True)
-    target_age_end: int | None = models.IntegerField(null=True, blank=True)
-    fee_decimal: float | None = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    opening_time: models.TimeField = models.TimeField(null=True, blank=True)  # type: ignore
+    closing_time: models.TimeField = models.TimeField(null=True, blank=True)  # type: ignore
+    target_age_start: models.IntegerField = models.IntegerField(null=True, blank=True)  # type: ignore
+    target_age_end: models.IntegerField = models.IntegerField(null=True, blank=True)  # type: ignore
+    fee_decimal: models.DecimalField = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )  # type: ignore
 
     PARKING_CHOICES = [
         ('NO', 'なし'),
         ('FREE', '無料'),
         ('PAID', '有料'),
     ]
-    parking_info: str | None = models.CharField(
+    parking_info: models.CharField = models.CharField(  # type: ignore
         max_length=10,
         choices=PARKING_CHOICES,
         default='NO',
@@ -113,7 +115,7 @@ class Playground(models.Model):
 
     @property
     def formatted_parking(self) -> str:
-        return self.get_parking_info_display()
+        return self.get_parking_info_display()  # type: ignore
 
     @property
     def formatted_phone(self) -> str:

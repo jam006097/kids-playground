@@ -41,6 +41,8 @@
                             <h5 class="card-title">{{ playground.name }}</h5>
                             <p class="card-text">{{ playground.address }}</p>
                             <p class="card-text">{{ playground.phone }}</p>
+                            <!-- 詳細ページへのリンク -->
+                            <a href="{% url 'myapp:facility_detail' pk=playground.pk %}" class="btn btn-outline-primary mt-2">詳細を見る</a>
                             <!-- お気に入り登録ボタン -->
                             {% include 'partials/_favorite_button.html' with playground=playground %}
                             <!-- 口コミボタン -->

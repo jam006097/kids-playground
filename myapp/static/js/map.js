@@ -14,14 +14,15 @@ class MapManager {
                 <strong>${playground.name}</strong><br>
                 住所: ${playground.address}<br>
                 電話番号: ${playground.phone}<br>
-                <button class="btn btn-outline-success btn-sm" data-playground-id="${playground.id}" data-action="toggle-favorite">
+                <a href="/facilities/${playground.id}/" class="btn btn-outline-primary btn-sm mt-2">詳細を見る</a>
+                <button class="btn btn-outline-success btn-sm mt-2" data-playground-id="${playground.id}" data-action="toggle-favorite">
                     ${buttonText}
                 </button>
-                <button class="btn btn-outline-secondary btn-sm" data-toggle="modal" data-target="#reviewModal"
+                <button class="btn btn-outline-secondary btn-sm mt-2" data-toggle="modal" data-target="#reviewModal"
                         data-playground-id="${playground.id}" data-playground-name="${playground.name}">
                     口コミを書く
                 </button>
-                <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm">口コミを見る</a>
+                <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm mt-2">口コミを見る</a>
             </div>
         `;
   }

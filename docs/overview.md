@@ -14,14 +14,12 @@ graph TD
     LOGIN[ログイン]
     REGISTER[会員登録]
     MYPAGE[マイページ]
-    LIST[遊び場一覧]
+    LIST[遊び場一覧 (地図機能含む)]
     DETAIL[遊び場詳細]
-    MAP[地図表示]
-    FAVORITE[お気に入り遊び場一覧]
+    FAVORITE[お気に入り遊び場一覧 (地図機能含む)]
     REVIEW[口コミ投稿]
 
     TOP --> LIST
-    TOP --> MAP
     TOP --> LOGIN
     TOP --> REGISTER
     LOGIN --> MYPAGE
@@ -30,7 +28,6 @@ graph TD
     LIST --> DETAIL
     DETAIL --> FAVORITE
     DETAIL --> REVIEW
-    MAP --> DETAIL
 ```
 
 ## 主なユースケース
@@ -42,7 +39,7 @@ graph TD
 | 機能             | 概要                                 |
 |------------------|--------------------------------------|
 | 遊び場一覧         | 遊び場情報をリスト表示                 |
-| 地図表示         | Leaflet.js上に遊び場をマッピング     |
+| 地図表示         | 遊び場一覧とお気に入り一覧にLeaflet.jsで地図表示 |
 | 遊び場詳細         | 遊び場の詳細情報・口コミ表示         |
 | ランキング表示   | 口コミに基づいた施設ランキング表示   |
 | 会員登録/ログイン | ユーザー認証                        |

@@ -47,9 +47,9 @@ sequenceDiagram
     participant View as Django View
     participant DB as DB
 
-    User->>Web: 検索フォームに条件を入力し送信
-    Web->>View: 検索リクエスト送信
-    View->>DB: Playgroundテーブルを検索
+    User->>Web: 検索フォームに条件（例: 都市名）を入力し送信
+    Web->>View: 検索リクエスト送信 (都市名パラメータ含む)
+    View->>DB: Playgroundテーブルを都市名でフィルタリングして検索
     DB-->>View: 検索結果返却
     View-->>Web: 検索結果をHTMLで返却
     Web-->>User: 検索結果を画面に表示

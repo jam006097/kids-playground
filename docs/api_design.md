@@ -1,15 +1,16 @@
-# API設計書
+# アプリケーションエンドポイントとインタラクション
 
-本システムの主なAPIエンドポイントと仕様をまとめます。
+本システムの主要なWebエンドポイントと、それらを通じたユーザーインタラクションの概要をまとめます。本アプリケーションは主にDjangoのテンプレートレンダリングを使用し、一部の機能（お気に入り、レビュー投稿）にはAJAXリクエストを利用しています。包括的なREST APIは提供していません。
 
 ---
 
 ## 施設関連
 
 | エンドポイント           | メソッド | 概要             | パラメータ例         | レスポンス例         | 認証 |
-|------------------------|----------|------------------|----------------------|----------------------|------|
-| /api/playgrounds/      | GET      | 施設一覧取得      | ?prefecture=東京     | 施設リスト(JSON)     | 不要 |
-| /api/playgrounds/{id}/ | GET      | 施設詳細取得      | なし                 | 施設詳細(JSON)       | 不要 |
+|------------------------|----------||------------------|----------------------|----------------------|------|
+| `/`                    | GET      | 施設一覧表示      | `?city=東京都`       | HTMLページ           | 不要 |
+| `/facilities/<int:pk>/`| GET      | 施設詳細表示      | なし                 | HTMLページ           | 不要 |
+| `/ranking/`            | GET      | 施設ランキング表示| `?sort=review_count` | HTMLページ           | 不要 |
 
 ---
 
@@ -17,9 +18,9 @@
 
 | エンドポイント           | メソッド | 概要             | パラメータ例         | レスポンス例         | 認証 |
 |------------------------|----------|------------------|----------------------|----------------------|------|
-| /api/favorites/        | GET      | お気に入り一覧取得| なし                 | お気に入りリスト(JSON)| 必要 |
-| /api/favorites/        | POST     | お気に入り登録    | playground_id        | 成功/失敗(JSON)      | 必要 |
-| /api/favorites/{id}/   | DELETE   | お気に入り削除    | なし                 | 成功/失敗(JSON)      | 必要 |
+| `/favorites/`          | GET      | お気に入り一覧表示| `?city=東京都`       | HTMLページ           | 必要 |
+| `/add_favorite/`       | POST     | お気に入り登録    | `playground_id`      | JSON: `{"status": "ok"}` | 必要 |
+| `/remove_favorite/`    | POST     | お気に入り削除    | `playground_id`      | JSON: `{"status": "ok"}` | 必要 |
 
 ---
 
@@ -27,32 +28,35 @@
 
 | エンドポイント           | メソッド | 概要             | パラメータ例         | レスポンス例         | 認証 |
 |------------------------|----------|------------------|----------------------|----------------------|------|
-| /api/reviews/          | GET      | レビュー一覧取得  | playground_id        | レビューリスト(JSON) | 不要 |
-| /api/reviews/          | POST     | レビュー投稿      | playground_id, content, rating | 成功/失敗(JSON) | 必要 |
-| /api/reviews/{id}/     | PUT      | レビュー編集      | content, rating      | 成功/失敗(JSON)      | 必要 |
-| /api/reviews/{id}/     | DELETE   | レビュー削除      | なし                 | 成功/失敗(JSON)      | 必要 |
+| `/playground/<int:playground_id>/reviews/` | GET | レビュー一覧表示  | なし                 | HTMLページ           | 不要 |
+| `/playground/<int:playground_id>/add_review/` | POST | レビュー投稿      | `content`, `rating`  | JSON: `{"status": "success", "message": "..."}` | 必要 |
 
 ---
 
-## ユーザー関連
+## ユーザー関連（django-allauth および accounts アプリによる提供）
 
 | エンドポイント           | メソッド | 概要             | パラメータ例         | レスポンス例         | 認証 |
 |------------------------|----------|------------------|----------------------|----------------------|------|
-| /api/register/         | POST     | ユーザー登録      | username, password, email | 成功/失敗(JSON) | 不要 |
-| /api/login/            | POST     | ログイン          | username, password   | トークン/失敗(JSON)  | 不要 |
-| /api/logout/           | POST     | ログアウト        | なし                 | 成功/失敗(JSON)      | 必要 |
-| /api/mypage/           | GET      | マイページ情報取得| なし                 | ユーザー情報(JSON)   | 必要 |
+| `/accounts/signup/`    | GET/POST | 会員登録          | `email`, `password`  | HTMLページ           | 不要 |
+| `/accounts/login/`     | GET/POST | ログイン          | `email`, `password`  | HTMLページ           | 不要 |
+| `/accounts/logout/`    | GET/POST | ログアウト        | なし                 | HTMLページ           | 必要 |
+| `/accounts/mypage/`    | GET      | マイページ表示    | なし                 | HTMLページ           | 必要 |
+| `/accounts/name/`      | GET/POST | アカウント名変更  | `account_name`       | HTMLページ           | 必要 |
 
 ---
 
-## レスポンス例
+## レスポンス例（AJAXリクエストの場合）
 
 ```json
 {
-  "success": true,
-  "message": "登録が完了しました。"
+  "status": "ok"
 }
 ```
 
----
+```json
+{
+  "status": "success",
+  "message": "口コミが投稿されました！"
+}
+```
 

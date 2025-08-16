@@ -14,9 +14,31 @@ classDiagram
         +string phone
         +float latitude
         +float longitude
+        +string description
+        +string website
+        +bool nursing_room_available
+        +bool diaper_changing_station_available
+        +bool stroller_accessible
+        +bool kids_space_available
+        +bool lunch_allowed
+        +string google_map_url
+        +bool indoor_play_area
+        +bool kids_toilet_available
+        +TimeField opening_time
+        +TimeField closing_time
+        +int target_age_start
+        +int target_age_end
+        +DecimalField fee_decimal
+        +CharField parking_info
         +PlaygroundManager objects
         --
-        Playgroundモデルは、子供が遊べる施設（遊び場）の情報を格納するためのモデルです。
+        +formatted_opening_hours() string
+        +formatted_target_age() string
+        +formatted_fee() string
+        +formatted_parking() string
+        +formatted_phone() string
+        --
+        Playgroundモデルは、子育て支援施設の情報を格納するためのモデルです。
     }
     class RankingListView {
         <<View>>
@@ -37,20 +59,24 @@ classDiagram
         +int rating
         +datetime created_at
     }
-    class User {
+    class CustomUser {
         +int id
-        +string username
-        ... // Django標準Userモデル
+        +string email
+        +string account_name
+        +bool is_staff
+        +bool is_active
+        +datetime date_joined
+        ... // AbstractBaseUser, PermissionsMixin fields
     }
 
     Playground "1" --> "1" PlaygroundManager : has
     RankingListView ..> PlaygroundManager : uses
-    User "1" --o "*" Favorite : owns
-    User "1" --o "*" Review : writes
+    CustomUser "1" --o "*" Favorite : owns
+    CustomUser "1" --o "*" Review : writes
     Playground "1" --o "*" Favorite : is_favorited_by
     Playground "1" --o "*" Review : receives
 ```
 
 ---
 
-- UserクラスはDjango標準のUserモデルを利用しています。
+- CustomUserクラスは、メールアドレスを認証の主キーとするカスタムユーザーモデルです。

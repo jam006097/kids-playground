@@ -11,7 +11,7 @@
         </div>
         <div class="card-body">
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><strong>説明:</strong> {{ playground.description }}</li>
+                <li class="list-group-item"><strong>説明:</strong> {{ playground.description|linebreaksbr }}</li>
                 <li class="list-group-item"><strong>住所:</strong> {{ playground.address }}</li>
                 <li class="list-group-item"><strong>電話番号:</strong> {{ playground.phone|format_phone_number }}</li>
                 <li class="list-group-item"><strong>ウェブサイト:</strong> {% if playground.website %}<a href="{{ playground.website }}" target="_blank">{{ playground.website }}</a>{% else %}なし{% endif %}</li>

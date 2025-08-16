@@ -17,7 +17,7 @@
     <!-- 検索結果の件数表示 -->
     <p>{{ filtered_count }} / {{ total_count }} 件を表示しています。</p>
     <!-- タブメニュー（一覧、地図、マイページ） -->
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
         <li class="nav-item">
             <a class="nav-link {% if request.GET.tab != 'map' %}active{% endif %}" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="true">一覧</a>
         </li>

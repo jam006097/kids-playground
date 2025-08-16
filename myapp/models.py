@@ -48,6 +48,24 @@ class Playground(models.Model):
     latitude: float | None = models.FloatField(null=True)  # type: ignore
     longitude: float | None = models.FloatField(null=True)  # type: ignore
 
+    description: str = models.TextField(default="")  # type: ignore
+    opening_hours: str = models.CharField(max_length=200, default="")  # type: ignore
+    website: str = models.URLField(max_length=200, default="")  # type: ignore
+
+    nursing_room_available: bool = models.BooleanField(default=False)  # type: ignore
+    diaper_changing_station_available: bool = models.BooleanField(default=False)  # type: ignore
+    stroller_accessible: bool = models.BooleanField(default=False)  # type: ignore
+    kids_space_available: bool = models.BooleanField(default=False)  # type: ignore
+    notes_for_infants: str | None = models.TextField(blank=True, null=True)  # type: ignore
+    lunch_allowed: bool = models.BooleanField(default=False)  # type: ignore
+
+    google_map_url: str | None = models.URLField(max_length=500, blank=True, null=True)  # type: ignore
+    parking_available: bool = models.BooleanField(default=False)  # type: ignore
+    indoor_play_area: bool = models.BooleanField(default=False)  # type: ignore
+    kids_toilet_available: bool = models.BooleanField(default=False)  # type: ignore
+    target_age: str | None = models.CharField(max_length=100, blank=True, null=True)  # type: ignore
+    fee: str | None = models.CharField(max_length=100, blank=True, null=True)  # type: ignore
+
     objects: "PlaygroundManager" = PlaygroundManager()
 
     def __str__(self) -> str:

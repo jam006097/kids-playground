@@ -24,7 +24,6 @@
         <li class="nav-item">
             <a class="nav-link {% if request.GET.tab == 'map' %}active{% endif %}" id="map-tab" data-toggle="tab" href="#map" role="tab" aria-controls="map" aria-selected="false">地図</a>
         </li>
-        
     </ul>
     <div class="tab-content" id="myTabContent">
         <!-- 一覧タブ -->
@@ -37,6 +36,8 @@
                             <h5 class="card-title">{{ playground.name }}</h5>
                             <p class="card-text">{{ playground.address }}</p>
                             <p class="card-text">{{ playground.phone }}</p>
+                            <!-- 詳細ページへのリンク -->
+                            <a href="{% url 'myapp:facility_detail' pk=playground.pk %}" class="btn btn-primary mt-2">詳細を見る</a>
                             <!-- お気に入り登録ボタン -->
                             {% include 'partials/_favorite_button.html' with playground=playground %}
                             <!-- 口コミボタン -->
@@ -62,7 +63,6 @@
         <div class="tab-pane fade {% if request.GET.tab == 'map' %}show active{% endif %}" id="map" role="tabpanel" aria-labelledby="map-tab">
             <div id="map-container" class="mb-4" style="height: 800px; width: 100%;"></div>
         </div>
-        
     </div><!-- タブコンテンツここまで -->
 
     <!-- モーダル要素をタブコンテンツの外に移動 -->
@@ -110,9 +110,9 @@ crossorigin=""></script>
     window.playgrounds = JSON.parse('{{ playgrounds_json|safe }}');
     window.favorite_ids = JSON.parse('{{ favorite_ids|safe }}');
 </script>
-<script type="module" src="{% static 'js/utils.js' %}"></script>
-<script type="module" src="{% static 'js/map.js' %}"></script>
-<script type="module" src="{% static 'js/favorite.js' %}"></script>
-<script type="module" src="{% static 'js/review.js' %}"></script>
-<script type="module" src="{% static 'js/scripts.js' %}"></script>
+<script type="module" src="{% static 'js/utils.js' %} "></script>
+<script type="module" src="{% static 'js/map.js' %} "></script>
+<script type="module" src="{% static 'js/favorite.js' %} "></script>
+<script type="module" src="{% static 'js/review.js' %} "></script>
+<script type="module" src="{% static 'js/scripts.js' %} "></script>
 {% endblock %}

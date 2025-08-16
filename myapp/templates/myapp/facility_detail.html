@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ playground.name }} 詳細{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">{{ playground.name }}</h1>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>説明:</strong> {{ playground.description }}</li>
+                <li class="list-group-item"><strong>住所:</strong> {{ playground.address }}</li>
+                <li class="list-group-item"><strong>電話番号:</strong> {{ playground.phone }}</li>
+                <li class="list-group-item"><strong>ウェブサイト:</strong> {% if playground.website %}<a href="{{ playground.website }}" target="_blank">{{ playground.website }}</a>{% else %}なし{% endif %}</li>
+                <li class="list-group-item"><strong>Google Map:</strong> {% if playground.google_map_url %}<a href="{{ playground.google_map_url }}" target="_blank">地図を見る</a>{% else %}なし{% endif %}</li>
+                <li class="list-group-item"><strong>営業時間:</strong> {{ playground.opening_hours }}</li>
+                <li class="list-group-item"><strong>料金:</strong> {% if playground.fee %}{{ playground.fee }}{% else %}不明{% endif %}</li>
+                <li class="list-group-item"><strong>対象年齢:</strong> {% if playground.target_age %}{{ playground.target_age }}{% else %}不明{% endif %}</li>
+                <li class="list-group-item"><strong>特記事項:</strong> {% if playground.notes_for_infants %}{{ playground.notes_for_infants }}{% else %}なし{% endif %}</li>
+                <li class="list-group-item"><strong>駐車場:</strong> {% if playground.parking_available %}あり{% else %}なし{% endif %}</li>
+                <li class="list-group-item"><strong>雨の日の利用:</strong> {% if playground.indoor_play_area %}可能{% else %}不可{% endif %}</li>
+                <li class="list-group-item"><strong>子供用トイレ:</strong> {% if playground.kids_toilet_available %}あり{% else %}なし{% endif %}</li>
+                <li class="list-group-item"><strong>ベビーカー:</strong> {% if playground.stroller_accessible %}アクセス可{% else %}アクセス不可{% endif %}</li>
+                <li class="list-group-item"><strong>授乳室:</strong> {% if playground.nursing_room_available %}あり{% else %}なし{% endif %}</li>
+                <li class="list-group-item"><strong>おむつ交換台:</strong> {% if playground.diaper_changing_station_available %}あり{% else %}なし{% endif %}</li>
+                <li class="list-group-item"><strong>キッズスペース:</strong> {% if playground.kids_space_available %}あり{% else %}なし{% endif %}</li>
+                <li class="list-group-item"><strong>昼食利用:</strong> {% if playground.lunch_allowed %}可能{% else %}不可{% endif %}</li>
+            </ul>
+            <a href="{% url 'myapp:index' %}" class="btn btn-secondary mt-3">一覧に戻る</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

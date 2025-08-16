@@ -43,3 +43,7 @@ footer a {
 footer a:hover {
     text-decoration: underline;
 }
+
+.detail-item {
+    text-decoration: underline;
+}

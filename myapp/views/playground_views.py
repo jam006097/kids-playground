@@ -1,3 +1,4 @@
+from django.db.models import Q  # Qオブジェクトをインポート
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpRequest
 from typing import Any, Dict, cast
@@ -15,7 +16,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 class PlaygroundListView(ListView):
     """
     公園一覧を表示するビュー。
-    都市によるフィルタリング機能と、ユーザーのお気に入り公園情報を表示する。
+    様々な条件でのフィルタリング機能と、ユーザーのお気に入り公園情報を表示する。
     """
 
     model = Playground
@@ -25,10 +26,21 @@ class PlaygroundListView(ListView):
     def get_queryset(self) -> QuerySet[Playground]:
         """
         クエリセットを取得する。
-        リクエストに'city'パラメータがあれば、その都市でフィルタリングする。
+        リクエストのGETパラメータに基づいて、公園をフィルタリングする。
         """
         queryset = cast(QuerySet[Playground], super().get_queryset())
-        self.selected_city = self.request.GET.get("city")
+
+        # フィルタリングパラメータの取得
+        self.search_query = self.request.GET.get("q")
+        self.selected_city = self.request.GET.get("city")  # Keep existing city filter
+
+        # フィルタリングロジック
+        if self.search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=self.search_query)
+                | Q(address__icontains=self.search_query)
+                | Q(description__icontains=self.search_query)
+            )
         if self.selected_city:
             # 都市名で部分一致検索
             queryset = queryset.filter(address__icontains=self.selected_city)

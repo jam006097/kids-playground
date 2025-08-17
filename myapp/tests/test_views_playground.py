@@ -29,3 +29,16 @@ class PlaygroundListViewTest(TestCase):
         self.assertTemplateUsed(response, "playgrounds/list.html")
         self.assertEqual(len(response.context["playgrounds"]), 1)
         self.assertEqual(response.context["playgrounds"][0].name, "Test Park 1")
+
+    def test_playground_list_view_with_keyword_search(self):
+        """キーワード検索で公園リストビューが正常に表示されることをテスト"""
+        Playground.objects.create(
+            name="Unique Park Name",
+            address="Search City",
+            description="This is a unique description.",
+        )
+        response = self.client.get(self.url, {"q": "Unique"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "playgrounds/list.html")
+        self.assertEqual(len(response.context["playgrounds"]), 1)
+        self.assertEqual(response.context["playgrounds"][0].name, "Unique Park Name")

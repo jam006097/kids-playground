@@ -57,6 +57,9 @@ class PlaygroundListView(ListView):
         self.target_age_min = self.request.GET.get(
             "target_age_min"
         )  # New filter parameter
+        self.target_age_max = self.request.GET.get(
+            "target_age_max"
+        )  # New filter parameter
 
         # フィルタリングロジック
         if self.search_query:
@@ -84,6 +87,8 @@ class PlaygroundListView(ListView):
             queryset = queryset.filter(kids_toilet_available=True)
         if self.target_age_min:
             queryset = queryset.filter(target_age_start__gte=self.target_age_min)
+        if self.target_age_max:
+            queryset = queryset.filter(target_age_end__lte=self.target_age_max)
         return queryset
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:

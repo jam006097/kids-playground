@@ -123,9 +123,9 @@ volumes:
 
 ```
 # .env (プロジェクトルートに配置)
-DB_USER=your_db_username # 例: データベースユーザー名 
+DB_USER=your_db_username # 例: データベースユーザー名
 DB_PASSWORD=your_db_password # 例: データベースパスワード
-POSTGRES_DB=your_db_name # 例: データベース名 
+POSTGRES_DB=your_db_name # 例: データベース名
 SECRET_KEY=your_django_secret_key_here # DjangoのSECRET_KEYもここに設定
 ```
 

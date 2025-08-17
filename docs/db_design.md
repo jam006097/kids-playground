@@ -116,4 +116,3 @@ erDiagram
 - CustomUserモデルを利用
 - 外部キーは`on_delete=models.CASCADE`（親が消えると子も消える）
 - Favoriteはuserとplaygroundの組み合わせで重複不可
-

@@ -107,7 +107,7 @@ from .models import YourModel
 def get_queryset(self) -> QuerySet[YourModel]:
     # super()の返り値を正しいQuerySetの型にキャストする
     queryset = cast(QuerySet[YourModel], super().get_queryset())
-    
+
     # これでquerysetに対してfilterなどのメソッドが使えるようになる
     return queryset.filter(...)
 ```
@@ -130,7 +130,7 @@ Favorite.objects.filter(user=user)
 ```
 
 ## 🛠 技術スタック
-- フレームワーク: Django 5.1.5 
+- フレームワーク: Django 5.1.5
 - 言語: Python 3.12.3
 - テスト: pytest
 - バージョン管理: GitHub
@@ -140,4 +140,3 @@ Favorite.objects.filter(user=user)
 - アプリ構成は Django 標準に準拠
 - `templates`, `static`, `tests` を明確に分離
 - テストファイル名は `test_*.py`
-

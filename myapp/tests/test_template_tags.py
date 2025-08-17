@@ -9,7 +9,7 @@ User = get_user_model()
 class TemplateTagsTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            email="testuser@example.com", password="password"
+            username="testuser", email="testuser@example.com", password="password"
         )
         self.playground = Playground.objects.create(name="Test Park")
 

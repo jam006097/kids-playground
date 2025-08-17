@@ -25,7 +25,7 @@ class PlaygroundFilterMixin:
             self.request.GET.get("diaper_changing_station") == "on"
         )
         self.stroller_accessible = self.request.GET.get("stroller_accessible") == "on"
-        self.kids_space = self.request.GET.get("kids_space") == "on"
+
         self.lunch_allowed = self.request.GET.get("lunch_allowed") == "on"
         self.indoor_play_area = self.request.GET.get("indoor_play_area") == "on"
         self.kids_toilet = self.request.GET.get("kids_toilet") == "on"
@@ -57,8 +57,7 @@ class PlaygroundFilterMixin:
             queryset = queryset.filter(diaper_changing_station_available=True)
         if self.stroller_accessible:
             queryset = queryset.filter(stroller_accessible=True)
-        if self.kids_space:
-            queryset = queryset.filter(kids_space_available=True)
+
         if self.lunch_allowed:
             queryset = queryset.filter(lunch_allowed=True)
         if self.indoor_play_area:
@@ -90,7 +89,6 @@ class PlaygroundFilterMixin:
                 "nursing_room": self.nursing_room,
                 "diaper_changing_station": self.diaper_changing_station,
                 "stroller_accessible": self.stroller_accessible,
-                "kids_space": self.kids_space,
                 "lunch_allowed": self.lunch_allowed,
                 "indoor_play_area": self.indoor_play_area,
                 "kids_toilet": self.kids_toilet,

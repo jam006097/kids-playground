@@ -156,3 +156,17 @@ class PlaygroundListViewTest(TestCase):
         self.assertTemplateUsed(response, "playgrounds/list.html")
         self.assertEqual(len(response.context["playgrounds"]), 1)
         self.assertEqual(response.context["playgrounds"][0].name, "Kids Toilet Park")
+
+    def test_playground_list_view_with_target_age_min_filter(self):
+        """対象年齢（最小）フィルターで公園リストビューが正常に表示されることをテスト"""
+        Playground.objects.create(
+            name="Age 5 Park", address="Filter City", target_age_start=5
+        )
+        Playground.objects.create(
+            name="Age 10 Park", address="Filter City", target_age_start=10
+        )
+        response = self.client.get(self.url, {"target_age_min": 7})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "playgrounds/list.html")
+        self.assertEqual(len(response.context["playgrounds"]), 1)
+        self.assertEqual(response.context["playgrounds"][0].name, "Age 10 Park")

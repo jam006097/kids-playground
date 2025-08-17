@@ -54,6 +54,9 @@ class PlaygroundListView(ListView):
         self.kids_toilet = (
             self.request.GET.get("kids_toilet") == "on"
         )  # New filter parameter
+        self.target_age_min = self.request.GET.get(
+            "target_age_min"
+        )  # New filter parameter
 
         # フィルタリングロジック
         if self.search_query:
@@ -79,6 +82,8 @@ class PlaygroundListView(ListView):
             queryset = queryset.filter(indoor_play_area=True)
         if self.kids_toilet:
             queryset = queryset.filter(kids_toilet_available=True)
+        if self.target_age_min:
+            queryset = queryset.filter(target_age_start__gte=self.target_age_min)
         return queryset
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:

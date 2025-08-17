@@ -90,7 +90,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">検索・フィルタリング</button>
-        <a href="{% url 'myapp:playground_list' %}" class="btn btn-secondary mt-3 ml-2">リセット</a>
+        <a href="{% url 'myapp:index' %}" class="btn btn-secondary mt-3 ml-2">リセット</a>
     </form>
     <!-- 検索結果の件数表示 -->
     <p>{{ filtered_count }} / {{ total_count }} 件を表示しています。</p>

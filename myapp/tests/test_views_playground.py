@@ -184,3 +184,17 @@ class PlaygroundListViewTest(TestCase):
         self.assertTemplateUsed(response, "playgrounds/list.html")
         self.assertEqual(len(response.context["playgrounds"]), 1)
         self.assertEqual(response.context["playgrounds"][0].name, "Age 5 Max Park")
+
+    def test_playground_list_view_with_fee_min_filter(self):
+        """料金（最小）フィルターで公園リストビューが正常に表示されることをテスト"""
+        Playground.objects.create(
+            name="Fee 500 Park", address="Filter City", fee_decimal=500
+        )
+        Playground.objects.create(
+            name="Fee 1000 Park", address="Filter City", fee_decimal=1000
+        )
+        response = self.client.get(self.url, {"fee_min": 700})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "playgrounds/list.html")
+        self.assertEqual(len(response.context["playgrounds"]), 1)
+        self.assertEqual(response.context["playgrounds"][0].name, "Fee 1000 Park")

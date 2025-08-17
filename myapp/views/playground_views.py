@@ -60,6 +60,7 @@ class PlaygroundListView(ListView):
         self.target_age_max = self.request.GET.get(
             "target_age_max"
         )  # New filter parameter
+        self.fee_min = self.request.GET.get("fee_min")  # New filter parameter
 
         # フィルタリングロジック
         if self.search_query:
@@ -89,6 +90,8 @@ class PlaygroundListView(ListView):
             queryset = queryset.filter(target_age_start__gte=self.target_age_min)
         if self.target_age_max:
             queryset = queryset.filter(target_age_end__lte=self.target_age_max)
+        if self.fee_min:
+            queryset = queryset.filter(fee_decimal__gte=self.fee_min)
         return queryset
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:

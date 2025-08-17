@@ -1,0 +1,9 @@
+.card-title {
+    height: 3em; /* 2行分の高さを確保 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* 2行に制限 */
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}

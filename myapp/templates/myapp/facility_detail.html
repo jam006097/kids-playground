@@ -25,7 +25,7 @@
                 <li class="list-group-item"><strong>ベビーカー:</strong> {% if playground.stroller_accessible %}アクセス可{% else %}アクセス不可{% endif %}</li>
                 <li class="list-group-item"><strong>授乳室:</strong> {% if playground.nursing_room_available %}あり{% else %}なし{% endif %}</li>
                 <li class="list-group-item"><strong>おむつ交換台:</strong> {% if playground.diaper_changing_station_available %}あり{% else %}なし{% endif %}</li>
-                <li class="list-group-item"><strong>キッズスペース:</strong> {% if playground.kids_space_available %}あり{% else %}なし{% endif %}</li>
+
                 <li class="list-group-item"><strong>昼食利用:</strong> {% if playground.lunch_allowed %}可能{% else %}不可{% endif %}</li>
             </ul>
             <a href="{% url 'myapp:index' %}" class="btn btn-secondary mt-3">一覧に戻る</a>

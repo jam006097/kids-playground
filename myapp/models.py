@@ -55,7 +55,7 @@ class Playground(models.Model):
     nursing_room_available: bool = models.BooleanField(default=False)  # type: ignore
     diaper_changing_station_available: bool = models.BooleanField(default=False)  # type: ignore
     stroller_accessible: bool = models.BooleanField(default=False)  # type: ignore
-    kids_space_available: bool = models.BooleanField(default=False)  # type: ignore
+
     lunch_allowed: bool = models.BooleanField(default=False)  # type: ignore
 
     google_map_url: str | None = models.URLField(max_length=500, blank=True, null=True)  # type: ignore

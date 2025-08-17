@@ -33,6 +33,9 @@ class PlaygroundListView(ListView):
         # フィルタリングパラメータの取得
         self.search_query = self.request.GET.get("q")
         self.selected_city = self.request.GET.get("city")  # Keep existing city filter
+        self.nursing_room = (
+            self.request.GET.get("nursing_room") == "on"
+        )  # New filter parameter
 
         # フィルタリングロジック
         if self.search_query:
@@ -44,6 +47,8 @@ class PlaygroundListView(ListView):
         if self.selected_city:
             # 都市名で部分一致検索
             queryset = queryset.filter(address__icontains=self.selected_city)
+        if self.nursing_room:
+            queryset = queryset.filter(nursing_room_available=True)
         return queryset
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:

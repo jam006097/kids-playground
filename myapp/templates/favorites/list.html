@@ -7,92 +7,99 @@
 <div class="container">
     <h1 class="my-4">お気に入り施設</h1>
 
+    <!-- 検索・フィルタリングボタン -->
+    <button class="btn btn-outline-secondary mb-3" type="button" data-toggle="collapse" data-target="#search-form-wrapper" aria-expanded="false" aria-controls="search-form-wrapper">
+        検索する
+    </button>
+
     <!-- 検索・フィルタリングフォーム -->
-    <form method="get" class="mb-4 p-3 border rounded bg-light">
-        <div class="form-row align-items-end">
-            <div class="form-group col-md-4">
-                <label for="q">キーワード検索:</label>
-                <input type="text" name="q" id="q" class="form-control" placeholder="施設名、住所、説明" value="{{ search_query|default_if_none:'' }}">
+    <div id="search-form-wrapper" class="collapse {% if search_form_opened %}show{% endif %}">
+        <form method="get" class="mb-4 p-3 border rounded bg-light">
+            <div class="form-row align-items-end">
+                <div class="form-group col-md-4">
+                    <label for="q">キーワード検索:</label>
+                    <input type="text" name="q" id="q" class="form-control" placeholder="施設名、住所、説明" value="{{ search_query|default_if_none:'' }}">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="city">住所 (部分一致):</label>
+                    <input type="text" name="city" id="city" class="form-control" placeholder="例: 鹿児島市" value="{{ selected_city|default_if_none:'' }}">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="parking_info">駐車場:</label>
+                    <select name="parking_info" id="parking_info" class="form-control">
+                        <option value="all" {% if not parking_info or parking_info == "all" %}selected{% endif %}>指定なし</option>
+                        <option value="NO" {% if parking_info == "NO" %}selected{% endif %}>なし</option>
+                        <option value="FREE" {% if parking_info == "FREE" %}selected{% endif %}>無料</option>
+                        <option value="PAID" {% if parking_info == "PAID" %}selected{% endif %}>有料</option>
+                    </select>
+                </div>
             </div>
-            <div class="form-group col-md-4">
-                <label for="city">住所 (部分一致):</label>
-                <input type="text" name="city" id="city" class="form-control" placeholder="例: 鹿児島市" value="{{ selected_city|default_if_none:'' }}">
-            </div>
-            <div class="form-group col-md-4">
-                <label for="parking_info">駐車場:</label>
-                <select name="parking_info" id="parking_info" class="form-control">
-                    <option value="all" {% if not parking_info or parking_info == "all" %}selected{% endif %}>指定なし</option>
-                    <option value="NO" {% if parking_info == "NO" %}selected{% endif %}>なし</option>
-                    <option value="FREE" {% if parking_info == "FREE" %}selected{% endif %}>無料</option>
-                    <option value="PAID" {% if parking_info == "PAID" %}selected{% endif %}>有料</option>
-                </select>
-            </div>
-        </div>
 
-        <div class="form-row mt-3">
-            <div class="form-group col-md-6">
-                <label>対象年齢:</label>
-                <div class="input-group">
-                    <input type="number" name="target_age_min" class="form-control" placeholder="最小年齢" value="{{ target_age_min|default_if_none:'' }}">
-                    <div class="input-group-append">
-                        <span class="input-group-text">歳 〜</span>
+            <div class="form-row mt-3">
+                <div class="form-group col-md-6">
+                    <label>対象年齢:</label>
+                    <div class="input-group">
+                        <input type="number" name="target_age_min" class="form-control" placeholder="最小年齢" value="{{ target_age_min|default_if_none:'' }}">
+                        <div class="input-group-append">
+                            <span class="input-group-text">歳 〜</span>
+                        </div>
+                        <input type="number" name="target_age_max" class="form-control" placeholder="最大年齢" value="{{ target_age_max|default_if_none:'' }}">
+                        <div class="input-group-append">
+                            <span class="input-group-text">歳</span>
+                        </div>
                     </div>
-                    <input type="number" name="target_age_max" class="form-control" placeholder="最大年齢" value="{{ target_age_max|default_if_none:'' }}">
-                    <div class="input-group-append">
-                        <span class="input-group-text">歳</span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label>料金:</label>
+                    <div class="input-group">
+                        <input type="number" name="fee_min" class="form-control" placeholder="最小料金" value="{{ fee_min|default_if_none:'' }}">
+                        <div class="input-group-append">
+                            <span class="input-group-text">円 〜</span>
+                        </div>
+                        <input type="number" name="fee_max" class="form-control" placeholder="最大料金" value="{{ fee_max|default_if_none:'' }}">
+                        <div class="input-group-append">
+                            <span class="input-group-text">円</span>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="form-group col-md-6">
-                <label>料金:</label>
-                <div class="input-group">
-                    <input type="number" name="fee_min" class="form-control" placeholder="最小料金" value="{{ fee_min|default_if_none:'' }}">
-                    <div class="input-group-append">
-                        <span class="input-group-text">円 〜</span>
-                    </div>
-                    <input type="number" name="fee_max" class="form-control" placeholder="最大料金" value="{{ fee_max|default_if_none:'' }}">
-                    <div class="input-group-append">
-                        <span class="input-group-text">円</span>
-                    </div>
+
+            <div class="form-group mt-3">
+                <label class="d-block mb-2">設備・特徴:</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="nursing_room" id="nursing_room" {% if nursing_room %}checked{% endif %}>
+                    <label class="form-check-label" for="nursing_room">授乳室</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="diaper_changing_station" id="diaper_changing_station" {% if diaper_changing_station %}checked{% endif %}>
+                    <label class="form-check-label" for="diaper_changing_station">おむつ交換台</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="stroller_accessible" id="stroller_accessible" {% if stroller_accessible %}checked{% endif %}>
+                    <label class="form-check-label" for="stroller_accessible">ベビーカー可</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="kids_space" id="kids_space" {% if kids_space %}checked{% endif %}>
+                    <label class="form-check-label" for="kids_space">キッズスペース</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="lunch_allowed" id="lunch_allowed" {% if lunch_allowed %}checked{% endif %}>
+                    <label class="form-check-label" for="lunch_allowed">飲食可</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="indoor_play_area" id="indoor_play_area" {% if indoor_play_area %}checked{% endif %}>
+                    <label class="form-check-label" for="indoor_play_area">屋内遊び場</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="kids_toilet" id="kids_toilet" {% if kids_toilet %}checked{% endif %}>
+                    <label class="form-check-label" for="kids_toilet">子供用トイレ</label>
                 </div>
             </div>
-        </div>
 
-        <div class="form-group mt-3">
-            <label class="d-block mb-2">設備・特徴:</label>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="nursing_room" id="nursing_room" {% if nursing_room %}checked{% endif %}>
-                <label class="form-check-label" for="nursing_room">授乳室</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="diaper_changing_station" id="diaper_changing_station" {% if diaper_changing_station %}checked{% endif %}>
-                <label class="form-check-label" for="diaper_changing_station">おむつ交換台</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="stroller_accessible" id="stroller_accessible" {% if stroller_accessible %}checked{% endif %}>
-                <label class="form-check-label" for="stroller_accessible">ベビーカー可</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="kids_space" id="kids_space" {% if kids_space %}checked{% endif %}>
-                <label class="form-check-label" for="kids_space">キッズスペース</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="lunch_allowed" id="lunch_allowed" {% if lunch_allowed %}checked{% endif %}>
-                <label class="form-check-label" for="lunch_allowed">飲食可</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="indoor_play_area" id="indoor_play_area" {% if indoor_play_area %}checked{% endif %}>
-                <label class="form-check-label" for="indoor_play_area">屋内遊び場</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="kids_toilet" id="kids_toilet" {% if kids_toilet %}checked{% endif %}>
-                <label class="form-check-label" for="kids_toilet">子供用トイレ</label>
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary mt-3">検索・フィルタリング</button>
-        <a href="{% url 'myapp:favorites' %}" class="btn btn-secondary mt-3 ml-2">リセット</a>
-    </form>
+            <button type="submit" class="btn btn-primary mt-3">検索・フィルタリング</button>
+            <a href="{% url 'myapp:favorites' %}" class="btn btn-secondary mt-3 ml-2">リセット</a>
+        </form>
+    </div>
 
     <!-- 検索結果の件数表示 -->
     <p>{{ filtered_count }} / {{ total_count }} 件を表示しています。</p>

@@ -229,3 +229,13 @@ class PlaygroundListViewTest(TestCase):
         self.assertTemplateUsed(response, "playgrounds/list.html")
         self.assertEqual(len(response.context["playgrounds"]), 1)
         self.assertEqual(response.context["playgrounds"][0].name, "Free Parking Park")
+
+    def test_search_form_opened_context_with_get_params(self):
+        """GETパラメータがある場合にsearch_form_openedがTrueになることをテスト"""
+        response = self.client.get(self.url, {"q": "Test"})
+        self.assertTrue(response.context["search_form_opened"])
+
+    def test_search_form_opened_context_without_get_params(self):
+        """GETパラメータがない場合にsearch_form_openedがFalseになることをテスト"""
+        response = self.client.get(self.url)
+        self.assertFalse(response.context.get("search_form_opened", False))

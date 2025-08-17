@@ -99,6 +99,7 @@ class PlaygroundFilterMixin:
                 "fee_min": self.fee_min,
                 "fee_max": self.fee_max,
                 "parking_info": self.parking_info,
+                "search_form_opened": bool(self.request.GET),
             }
         )
         return context

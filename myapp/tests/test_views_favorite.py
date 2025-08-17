@@ -84,3 +84,15 @@ class FavoriteViewsTest(TestCase):
         self.assertTemplateUsed(response, "favorites/list.html")
         self.assertEqual(len(response.context["favorites"]), 1)
         self.assertEqual(response.context["favorites"][0].name, "Test Park 1")
+
+    def test_search_form_opened_context_with_get_params(self):
+        """GETパラメータがある場合にsearch_form_openedがTrueになることをテスト"""
+        self.client.login(email="testuser@example.com", password="testpassword")
+        response = self.client.get(self.favorites_url, {"q": "Test"})
+        self.assertTrue(response.context["search_form_opened"])
+
+    def test_search_form_opened_context_without_get_params(self):
+        """GETパラメータがない場合にsearch_form_openedがFalseになることをテスト"""
+        self.client.login(email="testuser@example.com", password="testpassword")
+        response = self.client.get(self.favorites_url)
+        self.assertFalse(response.context.get("search_form_opened", False))

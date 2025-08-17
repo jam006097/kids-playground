@@ -51,7 +51,9 @@ class AllauthViewsTest(TestCase):
         from django.core import mail
 
         # テストユーザーを作成
-        User.objects.create_user(email="test@example.com", password="oldpassword")
+        User.objects.create_user(
+            username="testuser", email="test@example.com", password="oldpassword"
+        )
 
         self.assertEqual(len(mail.outbox), 0)
 

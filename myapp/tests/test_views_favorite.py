@@ -11,7 +11,7 @@ class FavoriteViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
-            email="testuser@example.com", password="testpassword"
+            username="testuser", email="testuser@example.com", password="testpassword"
         )
         self.playground1 = Playground.objects.create(
             name="Test Park 1", address="Kagoshima City", phone="111-111-1111"

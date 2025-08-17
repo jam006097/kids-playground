@@ -11,7 +11,7 @@ class ReviewViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
-            email="testuser@example.com", password="testpassword"
+            username="testuser", email="testuser@example.com", password="testpassword"
         )
         self.playground = Playground.objects.create(
             name="Test Park", address="Test Address", phone="123-456-7890"
@@ -51,12 +51,20 @@ class ReviewViewsTest(TestCase):
             user=self.user, playground=self.playground, content="Test review", rating=5
         )
 
-        # 初期状態（名無し）の確認
+        # 初期状態（名無し）の確認 - コンテキスト内のデータを確認
         response = self.client.get(self.review_list_url)
-        self.assertContains(response, "名無し")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["reviews"][0].user.account_name, "")
 
-        # アカウント名変更後の確認
+        # アカウント名変更後の確認 - ユーザーモデルの更新とコンテキスト内のデータを確認
         new_name = "テストユーザー"
         self.client.post(reverse("accounts:name_change"), {"account_name": new_name})
+
+        # ユーザーモデルが更新されたことを確認
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.account_name, new_name)
+
+        # レビューリストを再取得し、コンテキスト内のデータを確認
         response = self.client.get(self.review_list_url)
-        self.assertContains(response, new_name)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["reviews"][0].user.account_name, new_name)

@@ -36,6 +36,9 @@ class PlaygroundListView(ListView):
         self.nursing_room = (
             self.request.GET.get("nursing_room") == "on"
         )  # New filter parameter
+        self.diaper_changing_station = (
+            self.request.GET.get("diaper_changing_station") == "on"
+        )  # New filter parameter
 
         # フィルタリングロジック
         if self.search_query:
@@ -49,6 +52,8 @@ class PlaygroundListView(ListView):
             queryset = queryset.filter(address__icontains=self.selected_city)
         if self.nursing_room:
             queryset = queryset.filter(nursing_room_available=True)
+        if self.diaper_changing_station:
+            queryset = queryset.filter(diaper_changing_station_available=True)
         return queryset
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:

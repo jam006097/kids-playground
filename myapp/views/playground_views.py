@@ -1,4 +1,4 @@
-from django.db.models import Q  # Qオブジェクトをインポート
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpRequest
 from typing import Any, Dict, cast
@@ -11,9 +11,10 @@ import json
 from django.views.generic import ListView, View, CreateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from ..filters import PlaygroundFilterMixin
 
 
-class PlaygroundListView(ListView):
+class PlaygroundListView(PlaygroundFilterMixin, ListView):
     """
     公園一覧を表示するビュー。
     様々な条件でのフィルタリング機能と、ユーザーのお気に入り公園情報を表示する。
@@ -22,69 +23,6 @@ class PlaygroundListView(ListView):
     model = Playground
     template_name = "playgrounds/list.html"
     context_object_name = "playgrounds"
-
-    def _get_filter_params(self) -> None:
-        """
-        GETリクエストからフィルタリングパラメータを取得し、インスタンス変数に格納します。
-        """
-        self.search_query = self.request.GET.get("q")
-        self.selected_city = self.request.GET.get("city")
-        self.nursing_room = self.request.GET.get("nursing_room") == "on"
-        self.diaper_changing_station = (
-            self.request.GET.get("diaper_changing_station") == "on"
-        )
-        self.stroller_accessible = self.request.GET.get("stroller_accessible") == "on"
-        self.kids_space = self.request.GET.get("kids_space") == "on"
-        self.lunch_allowed = self.request.GET.get("lunch_allowed") == "on"
-        self.indoor_play_area = self.request.GET.get("indoor_play_area") == "on"
-        self.kids_toilet = self.request.GET.get("kids_toilet") == "on"
-        self.target_age_min = self.request.GET.get("target_age_min")
-        self.target_age_max = self.request.GET.get("target_age_max")
-        self.fee_min = self.request.GET.get("fee_min")
-        self.fee_max = self.request.GET.get("fee_max")
-        self.parking_info = self.request.GET.get("parking_info")
-
-    def get_queryset(self) -> QuerySet[Playground]:
-        """
-        クエリセットを取得し、フィルタリングパラメータに基づいてフィルタリングします。
-        """
-        queryset = cast(QuerySet[Playground], super().get_queryset())
-        self._get_filter_params()  # フィルタリングパラメータを取得
-
-        # フィルタリングロジック
-        if self.search_query:
-            queryset = queryset.filter(
-                Q(name__icontains=self.search_query)
-                | Q(address__icontains=self.search_query)
-                | Q(description__icontains=self.search_query)
-            )
-        if self.selected_city:
-            queryset = queryset.filter(address__icontains=self.selected_city)
-        if self.nursing_room:
-            queryset = queryset.filter(nursing_room_available=True)
-        if self.diaper_changing_station:
-            queryset = queryset.filter(diaper_changing_station_available=True)
-        if self.stroller_accessible:
-            queryset = queryset.filter(stroller_accessible=True)
-        if self.kids_space:
-            queryset = queryset.filter(kids_space_available=True)
-        if self.lunch_allowed:
-            queryset = queryset.filter(lunch_allowed=True)
-        if self.indoor_play_area:
-            queryset = queryset.filter(indoor_play_area=True)
-        if self.kids_toilet:
-            queryset = queryset.filter(kids_toilet_available=True)
-        if self.target_age_min:
-            queryset = queryset.filter(target_age_start__gte=self.target_age_min)
-        if self.target_age_max:
-            queryset = queryset.filter(target_age_end__lte=self.target_age_max)
-        if self.fee_min:
-            queryset = queryset.filter(fee_decimal__gte=self.fee_min)
-        if self.fee_max:
-            queryset = queryset.filter(fee_decimal__lte=self.fee_max)
-        if self.parking_info and self.parking_info != "all":
-            queryset = queryset.filter(parking_info=self.parking_info)
-        return queryset
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """
@@ -134,20 +72,6 @@ class PlaygroundListView(ListView):
         # コンテキストを更新
         context.update(
             {
-                "selected_city": self.selected_city,
-                "search_query": self.search_query,
-                "nursing_room": self.nursing_room,
-                "diaper_changing_station": self.diaper_changing_station,
-                "stroller_accessible": self.stroller_accessible,
-                "kids_space": self.kids_space,
-                "lunch_allowed": self.lunch_allowed,
-                "indoor_play_area": self.indoor_play_area,
-                "kids_toilet": self.kids_toilet,
-                "target_age_min": self.target_age_min,
-                "target_age_max": self.target_age_max,
-                "fee_min": self.fee_min,
-                "fee_max": self.fee_max,
-                "parking_info": self.parking_info,
                 "total_count": total_count,
                 "filtered_count": filtered_count,
                 "playgrounds_json": playgrounds_json,

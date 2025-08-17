@@ -71,3 +71,16 @@ class FavoriteViewsTest(TestCase):
         self.assertTemplateUsed(response, "favorites/list.html")
         self.assertEqual(len(response.context["favorites"]), 1)
         self.assertEqual(response.context["favorites"][0].name, "Test Park 1")
+
+    # お気に入り一覧ページのキーワード検索フィルタリングテスト
+    def test_favorite_list_view_with_keyword_filter(self):
+        self.client.login(email="testuser@example.com", password="testpassword")
+        Favorite.objects.create(user=self.user, playground=self.playground1)
+        Favorite.objects.create(user=self.user, playground=self.playground2)
+
+        response = self.client.get(self.favorites_url, {"q": "Park 1"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "favorites/list.html")
+        self.assertEqual(len(response.context["favorites"]), 1)
+        self.assertEqual(response.context["favorites"][0].name, "Test Park 1")

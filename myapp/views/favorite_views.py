@@ -13,7 +13,7 @@ from django.views.generic import ListView, View, CreateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-
+from ..filters import PlaygroundFilterMixin
 from users.models import CustomUser
 
 
@@ -61,7 +61,7 @@ class RemoveFavoriteView(LoginRequiredMixin, View):
         return JsonResponse({"status": "ok"})
 
 
-class FavoriteListView(LoginRequiredMixin, ListView):
+class FavoriteListView(LoginRequiredMixin, PlaygroundFilterMixin, ListView):
     """
     お気に入り一覧ページビュー。
     ログインしているユーザーのみがアクセス可能。
@@ -74,11 +74,10 @@ class FavoriteListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self) -> QuerySet[Playground]:
         user = cast(CustomUser, self.request.user)
-        queryset = cast(QuerySet[Playground], super().get_queryset())
+        # PlaygroundFilterMixinのget_querysetを呼び出してフィルタリングを適用
+        queryset = super().get_queryset()
+        # さらにお気に入り登録されたもので絞り込み
         queryset = queryset.filter(favorite__user=user)
-        self.selected_city = self.request.GET.get("city")
-        if self.selected_city:
-            queryset = queryset.filter(address__icontains=self.selected_city)
 
         # フィルタリング後の件数を取得
         self.filtered_count = queryset.count()
@@ -89,16 +88,15 @@ class FavoriteListView(LoginRequiredMixin, ListView):
         favorites = context["favorites"]
         favorite_ids = [str(p.id) for p in favorites]
         # 公園データをJSON形式に変換
-        # formatted_phone プロパティを含めるために手動でデータを構築
         playgrounds_data = []
-        for playground in favorites:  # ここは 'favorites' をループ
+        for playground in favorites:
             playgrounds_data.append(
                 {
                     "id": playground.id,
                     "name": playground.name,
                     "address": playground.address,
-                    "phone": playground.phone,  # 元の電話番号も保持
-                    "formatted_phone": playground.formatted_phone,  # フォーマット済み電話番号
+                    "phone": playground.phone,
+                    "formatted_phone": playground.formatted_phone,
                     "latitude": playground.latitude,
                     "longitude": playground.longitude,
                     "opening_hours": playground.formatted_opening_hours,
@@ -111,13 +109,45 @@ class FavoriteListView(LoginRequiredMixin, ListView):
 
         context.update(
             {
-                "selected_city": self.selected_city,
                 "favorite_ids": json.dumps(favorite_ids),
                 "playgrounds_json": playgrounds_json,
-                "filtered_count": self.filtered_count,  # 追加
+                "filtered_count": self.filtered_count,
                 "total_count": Favorite.objects.filter(
                     user=cast(CustomUser, self.request.user)
-                ).count(),  # 追加
+                ).count(),
             }
         )
         return context
+
+
+class ReviewView(LoginRequiredMixin, View):
+    """
+    口コミ投稿ビュー。
+    ログインしているユーザーのみがアクセス可能。
+    """
+
+    def post(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
+        """
+        POSTリクエストを処理し、口コミを保存する。
+        """
+        playground_id = request.POST.get("playground_id")
+        content = request.POST.get("content")
+        rating_str = request.POST.get("rating")
+
+        if not all([playground_id, content, rating_str]):
+            return JsonResponse(
+                {"status": "error", "message": "Missing required fields"}, status=400
+            )
+
+        content = cast(str, content)
+        rating_str = cast(str, rating_str)
+
+        playground = get_object_or_404(Playground, id=playground_id)
+        user = cast(CustomUser, request.user)
+        rating = int(rating_str)
+
+        Review.objects.create(
+            playground=playground, user=user, content=content, rating=rating
+        )
+
+        return JsonResponse({"status": "ok"})

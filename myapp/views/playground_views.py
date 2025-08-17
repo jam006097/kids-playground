@@ -62,6 +62,7 @@ class PlaygroundListView(ListView):
         )  # New filter parameter
         self.fee_min = self.request.GET.get("fee_min")  # New filter parameter
         self.fee_max = self.request.GET.get("fee_max")  # New filter parameter
+        self.parking_info = self.request.GET.get("parking_info")  # New filter parameter
 
         # フィルタリングロジック
         if self.search_query:
@@ -95,6 +96,10 @@ class PlaygroundListView(ListView):
             queryset = queryset.filter(fee_decimal__gte=self.fee_min)
         if self.fee_max:
             queryset = queryset.filter(fee_decimal__lte=self.fee_max)
+        if (
+            self.parking_info and self.parking_info != "all"
+        ):  # "all"はフィルタリングしない
+            queryset = queryset.filter(parking_info=self.parking_info)
         return queryset
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:

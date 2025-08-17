@@ -212,3 +212,20 @@ class PlaygroundListViewTest(TestCase):
         self.assertTemplateUsed(response, "playgrounds/list.html")
         self.assertEqual(len(response.context["playgrounds"]), 1)
         self.assertEqual(response.context["playgrounds"][0].name, "Fee 500 Max Park")
+
+    def test_playground_list_view_with_parking_info_filter(self):
+        """駐車場情報フィルターで公園リストビューが正常に表示されることをテスト"""
+        Playground.objects.create(
+            name="Free Parking Park", address="Filter City", parking_info="FREE"
+        )
+        Playground.objects.create(
+            name="Paid Parking Park", address="Filter City", parking_info="PAID"
+        )
+        Playground.objects.create(
+            name="No Parking Park", address="Filter City", parking_info="NO"
+        )
+        response = self.client.get(self.url, {"parking_info": "FREE"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "playgrounds/list.html")
+        self.assertEqual(len(response.context["playgrounds"]), 1)
+        self.assertEqual(response.context["playgrounds"][0].name, "Free Parking Park")

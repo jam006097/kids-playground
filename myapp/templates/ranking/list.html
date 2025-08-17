@@ -1,7 +1,12 @@
 
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}施設ランキング{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/ranking.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -49,13 +54,3 @@
 
 </div>
 {% endblock %}
-
-<style>
-.rank-badge {
-    font-size: 1.2em;
-    margin-right: 10px;
-    min-width: 30px;
-    display: inline-block;
-    text-align: center;
-}
-</style>

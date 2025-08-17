@@ -13,7 +13,9 @@ class CustomUserModelTest(TestCase):
         User = get_user_model()
         email = "test@example.com"
         password = "testpassword123"
-        user = User.objects.create_user(email=email, password=password)
+        user = User.objects.create_user(
+            username="testuser", email=email, password=password
+        )
 
         self.assertEqual(user.email, email)
         self.assertTrue(user.check_password(password))
@@ -25,20 +27,26 @@ class CustomUserModelTest(TestCase):
         """メールアドレスなしでユーザーを作成しようとするとエラーが発生することをテスト。"""
         User = get_user_model()
         with self.assertRaises(ValueError):
-            User.objects.create_user(email=None, password="testpassword123")
+            User.objects.create_user(
+                username="testuser", email=None, password="testpassword123"
+            )
 
     def test_create_user_with_empty_email_raises_error(self):
         """空のメールアドレスでユーザーを作成しようとするとエラーが発生することをテスト。"""
         User = get_user_model()
         with self.assertRaises(ValueError):
-            User.objects.create_user(email="", password="testpassword123")
+            User.objects.create_user(
+                username="testuser", email="", password="testpassword123"
+            )
 
     def test_create_superuser_with_email_and_password(self):
         """スーパーユーザーが正常に作成されることをテスト。"""
         User = get_user_model()
         email = "super@example.com"
         password = "superpassword123"
-        user = User.objects.create_superuser(email=email, password=password)
+        user = User.objects.create_superuser(
+            username="superuser", email=email, password=password
+        )
 
         self.assertEqual(user.email, email)
         self.assertTrue(user.check_password(password))
@@ -51,7 +59,10 @@ class CustomUserModelTest(TestCase):
         User = get_user_model()
         with self.assertRaises(ValueError):
             User.objects.create_superuser(
-                email="super@example.com", password="password", is_staff=False
+                username="superuser",
+                email="super@example.com",
+                password="password",
+                is_staff=False,
             )
 
     def test_superuser_must_have_is_superuser_true(self):
@@ -59,5 +70,8 @@ class CustomUserModelTest(TestCase):
         User = get_user_model()
         with self.assertRaises(ValueError):
             User.objects.create_superuser(
-                email="super@example.com", password="password", is_superuser=False
+                username="superuser",
+                email="super@example.com",
+                password="password",
+                is_superuser=False,
             )

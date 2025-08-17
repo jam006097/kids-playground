@@ -48,6 +48,9 @@ class PlaygroundListView(ListView):
         self.lunch_allowed = (
             self.request.GET.get("lunch_allowed") == "on"
         )  # New filter parameter
+        self.indoor_play_area = (
+            self.request.GET.get("indoor_play_area") == "on"
+        )  # New filter parameter
 
         # フィルタリングロジック
         if self.search_query:
@@ -69,6 +72,8 @@ class PlaygroundListView(ListView):
             queryset = queryset.filter(kids_space_available=True)
         if self.lunch_allowed:
             queryset = queryset.filter(lunch_allowed=True)
+        if self.indoor_play_area:
+            queryset = queryset.filter(indoor_play_area=True)
         return queryset
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:

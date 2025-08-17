@@ -140,3 +140,19 @@ class PlaygroundListViewTest(TestCase):
         self.assertTemplateUsed(response, "playgrounds/list.html")
         self.assertEqual(len(response.context["playgrounds"]), 1)
         self.assertEqual(response.context["playgrounds"][0].name, "Indoor Play Park")
+
+    def test_playground_list_view_with_kids_toilet_filter(self):
+        """子供用トイレフィルターで公園リストビューが正常に表示されることをテスト"""
+        Playground.objects.create(
+            name="Kids Toilet Park", address="Filter City", kids_toilet_available=True
+        )
+        Playground.objects.create(
+            name="No Kids Toilet Park",
+            address="Filter City",
+            kids_toilet_available=False,
+        )
+        response = self.client.get(self.url, {"kids_toilet": "on"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "playgrounds/list.html")
+        self.assertEqual(len(response.context["playgrounds"]), 1)
+        self.assertEqual(response.context["playgrounds"][0].name, "Kids Toilet Park")

@@ -76,3 +76,19 @@ class PlaygroundListViewTest(TestCase):
         self.assertTemplateUsed(response, "playgrounds/list.html")
         self.assertEqual(len(response.context["playgrounds"]), 1)
         self.assertEqual(response.context["playgrounds"][0].name, "Diaper Park")
+
+    def test_playground_list_view_with_stroller_accessible_filter(self):
+        """ベビーカー可フィルターで公園リストビューが正常に表示されることをテスト"""
+        Playground.objects.create(
+            name="Stroller Park", address="Filter City", stroller_accessible=True
+        )
+        Playground.objects.create(
+            name="No Stroller Park",
+            address="Filter City",
+            stroller_accessible=False,
+        )
+        response = self.client.get(self.url, {"stroller_accessible": "on"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "playgrounds/list.html")
+        self.assertEqual(len(response.context["playgrounds"]), 1)
+        self.assertEqual(response.context["playgrounds"][0].name, "Stroller Park")

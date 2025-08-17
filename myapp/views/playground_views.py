@@ -23,46 +23,33 @@ class PlaygroundListView(ListView):
     template_name = "playgrounds/list.html"
     context_object_name = "playgrounds"
 
-    def get_queryset(self) -> QuerySet[Playground]:
+    def _get_filter_params(self) -> None:
         """
-        クエリセットを取得する。
-        リクエストのGETパラメータに基づいて、公園をフィルタリングする。
+        GETリクエストからフィルタリングパラメータを取得し、インスタンス変数に格納します。
         """
-        queryset = cast(QuerySet[Playground], super().get_queryset())
-
-        # フィルタリングパラメータの取得
         self.search_query = self.request.GET.get("q")
-        self.selected_city = self.request.GET.get("city")  # Keep existing city filter
-        self.nursing_room = (
-            self.request.GET.get("nursing_room") == "on"
-        )  # New filter parameter
+        self.selected_city = self.request.GET.get("city")
+        self.nursing_room = self.request.GET.get("nursing_room") == "on"
         self.diaper_changing_station = (
             self.request.GET.get("diaper_changing_station") == "on"
-        )  # New filter parameter
-        self.stroller_accessible = (
-            self.request.GET.get("stroller_accessible") == "on"
-        )  # New filter parameter
-        self.kids_space = (
-            self.request.GET.get("kids_space") == "on"
-        )  # New filter parameter
-        self.lunch_allowed = (
-            self.request.GET.get("lunch_allowed") == "on"
-        )  # New filter parameter
-        self.indoor_play_area = (
-            self.request.GET.get("indoor_play_area") == "on"
-        )  # New filter parameter
-        self.kids_toilet = (
-            self.request.GET.get("kids_toilet") == "on"
-        )  # New filter parameter
-        self.target_age_min = self.request.GET.get(
-            "target_age_min"
-        )  # New filter parameter
-        self.target_age_max = self.request.GET.get(
-            "target_age_max"
-        )  # New filter parameter
-        self.fee_min = self.request.GET.get("fee_min")  # New filter parameter
-        self.fee_max = self.request.GET.get("fee_max")  # New filter parameter
-        self.parking_info = self.request.GET.get("parking_info")  # New filter parameter
+        )
+        self.stroller_accessible = self.request.GET.get("stroller_accessible") == "on"
+        self.kids_space = self.request.GET.get("kids_space") == "on"
+        self.lunch_allowed = self.request.GET.get("lunch_allowed") == "on"
+        self.indoor_play_area = self.request.GET.get("indoor_play_area") == "on"
+        self.kids_toilet = self.request.GET.get("kids_toilet") == "on"
+        self.target_age_min = self.request.GET.get("target_age_min")
+        self.target_age_max = self.request.GET.get("target_age_max")
+        self.fee_min = self.request.GET.get("fee_min")
+        self.fee_max = self.request.GET.get("fee_max")
+        self.parking_info = self.request.GET.get("parking_info")
+
+    def get_queryset(self) -> QuerySet[Playground]:
+        """
+        クエリセットを取得し、フィルタリングパラメータに基づいてフィルタリングします。
+        """
+        queryset = cast(QuerySet[Playground], super().get_queryset())
+        self._get_filter_params()  # フィルタリングパラメータを取得
 
         # フィルタリングロジック
         if self.search_query:
@@ -72,7 +59,6 @@ class PlaygroundListView(ListView):
                 | Q(description__icontains=self.search_query)
             )
         if self.selected_city:
-            # 都市名で部分一致検索
             queryset = queryset.filter(address__icontains=self.selected_city)
         if self.nursing_room:
             queryset = queryset.filter(nursing_room_available=True)
@@ -96,9 +82,7 @@ class PlaygroundListView(ListView):
             queryset = queryset.filter(fee_decimal__gte=self.fee_min)
         if self.fee_max:
             queryset = queryset.filter(fee_decimal__lte=self.fee_max)
-        if (
-            self.parking_info and self.parking_info != "all"
-        ):  # "all"はフィルタリングしない
+        if self.parking_info and self.parking_info != "all":
             queryset = queryset.filter(parking_info=self.parking_info)
         return queryset
 
@@ -106,6 +90,7 @@ class PlaygroundListView(ListView):
         """
         テンプレートに渡すコンテキストデータを取得する。
         公園の総数、フィルタリングされた公園の数、お気に入り公園の情報を追加する。
+        現在のフィルタリングパラメータもコンテキストに追加する。
         """
         context = super().get_context_data(**kwargs)
         playgrounds = context["playgrounds"]
@@ -150,6 +135,19 @@ class PlaygroundListView(ListView):
         context.update(
             {
                 "selected_city": self.selected_city,
+                "search_query": self.search_query,
+                "nursing_room": self.nursing_room,
+                "diaper_changing_station": self.diaper_changing_station,
+                "stroller_accessible": self.stroller_accessible,
+                "kids_space": self.kids_space,
+                "lunch_allowed": self.lunch_allowed,
+                "indoor_play_area": self.indoor_play_area,
+                "kids_toilet": self.kids_toilet,
+                "target_age_min": self.target_age_min,
+                "target_age_max": self.target_age_max,
+                "fee_min": self.fee_min,
+                "fee_max": self.fee_max,
+                "parking_info": self.parking_info,
                 "total_count": total_count,
                 "filtered_count": filtered_count,
                 "playgrounds_json": playgrounds_json,

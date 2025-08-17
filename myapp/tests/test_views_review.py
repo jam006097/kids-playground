@@ -11,7 +11,9 @@ class ReviewViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
-            username="testuser", email="testuser@example.com", password="testpassword"
+            email="testuser@example.com",
+            password="testpassword",
+            account_name="testuser",
         )
         self.playground = Playground.objects.create(
             name="Test Park", address="Test Address", phone="123-456-7890"
@@ -54,7 +56,7 @@ class ReviewViewsTest(TestCase):
         # 初期状態（名無し）の確認 - コンテキスト内のデータを確認
         response = self.client.get(self.review_list_url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["reviews"][0].user.account_name, "")
+        self.assertEqual(response.context["reviews"][0].user.account_name, "testuser")
 
         # アカウント名変更後の確認 - ユーザーモデルの更新とコンテキスト内のデータを確認
         new_name = "テストユーザー"

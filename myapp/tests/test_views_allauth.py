@@ -52,7 +52,7 @@ class AllauthViewsTest(TestCase):
 
         # テストユーザーを作成
         User.objects.create_user(
-            username="testuser", email="test@example.com", password="oldpassword"
+            email="test@example.com", password="oldpassword", account_name="testuser"
         )
 
         self.assertEqual(len(mail.outbox), 0)

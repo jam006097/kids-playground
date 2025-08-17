@@ -14,7 +14,7 @@ class CustomUserModelTest(TestCase):
         email = "test@example.com"
         password = "testpassword123"
         user = User.objects.create_user(
-            username="testuser", email=email, password=password
+            email=email, password=password, account_name="testuser"
         )
 
         self.assertEqual(user.email, email)
@@ -28,7 +28,7 @@ class CustomUserModelTest(TestCase):
         User = get_user_model()
         with self.assertRaises(ValueError):
             User.objects.create_user(
-                username="testuser", email=None, password="testpassword123"
+                account_name="testuser", email=None, password="testpassword123"
             )
 
     def test_create_user_with_empty_email_raises_error(self):
@@ -36,7 +36,7 @@ class CustomUserModelTest(TestCase):
         User = get_user_model()
         with self.assertRaises(ValueError):
             User.objects.create_user(
-                username="testuser", email="", password="testpassword123"
+                account_name="testuser", email="", password="testpassword123"
             )
 
     def test_create_superuser_with_email_and_password(self):
@@ -45,7 +45,7 @@ class CustomUserModelTest(TestCase):
         email = "super@example.com"
         password = "superpassword123"
         user = User.objects.create_superuser(
-            username="superuser", email=email, password=password
+            account_name="superuser", email=email, password=password
         )
 
         self.assertEqual(user.email, email)
@@ -59,7 +59,7 @@ class CustomUserModelTest(TestCase):
         User = get_user_model()
         with self.assertRaises(ValueError):
             User.objects.create_superuser(
-                username="superuser",
+                account_name="superuser",
                 email="super@example.com",
                 password="password",
                 is_staff=False,
@@ -70,7 +70,7 @@ class CustomUserModelTest(TestCase):
         User = get_user_model()
         with self.assertRaises(ValueError):
             User.objects.create_superuser(
-                username="superuser",
+                account_name="superuser",
                 email="super@example.com",
                 password="password",
                 is_superuser=False,

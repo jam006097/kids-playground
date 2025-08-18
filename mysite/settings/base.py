@@ -56,6 +56,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "myapp.context_processors.site_name",
             ],
         },
     },
@@ -100,6 +101,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 SITE_ID = 1
+SITE_NAME = "親子で遊ぼうナビ"
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/accounts/login/"
 

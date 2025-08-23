@@ -79,6 +79,9 @@ kids-playground-ai-api/
 ├── requirements.txt
 ├── README.md
 │
+├── docs/
+│   └── ai_api_development_guide.md # ★この開発ガイド
+│
 ├── src/
 │   └── ai_api/
 │       ├── __init__.py
@@ -104,12 +107,14 @@ kids-playground-ai-api/
 - **`Dockerfile`:** ローカル開発環境の統一と効率化のために使用します。
     - **注記:** この`Dockerfile`は、あくまでローカル開発用です。デプロイ先のHugging Face Spacesでは、`Dockerfile`は直接使われず、`requirements.txt`に基づいて環境が自動構築されます。
 - **`docker-compose.yml`:** DjangoサーバーとAI APIサーバーなど、複数のサービスを定義し、一括で起動・管理するために使用します。
+- **Docker Desktopの活用:** WindowsやMacのユーザーは、Docker Desktopを利用することで、コンテナの状態をGUIで視覚的に確認したり、起動・停止を容易に行うことができます。Linuxユーザーも利用可能です。コマンドライン操作に慣れていない開発者には、Docker Desktopの利用を推奨します。
 
 #### 2.3.1. ローカル環境の起動とアクセス
 
-開発を開始するには、プロジェクトのルートディレクトリで以下のコマンドを実行します。
+開発を開始するには、プロジェクトのルートディレクトリで以下のコマンドを実行します。Docker Desktopを利用している場合は、GUI上から `docker-compose.yml` を指定して起動することも可能です。
 
 ```bash
+
 # -d フラグでバックグラウンドで起動
 docker-compose up --build -d
 ```
@@ -123,6 +128,7 @@ docker-compose up --build -d
 コンテナ内で問題が発生した場合、以下のコマンドでコンテナの内部に入り、デバッグ作業を行うことができます。
 
 ```bash
+
 # <service_name> は docker-compose.yml で定義したサービス名 (例: web, api)
 docker-compose exec <service_name> bash
 ```
@@ -504,7 +510,7 @@ sequenceDiagram
         - `SummarizeReviewsView` のテストを書く際、`unittest.mock.patch` を使って `_call_summary_api` メソッドをモック（偽のオブジェクトに差し替え）します。
         - これにより、AI APIへ実際にネットワーク通信を発生させることなく、「APIが成功を返した場合」「タイムアウトした場合」「エラーを返した場合」など、あらゆる状況を想定したビューのロジックを高速にテストできます。
 
-この設計により、両アプリケーションは互いに依存することなく、独立して開発、テスト、デプロイを進めることが可能になります。
+この設計により、両アプリケーションは互いに依存することなく、独立して開発,テスト,デプロイを進めることが可能になります。
 
 ### 9.10. pyproject.toml の詳細設計
 
@@ -608,29 +614,59 @@ sequenceDiagram
 - **担当: AI** - このアイコンが付いているタスクは、AI（Gemini）がコード生成やファイル作成を直接実行できます。
 - **担当: 人間** - このアイコンが付いているタスクは、開発者による手動での実行、判断、または承認が必要です。
 
+### フェーズ0: プロジェクトの初期化
+
+**目的:** 新しいプロジェクトの作業を開始するための準備を行う。
+
+- [ ] **中タスク0.1: プロジェクトルートディレクトリの作成**
+    - **担当:** 人間
+    - **内容:** 作業を開始するディレクトリに、プロジェクトのルートとなる `kids-playground-ai-api` ディレクトリを作成し、その中に移動してください。
+    - **指示:** 以下のコマンドを実行してください。
+    ```bash
+mkdir kids-playground-ai-api
+cd kids-playground-ai-api
+```
+
 ### フェーズ1: 開発環境のセットアップ
 
 **目的:** コーディングを開始する前に、品質を担保し、開発を効率化するための基盤を構築する。
 
-- [ ] **中タスク1.1: プロジェクト構造の準備**
-    - [ ] **小タスク1.1.1: `src` ディレクトリの作成**
-        - **担当:** AI
-        - **内容:** `mkdir -p src/ai_api/core` を実行し、AIアプリケーションのソースコードを格納するディレクトリを作成します。
-    - [ ] **小タスク1.1.2: `tests` ディレクトリの作成**
-        - **担当:** AI
-        - **内容:** `mkdir -p tests/core` を実行し、テストコードを格納するディレクトリを作成します。
+- [ ] **中タスク1.0: ドキュメントの配置**
+    - **担当:** AI
+    - **内容:** この開発ガイド (`ai_api_development_guide.md`) を `docs/` ディレクトリに配置します。
+    - **指示:** 以下のコマンドを実行してください。
+    ```bash
+cp /path/to/current/ai_api_development_guide.md docs/ai_api_development_guide.md
+```
+    *   *注: `/path/to/current/ai_api_development_guide.md` は、このドキュメントが現在置かれている絶対パスに置き換える必要があります。*
+
+- [ ] **中タスク1.1: プロジェクト構造の初期セットアップ**
+    - **担当:** AI
+    - **内容:** 以下のディレクトリとファイルをプロジェクトルートに作成します。
+        - ディレクトリ: `src/ai_api/core`, `tests/core`, `docs`, `.github/workflows`
+        - ファイル: `.gitignore`, `Dockerfile`, `pyproject.toml`, `requirements.txt`, `README.md`, `.github/workflows/ci.yml` (空ファイルとして)
+    - **指示:** 以下のコマンドを実行して、プロジェクトの初期ディレクトリとファイルを準備してください。
+    ```bash
+mkdir -p src/ai_api/core tests/core docs .github/workflows
+touch .gitignore Dockerfile pyproject.toml requirements.txt README.md .github/workflows/ci.yml
+```
 
 - [ ] **中タスク1.2: 品質管理ツールの設定**
-    - [ ] **小タスク1.2.1: `pyproject.toml` の作成**
+    - [ ] **小タスク1.2.1: `pyproject.toml` の設定**
         - **担当:** AI
-        - **内容:** セクション `9.10` の設計に基づき、Ruff, Mypy, Pytestの設定を記述した `pyproject.toml` ファイルを作成します。
+        - **内容:** セクション `9.10` の設計に基づき、Ruff, Mypy, Pytestの設定を記述した `pyproject.toml` ファイルを更新します。
+        - **指示:** 以下の内容で `/home/jam/kidsPlayGround/pyproject.toml` を更新してください。
+        ```toml
+        # ... (pyproject.toml の内容をここに記述) ...
+        ```
 
 - [ ] **中タスク1.3: 依存関係の管理**
-    - [ ] **小タスク1.3.1: `requirements.txt` の作成**
+    - [ ] **小タスク1.3.1: `requirements.txt` の設定**
         - **担当:** AI
-        - **内容:** 以下のライブラリを記述した `requirements.txt` を作成します。
-          ```
-          # AI App
+        - **内容:** 以下のライブラリを記述した `requirements.txt` を更新します。
+        - **指示:** 以下の内容で `/home/jam/kidsPlayGround/requirements.txt` を更新してください。
+        ```
+        # AI App
 gradio
 transformers
 torch
@@ -665,6 +701,7 @@ mypy
 - [ ] **中タスク2.2: AI設定クラス `Config` の実装と注入**
     - [ ] **小タスク2.2.1 (RED):** `Summarizer`が設定オブジェクトを受け取るテスト作成
         - **担当:** AI
+        - **内容:** `tests/core/test_inference.py`に追記します。
         - **内容:** `Summarizer`がコンストラクタで設定オブジェクト（モデル名など）を受け取ることを期待するテストを`tests/core/test_inference.py`に追記します。
     - [ ] **小タスク2.2.2 (GREEN):** 設定クラスの作成とコンストラクタ修正
         - **担当:** AI

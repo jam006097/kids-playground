@@ -5,6 +5,12 @@ import sys
 DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
+# AI Summary API Settings
+AI_SUMMARY_API_URL = os.getenv(
+    "AI_SUMMARY_API_URL", "http://127.0.0.1:7860/api/predict/"
+)
+AI_SUMMARY_API_TIMEOUT = int(os.getenv("AI_SUMMARY_API_TIMEOUT", 30))
+
 # ローカルでの手動テスト時のみ実際にメールを送信する
 if "runserver" in sys.argv:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

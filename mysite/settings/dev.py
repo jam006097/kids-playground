@@ -7,7 +7,7 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # AI Summary API Settings
 AI_SUMMARY_API_URL = os.getenv(
-    "AI_SUMMARY_API_URL", "http://127.0.0.1:7860/api/predict/"
+    "AI_SUMMARY_API_URL", "https://kina006097-kids-playground-ai-api.hf.space/"
 )
 AI_SUMMARY_API_TIMEOUT = int(os.getenv("AI_SUMMARY_API_TIMEOUT", 30))
 

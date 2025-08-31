@@ -19,6 +19,9 @@ class SummarizeReviewsView(View):
             self._validate_reviews(reviews)
 
             combined_text = self._get_combined_text(reviews)
+            logger.debug(
+                f"Sending combined text to AI API for playground {playground_id}:\n{combined_text}"
+            )
             summary = call_summary_api(combined_text)
 
             return JsonResponse({"summary": summary})

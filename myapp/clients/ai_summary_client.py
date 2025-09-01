@@ -18,13 +18,26 @@ def call_summary_api(text: str) -> str:
     Raises:
         Exception: API呼び出しでエラーが発生した場合
     """
+    # --- デバッグコード --- #
+    api_url = getattr(settings, "AI_SUMMARY_API_URL", None)
+    logger.info(
+        f"[DEBUG] Attempting to connect to AI Summary API. URL from settings: {api_url}"
+    )
+
+    if not api_url:
+        logger.error(
+            "[DEBUG] AI_SUMMARY_API_URL is not set in the environment variables."
+        )
+        raise ValueError("AI Summary API URL is not configured.")
+    # --- デバッグコード終 --- #
+
     api_key = getattr(settings, "AI_SUMMARY_API_KEY", None)
     auth = ("gemini", api_key) if api_key else None
 
     try:
-        logger.debug(f"Connecting to Gradio API at {settings.AI_SUMMARY_API_URL}")
+        logger.debug(f"Connecting to Gradio API at {api_url}")
         client = Client(
-            settings.AI_SUMMARY_API_URL,
+            api_url,
             auth=auth,
         )
         logger.debug("Calling predict API...")

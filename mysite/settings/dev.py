@@ -9,6 +9,8 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 AI_SUMMARY_API_URL = os.getenv(
     "AI_SUMMARY_API_URL", "https://kina006097-kids-playground-ai-api.hf.space/"
 )
+AI_SUMMARY_API_USERNAME = os.getenv("AI_SUMMARY_API_USERNAME", "gemini")
+AI_SUMMARY_API_KEY = os.getenv("AI_SUMMARY_API_KEY")
 AI_SUMMARY_API_TIMEOUT = int(os.getenv("AI_SUMMARY_API_TIMEOUT", 30))
 
 

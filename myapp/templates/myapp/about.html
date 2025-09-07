@@ -9,7 +9,7 @@
     <section class="py-5 mb-5">
         <h2 class="h4 text-center mb-4">サイトの目的</h2>
         <p class="lead">この「親子で遊ぼうナビ」は、子供たちが安全に楽しく遊べる場所を見つけるための情報提供を目的としたWebアプリケーションです。保護者の方々が安心して子供を遊ばせられるよう、公園や遊び場の詳細情報、レビュー、お気に入り登録機能などを提供します。</p>
-        <p>本サイトは、私のWeb開発スキルを示すポートフォリオとして開発されました。Djangoを用いたバックエンド開発、JavaScriptによるインタラクティブなフロントエンド、そして堅牢なデータベース設計とテスト駆動開発（TDD）の実践を特徴としています。</p>
+        <p>本サイトは、私のWeb開発スキルを示すポートフォリオとして開発されました。Djangoを用いたバックエンド開発、JavaScriptによるインタラクティブなフロントエンド、そして堅牢なデータベース設計とテスト駆動開発（TDD）の実践を特徴としています。また、開発プロセスにはGitHub Actionsを活用したCI/CDパイプラインを導入し、品質と効率を両立させています。</p>
     </section>
 
     <section class="py-5 bg-light mb-5">
@@ -29,6 +29,11 @@
                 <i class="fas fa-comments fa-3x text-info mb-3"></i>
                 <h5>レビュー投稿</h5>
                 <p>実際に利用したユーザーからのレビューを閲覧・投稿できます。</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <i class="fas fa-robot fa-3x text-danger mb-3"></i>
+                <h5>口コミAI要約</h5>
+                <p>Hugging Face Spacesを活用してAIが、投稿された口コミを自動で要約します。</p>
             </div>
             <div class="col-md-4 mb-4">
                 <i class="fas fa-heart fa-3x text-danger mb-3"></i>
@@ -57,6 +62,9 @@
                     <li class="mb-2"><i class="fas fa-leaf text-success mr-2"></i>Django 5.1.5</li>
                     <li class="mb-2"><i class="fab fa-python text-primary mr-2"></i>Python 3.12.3</li>
                     <li class="mb-2"><i class="fas fa-database text-secondary mr-2"></i>PostgreSQL</li>
+                    <li class="mb-2"><i class="fab fa-docker text-primary mr-2"></i>Docker (コンテナ化デプロイ)</li>
+                    <li class="mb-2"><i class="fas fa-robot text-danger mr-2"></i>Hugging Face Spaces (AI要約API)</li>
+                    <li class="mb-2"><i class="fab fa-github-alt text-dark mr-2"></i>GitHub Actions (CI/CD)</li>
                     <li class="mb-2"><i class="fas fa-flask text-info mr-2"></i>Pytest</li>
                     <li class="mb-2"><i class="fas fa-check-circle text-success mr-2"></i>Flake8</li>
                     <li class="mb-2"><i class="fas fa-paint-brush text-primary mr-2"></i>Black</li>
@@ -78,7 +86,7 @@
 
     <section class="py-5 bg-light text-center">
         <h2 class="h4 mb-4">作者について</h2>
-        <p class="lead text-left">このサイトは、Web開発がしたい1人の開発者によって作成されました。ユーザーフレンドリーなインターフェースと堅牢なバックエンドの構築を目指し、日々学習と実践を重ねています。ご意見やご感想がありましたら、お気軽にお問い合わせください。</p>
+        <p class="lead text-left">このサイトは、1人の開発者によって作成されました。ユーザーフレンドリーなインターフェースと堅牢なバックエンドの構築を目指し、日々学習と実践を重ねています。ご意見やご感想がありましたら、お気軽にお問い合わせください。</p>
         <a href="https://github.com/jam006097/kidsPlayGround" target="_blank" rel="noopener noreferrer" class="btn btn-dark btn-lg mt-3"><i class="fab fa-github mr-2"></i>GitHubでプロジェクトを見る</a>
     </section>
 </div>

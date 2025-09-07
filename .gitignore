@@ -79,3 +79,5 @@ node_modules/
 
 # Test
 .pytest_cache/
+
+sqldata_buckup/

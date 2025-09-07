@@ -24,7 +24,7 @@ def call_summary_api(text: str) -> str:
     api_key = getattr(settings, "AI_SUMMARY_API_KEY", None)
     auth = (api_user, api_key) if api_key else None
 
-    logger.info(
+    logger.error(
         f"DEBUG: Render client attempting login with user: {api_user}, key: {api_key}"
     )  # デバッグコード
 

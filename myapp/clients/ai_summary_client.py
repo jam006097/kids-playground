@@ -1,3 +1,4 @@
+import os
 from gradio_client import Client
 from django.conf import settings
 import logging
@@ -18,7 +19,15 @@ def call_summary_api(text: str) -> str:
     Raises:
         Exception: API呼び出しでエラーが発生した場合
     """
-    api_url = getattr(settings, "AI_SUMMARY_API_URL", None)
+    api_url = os.getenv("AI_API_URL")
+    if not api_url:
+        api_url = getattr(settings, "AI_SUMMARY_API_URL", None)
+
+    if not api_url:
+        logger.error(
+            "AI_API_URL is not set in environment variables or Django settings."
+        )
+        raise ValueError("AI APIのURLが設定されていません。")
 
     api_user = getattr(settings, "AI_SUMMARY_API_USERNAME", "gemini")
     api_key = getattr(settings, "AI_SUMMARY_API_KEY", None)

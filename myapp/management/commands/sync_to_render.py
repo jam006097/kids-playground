@@ -18,7 +18,7 @@ class Command(BaseCommand):
         local_db_container = "kidsplayground_postgres"
         local_db_user = "kina"
         local_db_name = "kidsplayground_db"
-        backup_file = "backup.sql"
+        backup_file = "sqldata_buckup/backup.sql"
         render_db_url = os.getenv("RENDER_DATABASE_URL")
 
         if not render_db_url:

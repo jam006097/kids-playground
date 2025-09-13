@@ -26,61 +26,81 @@
 - コード品質: Pytest, Flake8, Black, Mypy, pre-commit
 - ソース管理: Git, GitHub
 
-## ローカル開発環境セットアップ (Docker)
+## ローカル開発環境セットアップ
 
-ローカルでの開発はDockerを使用することを推奨します。
+このプロジェクトでは、コード編集はローカルのPython仮想環境（`venv`）で行い、アプリケーションの実行やテストはDockerコンテナで行うハイブリッドな開発スタイルを推奨しています。
 
-> [!NOTE]
-> より詳細な手順やトラブルシューティングは [docs/docker_local_setup_guide.md](./docs/docker_local_setup_guide.md) を参照してください。
+### ステップ1: コード編集環境のセットアップ (`venv`)
 
-### 1. リポジトリをクローン
-```bash
-git clone https://github.com/jam006097/kidsPlayGround.git
-cd kidsPlayGround
-```
+まず、コードの補完や静的解析をエディタで有効にするため、ローカルにPythonの仮想環境を構築します。
 
-### 2. 環境変数の設定
-リポジトリのルートにある `.env.example` ファイルをコピーして `.env` ファイルを作成します。
-```bash
-cp .env.example .env
-```
-`.env` ファイルには、開発用のデータベース接続情報やDjangoの`SECRET_KEY`などが含まれています。必要に応じて内容を編集してください。
+1.  **リポジトリをクローン**
+    ```bash
+    git clone https://github.com/jam006097/kidsPlayGround.git
+    cd kidsPlayGround
+    ```
 
-### 3. フロントエンドの依存関係をインストール
-開発に使用するリンターやフォーマッター等のNode.jsパッケージをインストールします。
-```bash
-npm install
-```
+2.  **Python仮想環境の作成と有効化**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+    *Windowsの場合は `venv\Scripts\activate` を実行してください。*
 
-### 4. Dockerコンテナの起動
-Docker Composeを使って、DjangoアプリケーションとPostgreSQLデータベースのコンテナをビルドし、バックグラウンドで起動します。
-```bash
-docker-compose up -d --build
-```
-- 初回起動時は、Dockerイメージのビルドに時間がかかることがあります。
-- `db`、`ai-api`、`web` の3つのサービスが起動します。
+3.  **依存パッケージのインストール**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-### 5. データベースの初期化
-コンテナ内でマイグレーションを実行し、データベースのテーブルを作成します。
-```bash
-docker-compose exec web python manage.py migrate
-```
+4.  **pre-commitフックのセットアップ**
+    コミット前にコード品質チェックを自動実行するための設定です。
+    ```bash
+    pre-commit install
+    ```
 
-### 6. 管理者ユーザーの作成
-アプリケーションにログインするための管理者（スーパーユーザー）を作成します。
-```bash
-docker-compose exec web python manage.py createsuperuser
-```
-- 指示に従い、ユーザー名、メールアドレス、パスワードを設定してください。
+5.  **フロントエンド依存関係のインストール**
+    コードフォーマッターなどに使用します。
+    ```bash
+    npm install
+    ```
 
-### 7. pre-commitフックのセットアップ
-品質を保つため、コミット前に自動でコードチェックが実行されるように `pre-commit` フックをインストールします。
-```bash
-docker-compose exec web pre-commit install
-```
+6.  **エディタの設定**
+    お使いのエディタ（VSCodeなど）で、作成した`venv`内のPythonインタープリタ（例: `venv/bin/python`）を選択してください。これにより、コードの自動補完やエラーチェックが正しく機能します。
 
-### 8. アプリケーションへのアクセス
-セットアップが完了したら、ブラウザで [http://localhost:8000](http://localhost:8000) にアクセスします。
+
+### ステップ2: テスト・実行環境のセットアップ (Docker)
+
+次に、アプリケーションの実際の動作確認やテストを行うためのDocker環境をセットアップします。
+
+1.  **環境変数の設定**
+    リポジトリのルートにある `.env.example` ファイルをコピーして `.env` ファイルを作成します。
+    ```bash
+    cp .env.example .env
+    ```
+    `.env` ファイルには、開発用のデータベース接続情報やDjangoの`SECRET_KEY`などが含まれています。必要に応じて内容を編集してください。
+
+2.  **Dockerコンテナの起動**
+    Docker Composeを使って、DjangoアプリケーションとPostgreSQLデータベースのコンテナをビルドし、バックグラウンドで起動します。
+    ```bash
+    docker-compose up -d --build
+    ```
+    - 初回起動時は、Dockerイメージのビルドに時間がかかることがあります。
+    - `db`、`ai-api`、`web` の3つのサービスが起動します。
+
+3.  **データベースの初期化**
+    コンテナ内でマイグレーションを実行し、データベースのテーブルを作成します。
+    ```bash
+    docker-compose exec -T web python manage.py migrate
+    ```
+
+4.  **管理者ユーザーの作成**
+    アプリケーションにログインするための管理者（スーパーユーザー）を作成します。このコマンドは対話形式のため、ご自身のターミナルで実行してください。
+    ```bash
+    docker-compose exec web python manage.py createsuperuser
+    ```
+
+5.  **アプリケーションへのアクセス**
+    セットアップが完了したら、ブラウザで [http://localhost:8000](http://localhost:8000) にアクセスします。
 
 ### コンテナの停止
 ```bash

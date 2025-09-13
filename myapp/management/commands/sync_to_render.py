@@ -14,11 +14,21 @@ class Command(BaseCommand):
         )
         load_dotenv(os.path.join(project_root, ".env"))
 
-        # 設定
+        # --- 設定 ---
+        # バックアップファイル名に日付を追加
+        from datetime import datetime
+
+        datestamp = datetime.now().strftime("%Y%m%d")
+        backup_dir = "sqldata_buckup"
+        backup_filename = f"backup_{datestamp}.sql"
+        backup_file = os.path.join(backup_dir, backup_filename)
+
+        # バックアップディレクトリが存在しない場合は作成
+        os.makedirs(backup_dir, exist_ok=True)
+
         local_db_container = "kidsplayground_postgres"
         local_db_user = "kina"
         local_db_name = "kidsplayground_db"
-        backup_file = "sqldata_buckup/backup.sql"
         render_db_url = os.getenv("RENDER_DATABASE_URL")
 
         if not render_db_url:
@@ -102,12 +112,11 @@ class Command(BaseCommand):
             )
             return
 
-        # 正常終了した場合のみバックアップファイルを削除
-        if os.path.exists(backup_file):
-            self.stdout.write("\nステップ4: 一時バックアップファイルを削除します...")
-            os.remove(backup_file)
-            self.stdout.write(
-                self.style.SUCCESS(" -> バックアップファイルを削除しました。")
+        # 正常終了したことをユーザーに通知
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"\nステップ4: バックアップファイル '{backup_file}' を保存しました。"
             )
+        )
 
         self.stdout.write(self.style.SUCCESS("\n🎉 データ移行がすべて完了しました！"))

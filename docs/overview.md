@@ -30,6 +30,44 @@ graph TD
     DETAIL --> REVIEW
 ```
 
+## アプリケーション構成
+```mermaid
+graph TD
+    subgraph "Project Core"
+        mysite("mysite")
+    end
+
+    subgraph "User Management"
+        users("users")
+        accounts("accounts")
+    end
+
+    subgraph "Main Features"
+        myapp("myapp")
+    end
+
+    mysite --> users
+    mysite --> accounts
+    mysite --> myapp
+
+    accounts --> users
+    myapp --> users
+
+    style mysite fill:#f9f,stroke:#333,stroke-width:2px
+    style users fill:#ccf,stroke:#333,stroke-width:2px
+    style accounts fill:#ccf,stroke:#333,stroke-width:2px
+    style myapp fill:#cfc,stroke:#333,stroke-width:2px
+```
+
+| アプリケーション | 役割                                                                                                                            |
+|------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| `mysite`         | プロジェクト全体の設定 (`settings.py`) とURLディスパッチ (`urls.py`) を管理する中心的なアプリケーション。                         |
+| `users`          | `email`をユーザー名とするカスタムユーザーモデル (`CustomUser`) を定義。                                                         |
+| `accounts`       | `django-allauth` を利用したユーザー認証（登録、ログイン等）と、マイページなどのアカウント関連機能を提供する。                   |
+| `myapp`          | 施設情報、口コミ、お気に入り、ランキングなど、このWebサービスの主要な機能を提供するコアアプリケーション。                         |
+
+---
+
 ## 主なユースケース
 - 遊び場を検索・一覧・地図で閲覧する
 - 会員登録・ログインし、マイページやお気に入り管理を行う

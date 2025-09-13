@@ -19,7 +19,6 @@ classDiagram
         +bool nursing_room_available
         +bool diaper_changing_station_available
         +bool stroller_accessible
-        +bool kids_space_available
         +bool lunch_allowed
         +string google_map_url
         +bool indoor_play_area

@@ -26,7 +26,6 @@ erDiagram
         bool nursing_room_available
         bool diaper_changing_station_available
         bool stroller_accessible
-        bool kids_space_available
         bool lunch_allowed
         string google_map_url
         bool indoor_play_area
@@ -79,7 +78,6 @@ erDiagram
 | nursing_room_available | BooleanField | 授乳室の有無 |
 | diaper_changing_station_available | BooleanField | おむつ交換台の有無 |
 | stroller_accessible | BooleanField | ベビーカーアクセス可否 |
-| kids_space_available | BooleanField | キッズスペースの有無 |
 | lunch_allowed | BooleanField    | 持ち込みランチ可否 |
 | google_map_url | URLField      | GoogleマップURL |
 | indoor_play_area | BooleanField  | 屋内遊び場の有無 |

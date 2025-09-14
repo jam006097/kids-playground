@@ -10,6 +10,8 @@ class TestCallSummaryApi(SimpleTestCase):
     AI要約APIクライアント `call_summary_api` のテスト (gradio_client版)
     """
 
+    @override_settings(AI_SUMMARY_API_KEY="test_api_key")
+    @override_settings(AI_SUMMARY_API_USERNAME="test_api_username")
     @patch("myapp.clients.ai_summary_client.Client")
     def test_成功時に要約テキストを返すこと(self, MockClient):
         """
@@ -25,7 +27,9 @@ class TestCallSummaryApi(SimpleTestCase):
 
         # 検証
         self.assertEqual(summary, "AIによる要約結果です。")
-        MockClient.assert_called_once_with("https://test-space.hf.space/", auth=None)
+        MockClient.assert_called_once_with(
+            "https://test-space.hf.space/", auth=("test_api_username", "test_api_key")
+        )
         mock_instance.predict.assert_called_once_with(
             "これはテストの口コミです。", api_name="/predict"
         )
@@ -47,6 +51,7 @@ class TestCallSummaryApi(SimpleTestCase):
             call_summary_api("エラーになるテキスト")
 
     @override_settings(AI_SUMMARY_API_KEY="test_api_key")
+    @override_settings(AI_SUMMARY_API_USERNAME="test_api_username")
     @patch("myapp.clients.ai_summary_client.Client")
     def test_APIキーが設定されている場合にauthが渡されること(self, MockClient):
         """
@@ -62,5 +67,5 @@ class TestCallSummaryApi(SimpleTestCase):
 
         # 検証
         MockClient.assert_called_once_with(
-            "https://test-space.hf.space/", auth=("gemini", "test_api_key")
+            "https://test-space.hf.space/", auth=("test_api_username", "test_api_key")
         )

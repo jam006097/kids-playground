@@ -8,7 +8,7 @@
     <h1 class="my-4">お気に入りの遊び場</h1>
 
     <!-- 検索・フィルタリングボタン -->
-    <button class="btn btn-outline-secondary mb-3" type="button" data-toggle="collapse" data-target="#search-form-wrapper" aria-expanded="false" aria-controls="search-form-wrapper">
+    <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#search-form-wrapper" aria-expanded="false" aria-controls="search-form-wrapper">
         検索する
     </button>
 
@@ -94,7 +94,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary mt-3">検索・フィルタリング</button>
-            <a href="{% url 'myapp:favorites' %}" class="btn btn-secondary mt-3 ml-2">リセット</a>
+            <a href="{% url 'myapp:favorites' %}" class="btn btn-secondary mt-3 ms-2">リセット</a>
         </form>
     </div>
 
@@ -104,10 +104,10 @@
     <!-- タブメニュー -->
     <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="list-tab" data-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="true">一覧</a>
+            <a class="nav-link active" id="list-tab" data-bs-toggle="tab" href="#list" role="tab" aria-controls="list" aria-selected="true">一覧</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="map-tab" data-toggle="tab" href="#map" role="tab" aria-controls="map" aria-selected="false">地図</a>
+            <a class="nav-link" id="map-tab" data-bs-toggle="tab" href="#map" role="tab" aria-controls="map" aria-selected="false">地図</a>
         </li>
     </ul>
 
@@ -129,7 +129,7 @@
                             {% include 'partials/_favorite_button.html' with playground=playground %}
                             <!-- 口コミボタン -->
                             {% if user.is_authenticated %}
-                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#reviewModal"
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#reviewModal"
                                     data-playground-id="{{ playground.id }}" data-playground-name="{{ playground.name }}">
                                 口コミを書く
                             </button>
@@ -159,7 +159,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="reviewModalLabel">口コミを投稿</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>

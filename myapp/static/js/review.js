@@ -1,73 +1,79 @@
 /**
- * 口コミ管理を行うクラス。
- * モーダルの表示、フォームのデータ取得、AJAXによる口コミ投稿処理を管理します。
+ * 口コミ管理を行うクラス。(jQuery依存なし)
  */
 class ReviewManager {
-  /**
-   * ReviewManagerのコンストラクタ。
-   * @param {object} jQuery - jQueryオブジェクト。
-   * @param {Document} [documentObj=document] - Documentオブジェクト。テスト用にモックを注入できるようにします。
-   */
-  constructor(jQuery, documentObj = document) {
-    this.$ = jQuery;
+  constructor(modalElement, formElement, documentObj = document) {
+    if (!modalElement || !formElement) {
+      throw new Error('ReviewManagerにはモーダルとフォームの要素が必要です。');
+    }
+    this.modalElement = modalElement;
+    this.formElement = formElement;
     this.document = documentObj;
-    this.initReviewHandlers();
+    this.modal = new bootstrap.Modal(this.modalElement);
+
+    this.playgroundIdInput = this.formElement.querySelector('#playgroundId');
+    this.modalTitle = this.modalElement.querySelector('.modal-title');
+
+    // this.handleSubmitをこのクラスインスタンスにバインドする
+    this.handleSubmit = this.handleSubmit.bind(this);
+
+    this.initEventHandlers();
   }
 
-  /**
-   * CSRFトークンをDOMから取得します。
-   * @returns {string} CSRFトークンの値。
-   */
   getCsrfToken() {
-    return this.document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const tokenElement = this.document.querySelector('[name=csrfmiddlewaretoken]');
+    return tokenElement ? tokenElement.value : '';
   }
 
-  /**
-   * 口コミ関連のイベントハンドラを初期化します。
-   * モーダルの表示時とフォーム送信時の処理を設定します。
-   */
-  initReviewHandlers() {
-    const self = this; // `this` コンテキストを保持
-
-    // モーダルが開かれるときに施設情報を設定
-    // 関連するボタンから遊び場IDと名前を取得し、モーダル内の要素に設定します。
-    self.$('#reviewModal').on('show.bs.modal', (event) => {
-      const button = self.$(event.relatedTarget); // モーダルをトリガーしたボタン
-      const playgroundId = button.data('playground-id'); // ボタンから遊び場IDを取得
-      const playgroundName = button.data('playground-name'); // ボタンから遊び場名を取得
-      const modal = self.$(event.currentTarget); // 現在のモーダル要素
-
-      modal.find('#playgroundId').val(playgroundId); // 隠しフィールドに遊び場IDを設定
-      modal.find('.modal-title').text(playgroundName + 'への口コミ'); // モーダルのタイトルを設定
+  // メソッド名を変更
+  initEventHandlers() {
+    this.modalElement.addEventListener('show.bs.modal', (event) => {
+      const button = event.relatedTarget;
+      if (!button) return;
+      const playgroundId = button.dataset.playgroundId;
+      const playgroundName = button.dataset.playgroundName;
+      if (this.playgroundIdInput) {
+        this.playgroundIdInput.value = playgroundId;
+      }
+      if (this.modalTitle) {
+        this.modalTitle.textContent = playgroundName + 'への口コミ';
+      }
     });
 
-    // 口コミフォームの送信処理
-    // フォームの送信をインターセプトし、AJAXでデータを送信します。
-    self.$('#reviewForm').on('submit', (event) => {
-      event.preventDefault(); // デフォルトのフォーム送信を防止
+    // イベントリスナーは、新しいhandleSubmitメソッドを参照するだけ
+    this.formElement.addEventListener('submit', this.handleSubmit);
+  }
 
-      const formData = self.$(event.currentTarget).serialize(); // フォームデータをシリアライズ
-      const playgroundId = self.$('#playgroundId').val(); // 遊び場IDを取得
-      const csrfToken = self.getCsrfToken(); // CSRFトークンを取得
+  // フォーム送信ロジックを独立したメソッドとして切り出す
+  async handleSubmit(event) {
+    event.preventDefault();
 
-      self.$.ajax({
-        url: `/playground/${playgroundId}/add_review/`, // 口コミ投稿のエンドポイント
+    const urlEncodedData = new URLSearchParams(new FormData(this.formElement));
+    const csrfToken = this.getCsrfToken();
+    urlEncodedData.append('csrfmiddlewaretoken', csrfToken);
+
+    const playgroundId = this.playgroundIdInput ? this.playgroundIdInput.value : '';
+
+    try {
+      const response = await fetch(`/playground/${playgroundId}/add_review/`, {
         method: 'POST',
-        data: formData + '&csrfmiddlewaretoken=' + csrfToken, // フォームデータとCSRFトークンを結合
-        success: (response) => {
-          // 成功時の処理
-          // グローバルなalert関数を直接呼び出しています。
-          // GEMINI.mdの指示に従い、組み込み関数の呼び出しは直接行うのが安全です。
-          alert(response.message);
-          self.$('#reviewModal').modal('hide'); // モーダルを閉じる
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrfToken,
         },
-        error: () => {
-          // 失敗時の処理
-          // グローバルなalert関数を直接呼び出しています。
-          alert('口コミの投稿に失敗しました。');
-        },
+        body: urlEncodedData.toString(),
       });
-    });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok.');
+      }
+
+      const data = await response.json();
+      alert(data.message);
+      this.modal.hide();
+    } catch (error) {
+      alert('口コミの投稿に失敗しました。');
+    }
   }
 }
 

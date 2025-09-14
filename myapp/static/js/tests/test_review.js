@@ -1,169 +1,111 @@
 import { ReviewManager } from '../review.js';
 
+// Bootstrap 5 Modalのモック
+const mockBsModal = {
+  hide: jest.fn(),
+};
+if (typeof global.bootstrap === 'undefined') {
+  global.bootstrap = {};
+}
+global.bootstrap.Modal = jest.fn(() => mockBsModal);
+
+// fetchをグローバルにモック
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({ message: '口コミが投稿されました。' }),
+  })
+);
+
 describe('ReviewManager', () => {
-  let mockJQuery;
+  let reviewModal;
+  let reviewForm;
+  let playgroundIdInput;
+  let modalTitle;
   let mockDocument;
 
-  let mockReviewModalElement;
-  let mockReviewFormElement;
-  let mockPlaygroundIdElement;
-  let mockModalTitleElement;
-
-  // 各テストで新しいモック要素を作成するためのファクトリ関数
-  const createMockElement = () => ({
-    on: jest.fn(),
-    val: jest.fn(),
-    text: jest.fn(),
-    serialize: jest.fn(() => 'formData'),
-    modal: jest.fn(),
-    find: jest.fn(() => createMockElement()), // findが新しいモック要素を返すように
-    data: jest.fn(),
-  });
-
   beforeEach(() => {
-    // Specific mocks for #reviewModal, #reviewForm, and #playgroundId
-    mockReviewModalElement = createMockElement();
-    mockReviewFormElement = createMockElement();
-    mockPlaygroundIdElement = createMockElement();
-    mockModalTitleElement = createMockElement();
-    mockModalTitleElement.text = jest.fn();
-
-    // Override specific methods for these elements
-    mockReviewModalElement.on = jest.fn((event, handler) => {
-      if (event === 'show.bs.modal') {
-        mockReviewModalElement.showBsModalHandler = handler;
-      }
-      return mockReviewModalElement;
-    });
-    mockReviewModalElement.modal = jest.fn();
-
-    // mockReviewModalElementのfindメソッドを個別にモック
-    mockReviewModalElement.find = jest.fn((selector) => {
-      if (selector === '#playgroundId') return mockPlaygroundIdElement;
-      if (selector === '.modal-title') return mockModalTitleElement;
-      return createMockElement();
-    });
-
-    mockReviewFormElement.on = jest.fn((event, handler) => {
-      if (event === 'submit') {
-        mockReviewFormElement.submitHandler = handler;
-      }
-      return mockReviewFormElement;
-    });
-    mockReviewFormElement.serialize = jest.fn(() => 'formData');
-
-    // Ensure mockPlaygroundIdElement.val is a mock function
-    mockPlaygroundIdElement.val = jest.fn(() => '123');
-
-    // jQueryのモック
-    mockJQuery = jest.fn((selector) => {
-      if (selector === mockReviewModalElement) return mockReviewModalElement;
-      if (selector === '#reviewModal') return mockReviewModalElement;
-      if (selector === '#reviewForm') return mockReviewFormElement;
-      if (selector === '#playgroundId') return mockPlaygroundIdElement;
-      const genericElement = createMockElement();
-      genericElement.data = jest.fn((key) => {
-        if (key === 'playground-id') return '456';
-        if (key === 'playground-name') return '別の公園';
-        return undefined;
-      });
-      return genericElement;
-    });
-
-    // $.ajaxをモック
-    mockJQuery.ajax = jest.fn();
-    global.$ = mockJQuery;
-
-    // alertをスパイ
+    fetch.mockClear();
     jest.spyOn(global, 'alert').mockImplementation(() => {});
+    global.bootstrap.Modal.mockClear();
+    mockBsModal.hide.mockClear();
 
-    // documentをモック
+    document.body.innerHTML = `
+      <div class="modal" id="reviewModal">
+        <h5 class="modal-title">口コミを投稿</h5>
+        <form id="reviewForm">
+          <input type="hidden" id="playgroundId" name="playground_id">
+          <input name="rating" value="5">
+          <textarea name="content">Great!</textarea>
+        </form>
+      </div>
+    `;
+
+    reviewModal = document.getElementById('reviewModal');
+    reviewForm = document.getElementById('reviewForm');
+    playgroundIdInput = document.getElementById('playgroundId');
+    modalTitle = reviewModal.querySelector('.modal-title');
+
     mockDocument = {
       querySelector: jest.fn((selector) => {
         if (selector === '[name=csrfmiddlewaretoken]') {
           return { value: 'mockCsrfToken' };
         }
-        return null;
+        return document.querySelector(selector);
       }),
     };
-
-    // ReviewManagerのインスタンスを作成
-    new ReviewManager(mockJQuery, mockDocument);
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    document.body.innerHTML = '';
     jest.restoreAllMocks();
   });
 
-  describe('initReviewHandlers - モーダル表示時の挙動', () => {
-    test('モーダルが開かれたときに施設情報が正しく設定されること', () => {
-      const showBsModalCallback = mockReviewModalElement.showBsModalHandler;
+  describe('jQueryからの脱却', () => {
+    test('モーダル表示時に施設情報が設定されること', () => {
+      const manager = new ReviewManager(reviewModal, reviewForm, mockDocument);
 
-      const mockEvent = {
-        relatedTarget: {
-          dataset: {
-            'playground-id': '456',
-            'playground-name': '別の公園',
-          },
-        },
-        currentTarget: mockReviewModalElement,
-      };
+      const triggerButton = document.createElement('button');
+      triggerButton.dataset.playgroundId = '456';
+      triggerButton.dataset.playgroundName = '別の公園';
 
-      showBsModalCallback.call(mockReviewModalElement, mockEvent);
+      const event = new Event('show.bs.modal');
+      Object.defineProperty(event, 'relatedTarget', { value: triggerButton, writable: false });
 
-      expect(mockPlaygroundIdElement.val).toHaveBeenCalledWith('456');
-      expect(mockModalTitleElement.text).toHaveBeenCalledWith(
-        '別の公園への口コミ',
-      );
-    });
-  });
+      reviewModal.dispatchEvent(event);
 
-  describe('initReviewHandlers - フォーム送信時の挙動', () => {
-    beforeEach(() => {
-      mockPlaygroundIdElement.val.mockReturnValue('123');
+      expect(playgroundIdInput.value).toBe('456');
+      expect(modalTitle.textContent).toBe('別の公園への口コミ');
     });
 
-    test('AJAXリクエストが成功した場合、alertが呼び出されモーダルが閉じられること', async () => {
-      mockJQuery.ajax.mockImplementationOnce((options) => {
-        options.success({
-          message: '口コミが投稿されました。',
-        });
-      });
+    test('フォーム送信時にfetchが呼ばれ、成功時にモーダルが閉じること', async () => {
+      const manager = new ReviewManager(reviewModal, reviewForm, mockDocument);
+      playgroundIdInput.value = '123';
 
-      const mockEvent = {
-        preventDefault: jest.fn(),
-      };
-      mockReviewFormElement.submitHandler(mockEvent);
+      // dispatchEventの代わりに、テスト対象のメソッドを直接呼び出す
+      const mockEvent = { preventDefault: jest.fn() };
+      await manager.handleSubmit(mockEvent);
 
-      expect(mockJQuery.ajax).toHaveBeenCalledWith(
+      expect(fetch).toHaveBeenCalledWith(
+        '/playground/123/add_review/',
         expect.objectContaining({
-          url: '/playground/123/add_review/',
           method: 'POST',
-          data: 'formData&csrfmiddlewaretoken=mockCsrfToken',
-        }),
+          body: 'playground_id=123&rating=5&content=Great%21&csrfmiddlewaretoken=mockCsrfToken',
+        })
       );
       expect(global.alert).toHaveBeenCalledWith('口コミが投稿されました。');
-      expect(mockReviewModalElement.modal).toHaveBeenCalledWith('hide');
+      expect(mockBsModal.hide).toHaveBeenCalled();
     });
 
-    test('AJAXリクエストが失敗した場合、alertが呼び出されること', async () => {
-      mockJQuery.ajax.mockImplementationOnce((options) => {
-        options.error({});
-      });
+    test('fetchリクエストが失敗した場合、alertが呼び出されること', async () => {
+      fetch.mockRejectedValueOnce(new Error('Network error'));
+      const manager = new ReviewManager(reviewModal, reviewForm, mockDocument);
+      playgroundIdInput.value = '123';
 
-      const mockEvent = {
-        preventDefault: jest.fn(),
-      };
-      mockReviewFormElement.submitHandler(mockEvent);
+      // dispatchEventの代わりに、テスト対象のメソッドを直接呼び出す
+      const mockEvent = { preventDefault: jest.fn() };
+      await manager.handleSubmit(mockEvent);
 
-      expect(mockJQuery.ajax).toHaveBeenCalledWith(
-        expect.objectContaining({
-          url: '/playground/123/add_review/',
-          method: 'POST',
-          data: 'formData&csrfmiddlewaretoken=mockCsrfToken',
-        }),
-      );
       expect(global.alert).toHaveBeenCalledWith('口コミの投稿に失敗しました。');
     });
   });

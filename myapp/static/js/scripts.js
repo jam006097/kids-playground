@@ -5,20 +5,22 @@ import { ReviewManager } from './review.js';
 document.addEventListener('DOMContentLoaded', function () {
   const mapManager = new MapManager();
   const favoriteManager = new FavoriteManager();
-  new ReviewManager($);
+  // ReviewManagerを初期化
+  const reviewModal = document.getElementById('reviewModal');
+  const reviewForm = document.getElementById('reviewForm');
+  if (reviewModal && reviewForm) {
+    new ReviewManager(reviewModal, reviewForm);
+  }
 
   // ページに応じて適切な地図のイベントリスナーを設定
-  if (document.getElementById('map-container')) {
-    // トップページの地図処理
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-      if (e.target.id === 'map-tab') {
+  const mapTab = document.getElementById('map-tab');
+  if (mapTab) {
+    mapTab.addEventListener('shown.bs.tab', () => {
+      if (document.getElementById('map-container')) {
+        // トップページの地図処理
         mapManager.initMap(window.playgrounds);
-      }
-    });
-  } else if (document.getElementById('mypage-map-container')) {
-    // お気に入りページの地図処理
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-      if (e.target.id === 'map-tab') {
+      } else if (document.getElementById('mypage-map-container')) {
+        // お気に入りページの地図処理
         mapManager.initFavoritesMap(window.playgrounds);
       }
     });

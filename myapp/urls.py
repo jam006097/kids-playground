@@ -7,10 +7,10 @@ from myapp.views.favorite_views import (
 )
 from myapp.views.review_views import AddReviewView, ReviewListView
 from myapp.views.ranking_views import RankingListView
-from myapp.views.detail_views import FacilityDetailView  # New import
+from myapp.views.detail_views import FacilityDetailView
 from myapp.views.chat_views import ChatView
-from myapp import views  # 追加
-from .views.summary_views import SummarizeReviewsView
+from myapp.views.about import about_view
+from myapp.views.summary_views import SummarizeReviewsView
 
 app_name = "myapp"
 
@@ -31,7 +31,7 @@ urlpatterns = [
         ReviewListView.as_view(),
         name="view_reviews",
     ),
-    path("about/", views.about_view, name="about"),  # 追加
+    path("about/", about_view, name="about"),
     path("chat/", ChatView.as_view(), name="chat"),
     path(
         "summarize/playground/<int:playground_id>/",

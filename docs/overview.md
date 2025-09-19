@@ -18,10 +18,12 @@ graph TD
     DETAIL[遊び場詳細]
     FAVORITE[お気に入り遊び場一覧 (地図機能含む)]
     REVIEW[口コミ投稿]
+    AI_CHAT[AIチャット]
 
     TOP --> LIST
     TOP --> LOGIN
     TOP --> REGISTER
+    TOP --> AI_CHAT
     LOGIN --> MYPAGE
     REGISTER --> MYPAGE
     MYPAGE --> FAVORITE
@@ -80,6 +82,7 @@ graph TD
 | 地図表示         | 遊び場一覧とお気に入り一覧にLeaflet.jsで地図表示 |
 | 遊び場詳細         | 遊び場の詳細情報・口コミ表示         |
 | ランキング表示   | 口コミに基づいた施設ランキング表示   |
+| AIチャット       | AIチャットボットとの対話機能         |
 | 会員登録/ログイン | ユーザー認証                        |
 | マイページ       | お気に入り・投稿口コミ管理         |
 | お気に入り登録   | 遊び場をお気に入りリストに追加/削除   |

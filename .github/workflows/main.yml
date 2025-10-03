@@ -36,6 +36,7 @@ jobs:
 
     - name: Install Python dependencies # Pythonの依存ライブラリをインストール
       run: |
+        python -m pip install --upgrade pip
         pip cache purge # キャッシュをクリアして、確実にインストール
         pip install -r requirements.txt
         pip install pip-audit

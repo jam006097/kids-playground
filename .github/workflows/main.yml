@@ -38,6 +38,11 @@ jobs:
       run: |
         pip cache purge # キャッシュをクリアして、確実にインストール
         pip install -r requirements.txt
+        pip install pip-audit
+
+    - name: Run pip-audit # Pythonの脆弱性監査を実行
+      run: |
+        pip-audit
 
     - name: Run Python tests # Pythonのテストを実行
       env: # テスト用の環境変数を設定
@@ -52,7 +57,10 @@ jobs:
         node-version: '20'
 
     - name: Install Node.js dependencies # Node.jsの依存ライブラリをインストール
-      run: npm install
+      run: npm ci # package-lock.jsonに基づきクリーンインストール
+
+    - name: Run npm audit # Node.jsの脆弱性監査を実行
+      run: npm audit
 
     - name: Run JavaScript tests # JavaScriptのテストを実行
       run: |

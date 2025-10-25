@@ -7,7 +7,12 @@
     "doc": "docs"
   },
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.27.1",
     "@babel/preset-env": "^7.28.0",
+    "@babel/preset-typescript": "^7.28.5",
+    "@types/istanbul-lib-report": "^3.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/yargs-parser": "^21.0.3",
     "babel-jest": "^30.0.5",
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.8",
@@ -15,12 +20,15 @@
     "eslint-plugin-prettier": "^5.5.3",
     "jest": "^30.0.5",
     "jest-environment-jsdom": "^30.0.5",
-    "prettier": "^3.6.2"
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "test": "jest",
     "lint": "eslint \"myapp/**/*.js\"",
-    "format": "prettier --write \"myapp/**/*.js\""
+    "format": "prettier --write \"myapp/**/*.js\"",
+    "build": "tsc",
+    "build:watch": "tsc --watch"
   },
   "keywords": [],
   "author": "",

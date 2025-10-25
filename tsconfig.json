@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
+    "outDir": "myapp/static/js/dist"
+  },
+  "include": [
+    "myapp/static/js/**/*.ts",
+    "myapp/static/js/**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "myapp/static/js/tests",
+    "myapp/static/js/dist",
+    "myapp/static/js/scripts.js"
+  ]
+}

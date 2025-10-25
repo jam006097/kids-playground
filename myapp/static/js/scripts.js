@@ -1,5 +1,5 @@
 import { MapManager } from './map.js';
-import { FavoriteManager } from './favorite.js';
+import { FavoriteManager } from './dist/favorite.js';
 import { ReviewManager } from './review.js';
 
 document.addEventListener('DOMContentLoaded', function () {

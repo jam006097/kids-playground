@@ -105,12 +105,10 @@ class FavoriteListView(LoginRequiredMixin, PlaygroundFilterMixin, ListView):
                     "parking": playground.formatted_parking,
                 }
             )
-        playgrounds_json = json.dumps(playgrounds_data)
-
         context.update(
             {
-                "favorite_ids": json.dumps(favorite_ids),
-                "playgrounds_json": playgrounds_json,
+                "favorite_ids": favorite_ids,
+                "playgrounds_data": playgrounds_data,
                 "filtered_count": self.filtered_count,
                 "total_count": Favorite.objects.filter(
                     user=cast(CustomUser, self.request.user)

@@ -56,8 +56,6 @@ class PlaygroundListView(PlaygroundFilterMixin, ListView):
                     "parking": playground.formatted_parking,
                 }
             )
-        playgrounds_json = json.dumps(playgrounds_data)
-
         favorite_ids: list[str] = []
         # ユーザーが認証済みの場合、お気に入り公園の情報を取得
         if self.request.user.is_authenticated:
@@ -74,8 +72,8 @@ class PlaygroundListView(PlaygroundFilterMixin, ListView):
             {
                 "total_count": total_count,
                 "filtered_count": filtered_count,
-                "playgrounds_json": playgrounds_json,
-                "favorite_ids": json.dumps(favorite_ids),
+                "playgrounds_data": playgrounds_data,
+                "favorite_ids": favorite_ids,
             }
         )
         return context

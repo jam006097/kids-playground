@@ -196,9 +196,12 @@ crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
 integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
 crossorigin=""></script>
+{{ playgrounds_data|json_script:"playgrounds-data" }}
+{{ favorite_ids|json_script:"favorite-ids" }}
 <script>
-    window.playgrounds = JSON.parse('{{ playgrounds_json|safe }}');
-    window.favorite_ids = JSON.parse('{{ favorite_ids|safe }}');
+    // Djangoテンプレートから渡されたデータをJavaScriptで使用できるようにする
+    window.playgrounds = JSON.parse(document.getElementById('playgrounds-data').textContent);
+    window.favorite_ids = JSON.parse(document.getElementById('favorite-ids').textContent);
 </script>
 <script type="module" src="{% static 'js/utils.js' %}"></script>
 <script type="module" src="{% static 'js/map.js' %}"></script>

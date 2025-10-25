@@ -4,7 +4,7 @@ from django.test import SimpleTestCase, override_settings
 from myapp.clients.ai_summary_client import call_summary_api
 
 
-@override_settings(AI_SUMMARY_API_URL="https://test-space.hf.space/")
+@override_settings(AI_SUMMARY_API_URL="http://ai-api:7860")
 class TestCallSummaryApi(SimpleTestCase):
     """
     AI要約APIクライアント `call_summary_api` のテスト (gradio_client版)
@@ -28,7 +28,7 @@ class TestCallSummaryApi(SimpleTestCase):
         # 検証
         self.assertEqual(summary, "AIによる要約結果です。")
         MockClient.assert_called_once_with(
-            "https://test-space.hf.space/", auth=("test_api_username", "test_api_key")
+            "http://ai-api:7860", auth=("test_api_username", "test_api_key")
         )
         mock_instance.predict.assert_called_once_with(
             "これはテストの口コミです。", api_name="/predict"
@@ -67,5 +67,5 @@ class TestCallSummaryApi(SimpleTestCase):
 
         # 検証
         MockClient.assert_called_once_with(
-            "https://test-space.hf.space/", auth=("test_api_username", "test_api_key")
+            "http://ai-api:7860", auth=("test_api_username", "test_api_key")
         )

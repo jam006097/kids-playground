@@ -68,19 +68,28 @@ class Command(BaseCommand):
             self.stdout.write(
                 "\nステップ2: Renderデータベースの既存テーブルを削除します..."
             )
-            drop_command = f'psql "{render_db_url}" -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"'
-            subprocess.run(drop_command, shell=True, check=True, capture_output=True)
+            drop_command_args = [
+                "psql",
+                render_db_url,
+                "-c",
+                "DROP SCHEMA public CASCADE; CREATE SCHEMA public;",
+            ]
+            subprocess.run(drop_command_args, check=True, capture_output=True)
             self.stdout.write(self.style.SUCCESS(" -> テーブル削除完了"))
 
             self.stdout.write(
                 "\nステップ3: Renderデータベースへデータをリストアします..."
             )
-            # psqlはシェルのリダイレクト<を使うため、shell=Trueで実行
-            restore_command = (
-                f'psql "{render_db_url}" --echo-all -v ON_ERROR_STOP=1 < {backup_file}'
-            )
-            # shell=Trueの場合、コマンド全体を文字列として渡す
-            subprocess.run(restore_command, shell=True, check=True)
+            # psqlの標準入力にバックアップファイルを渡すことで、シェルのリダイレクト(<)を代替
+            restore_command_args = [
+                "psql",
+                render_db_url,
+                "--echo-all",
+                "-v",
+                "ON_ERROR_STOP=1",
+            ]
+            with open(backup_file, "r") as f:
+                subprocess.run(restore_command_args, stdin=f, check=True)
             self.stdout.write(self.style.SUCCESS(" -> リストア処理が完了しました。"))
 
         except subprocess.CalledProcessError as e:

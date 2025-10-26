@@ -80,7 +80,7 @@ jobs:
       run: |
         black . --check
         flake8 .
-        bandit -c bandit.yaml -r .
+        bandit -c bandit.yaml -r . -ll
 
     - name: Lint and Format Check (JavaScript) # JavaScriptのLintとフォーマットチェック
       run: |

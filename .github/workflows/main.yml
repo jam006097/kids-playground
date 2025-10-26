@@ -52,6 +52,13 @@ jobs:
       run: |
         pytest --ds=mysite.settings.dev
 
+    - name: Run Django Deploy Check # Djangoの本番設定チェック
+      env:
+        DJANGO_SETTINGS_MODULE: mysite.settings.prod
+        SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      run: |
+        python manage.py check --deploy
+
     - name: Set up Node.js # Node.js環境をセットアップ (JSテスト用)
       uses: actions/setup-node@v4
       with:
@@ -69,10 +76,11 @@ jobs:
         npm run lint # その後Lintチェック
         npm run format -- --check # フォーマットが正しく適用されたか最終チェック
 
-    - name: Lint and Format Check (Python) # PythonのLintとフォーマットチェック
+    - name: Lint and Security Check (Python) # PythonのLintとセキュリティチェック
       run: |
         black . --check
         flake8 .
+        bandit -c .bandit -r .
 
     - name: Lint and Format Check (JavaScript) # JavaScriptのLintとフォーマットチェック
       run: |

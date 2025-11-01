@@ -1,54 +1,59 @@
+
+
 /**
- * 口コミ管理を行うクラス。(jQuery依存なし)
+ * 口コミ管理を行うクラス
  */
 class ReviewManager {
-  constructor(modalElement, formElement, documentObj = document) {
+  private modalElement: HTMLElement;
+  private formElement: HTMLFormElement;
+  private document: Document;
+  private modal: bootstrap.Modal;
+  private playgroundIdInput: HTMLInputElement | null;
+  private modalTitle: HTMLElement | null;
+
+  constructor(modalElement: HTMLElement, formElement: HTMLFormElement, documentObj: Document = document) {
     if (!modalElement || !formElement) {
       throw new Error('ReviewManagerにはモーダルとフォームの要素が必要です。');
     }
     this.modalElement = modalElement;
     this.formElement = formElement;
     this.document = documentObj;
-    this.modal = new bootstrap.Modal(this.modalElement);
+    this.modal = new window.bootstrap.Modal(this.modalElement);
 
-    this.playgroundIdInput = this.formElement.querySelector('#playgroundId');
-    this.modalTitle = this.modalElement.querySelector('.modal-title');
+    this.playgroundIdInput = this.formElement.querySelector<HTMLInputElement>('#playgroundId');
+    this.modalTitle = this.modalElement.querySelector<HTMLElement>('.modal-title');
 
-    // this.handleSubmitをこのクラスインスタンスにバインドする
     this.handleSubmit = this.handleSubmit.bind(this);
 
     this.initEventHandlers();
   }
 
-  getCsrfToken() {
-    const tokenElement = this.document.querySelector('[name=csrfmiddlewaretoken]');
+  getCsrfToken(): string {
+    const tokenElement = this.document.querySelector<HTMLInputElement>('[name=csrfmiddlewaretoken]');
     return tokenElement ? tokenElement.value : '';
   }
 
-  // メソッド名を変更
-  initEventHandlers() {
-    this.modalElement.addEventListener('show.bs.modal', (event) => {
-      const button = event.relatedTarget;
+  initEventHandlers(): void {
+    this.modalElement.addEventListener('show.bs.modal', (event: Event) => {
+      const button = (event as any).relatedTarget as HTMLButtonElement | null;
       if (!button) return;
       const playgroundId = button.dataset.playgroundId;
       const playgroundName = button.dataset.playgroundName;
-      if (this.playgroundIdInput) {
+      if (this.playgroundIdInput && playgroundId) {
         this.playgroundIdInput.value = playgroundId;
       }
-      if (this.modalTitle) {
+      if (this.modalTitle && playgroundName) {
         this.modalTitle.textContent = playgroundName + 'への口コミ';
       }
     });
 
-    // イベントリスナーは、新しいhandleSubmitメソッドを参照するだけ
     this.formElement.addEventListener('submit', this.handleSubmit);
   }
 
-  // フォーム送信ロジックを独立したメソッドとして切り出す
-  async handleSubmit(event) {
+  async handleSubmit(event: Event): Promise<void> {
     event.preventDefault();
 
-    const urlEncodedData = new URLSearchParams(new FormData(this.formElement));
+    const urlEncodedData = new URLSearchParams(new FormData(this.formElement) as any);
     const csrfToken = this.getCsrfToken();
     urlEncodedData.append('csrfmiddlewaretoken', csrfToken);
 
@@ -68,7 +73,7 @@ class ReviewManager {
         throw new Error('Network response was not ok.');
       }
 
-      const data = await response.json();
+      const data: { message: string } = await response.json();
       alert(data.message);
       this.modal.hide();
     } catch (error) {

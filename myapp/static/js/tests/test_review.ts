@@ -1,13 +1,11 @@
-import { ReviewManager } from '../review.js';
+import { ReviewManager } from '../review';
 
-// Bootstrap 5 Modalのモック
-const mockBsModal = {
-  hide: jest.fn(),
-};
-if (typeof global.bootstrap === 'undefined') {
-  global.bootstrap = {};
-}
-global.bootstrap.Modal = jest.fn(() => mockBsModal);
+// jest.config.jsのmoduleNameMapperにより、'bootstrap'はダミーに置き換えられるが、
+// テストコード内でbootstrap.Modalがコンストラクタとして振る舞うように、ここで再度モックする。
+const mockHide = jest.fn();
+const mockModalConstructor = jest.fn(() => ({
+  hide: mockHide,
+}));
 
 // fetchをグローバルにモック
 global.fetch = jest.fn(() =>
@@ -15,21 +13,27 @@ global.fetch = jest.fn(() =>
     ok: true,
     json: () => Promise.resolve({ message: '口コミが投稿されました。' }),
   })
-);
+) as jest.Mock;
 
 describe('ReviewManagerの口コミ投稿機能', () => {
-  let reviewModal;
-  let reviewForm;
-  let playgroundIdInput;
-  let modalTitle;
+  let reviewModal: HTMLElement;
+  let reviewForm: HTMLFormElement;
+  let playgroundIdInput: HTMLInputElement;
+  let modalTitle: HTMLElement;
 
   beforeEach(() => {
-    fetch.mockClear();
-    jest.spyOn(global, 'alert').mockImplementation(() => {});
-    global.bootstrap.Modal.mockClear();
-    mockBsModal.hide.mockClear();
+    // グローバルなwindowオブジェクトにbootstrapのモックをセットアップ
+    (window as any).bootstrap = {
+      Modal: mockModalConstructor,
+    };
 
-    // テスト用のDOMに、CSRFトークンを含んだフォームをセットアップ
+    // 各モックをクリア
+    (fetch as jest.Mock).mockClear();
+    mockModalConstructor.mockClear();
+    mockHide.mockClear();
+    jest.spyOn(global, 'alert').mockImplementation(() => {});
+
+    // テスト用のDOMをセットアップ
     document.body.innerHTML = `
       <div class="modal" id="reviewModal">
         <h5 class="modal-title">口コミを投稿</h5>
@@ -42,10 +46,10 @@ describe('ReviewManagerの口コミ投稿機能', () => {
       </div>
     `;
 
-    reviewModal = document.getElementById('reviewModal');
-    reviewForm = document.getElementById('reviewForm');
-    playgroundIdInput = document.getElementById('playgroundId');
-    modalTitle = reviewModal.querySelector('.modal-title');
+    reviewModal = document.getElementById('reviewModal')!;
+    reviewForm = document.getElementById('reviewForm')! as HTMLFormElement;
+    playgroundIdInput = document.getElementById('playgroundId')! as HTMLInputElement;
+    modalTitle = reviewModal.querySelector('.modal-title')!;
   });
 
   afterEach(() => {
@@ -54,9 +58,7 @@ describe('ReviewManagerの口コミ投稿機能', () => {
   });
 
   test('「口コミを書く」ボタンでモーダルを開いたとき、対象の施設名がタイトルに表示されること', () => {
-    // managerのコンストラクタには本物のdocumentを渡す
     const manager = new ReviewManager(reviewModal, reviewForm, document);
-
     const triggerButton = document.createElement('button');
     triggerButton.dataset.playgroundId = '456';
     triggerButton.dataset.playgroundName = '別の公園';
@@ -75,20 +77,19 @@ describe('ReviewManagerの口コミ投稿機能', () => {
     playgroundIdInput.value = '123';
 
     const mockEvent = { preventDefault: jest.fn() };
-    await manager.handleSubmit(mockEvent);
+    await manager.handleSubmit(mockEvent as Event);
 
-    // 検証：ユーザーに観測可能な振る舞いのみをテストする
     expect(global.alert).toHaveBeenCalledWith('口コミが投稿されました。');
-    expect(mockBsModal.hide).toHaveBeenCalled();
+    expect(mockHide).toHaveBeenCalled();
   });
 
   test('口コミの送信に失敗したとき、「投稿に失敗しました」と表示されること', async () => {
-    fetch.mockRejectedValueOnce(new Error('Network error'));
+    (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
     const manager = new ReviewManager(reviewModal, reviewForm, document);
     playgroundIdInput.value = '123';
 
     const mockEvent = { preventDefault: jest.fn() };
-    await manager.handleSubmit(mockEvent);
+    await manager.handleSubmit(mockEvent as Event);
 
     expect(global.alert).toHaveBeenCalledWith('口コミの投稿に失敗しました。');
   });

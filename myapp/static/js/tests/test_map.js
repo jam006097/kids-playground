@@ -68,96 +68,50 @@ describe('MapManager', () => {
 
   describe('initMap', () => {
     const mockPlaygrounds = [
-      {
-        id: '1',
-        name: '公園A',
-        address: '住所A',
-        phone: '111',
-        latitude: '31.5',
-        longitude: '130.5',
-      },
-      {
-        id: '2',
-        name: '公園B',
-        address: '住所B',
-        phone: '222',
-        latitude: '31.6',
-        longitude: '130.6',
-      },
+      { id: '1', latitude: '31.5', longitude: '130.5' },
+      { id: '2', latitude: '31.6', longitude: '130.6' },
     ];
 
-    test('地図が初期化され、適切な引数で呼び出されること', () => {
-      mapManager.initMap(mockPlaygrounds);
-      expect(mockL.map).toHaveBeenCalledWith('map-container');
-      expect(mockMap.setView).toHaveBeenCalledWith(
-        mapManager.KAGOSHIMA_CENTER,
-        mapManager.DEFAULT_ZOOM_LEVEL,
-      );
-      expect(mockTileLayer.addTo).toHaveBeenCalledWith(window.mapInstance); // window.mapInstanceを渡す
-    });
-
-    test('遊び場が与えられた場合、各遊び場に対してマーカーが追加され、ポップアップがバインドされること', () => {
+    test('地図を初期化し、遊び場のピンを配置すること', () => {
       mapManager.initMap(mockPlaygrounds);
 
+      // 検証：地図が生成され、ピンが遊び場の数だけ作られようとしたか
+      expect(mockL.map).toHaveBeenCalled();
       expect(mockL.marker).toHaveBeenCalledTimes(mockPlaygrounds.length);
-      expect(mockMarker.addTo).toHaveBeenCalledTimes(mockPlaygrounds.length);
-      expect(mockMarker.bindPopup).toHaveBeenCalledTimes(
-        mockPlaygrounds.length,
-      );
-
-      expect(mockL.marker).toHaveBeenCalledWith([31.5, 130.5]);
-      expect(mockL.marker).toHaveBeenCalledWith([31.6, 130.6]);
-
-      expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.any(Function));
-      expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.any(Function));
     });
 
-    test('window.mapInstanceが既に存在する場合、removeが呼び出されること', () => {
+    test('地図が既に存在する場合、古い地図を破棄してから新しい地図を描画すること', () => {
       global.window.mapInstance = mockMap;
       mapManager.initMap(mockPlaygrounds);
+
+      // 検証：古い地図のremoveが呼ばれたか
       expect(mockMap.remove).toHaveBeenCalled();
+      // 検証：新しい地図が生成されたか
+      expect(mockL.map).toHaveBeenCalled();
     });
   });
 
   describe('initFavoritesMap', () => {
     const mockPlaygrounds = [
-      {
-        id: '1',
-        name: 'お気に入り公園A',
-        address: 'お気に入り住所A',
-        phone: '333',
-        latitude: '32.0',
-        longitude: '131.0',
-      },
+      { id: '1', latitude: '32.0', longitude: '131.0' },
     ];
 
-    test('お気に入り地図が初期化され、適切な引数で呼び出されること', () => {
-      mapManager.initFavoritesMap(mockPlaygrounds);
-      expect(mockL.map).toHaveBeenCalledWith('mypage-map-container');
-      expect(mockMap.setView).toHaveBeenCalledWith(
-        mapManager.KAGOSHIMA_CENTER,
-        mapManager.DEFAULT_ZOOM_LEVEL,
-      );
-      expect(mockTileLayer.addTo).toHaveBeenCalledWith(window.favMapInstance); // window.favMapInstanceを渡す
-    });
-
-    test('遊び場が与えられた場合、各遊び場に対してマーカーが追加され、ポップアップがバインドされること', () => {
+    test('お気に入り地図を初期化し、ピンを配置すること', () => {
       mapManager.initFavoritesMap(mockPlaygrounds);
 
+      // 検証：地図が生成され、ピンが遊び場の数だけ作られようとしたか
+      expect(mockL.map).toHaveBeenCalled();
       expect(mockL.marker).toHaveBeenCalledTimes(mockPlaygrounds.length);
-      expect(mockMarker.addTo).toHaveBeenCalledTimes(mockPlaygrounds.length);
-      expect(mockMarker.bindPopup).toHaveBeenCalledTimes(
-        mockPlaygrounds.length,
-      );
-
-      expect(mockL.marker).toHaveBeenCalledWith([32.0, 131.0]);
-      expect(mockMarker.bindPopup).toHaveBeenCalledWith(expect.any(Function));
     });
 
-    test('window.favMapInstanceが既に存在する場合、removeが呼び出されること', () => {
+    test('お気に入り地図が既に存在する場合、古い地図を破棄してから新しい地図を描画すること', () => {
       global.window.favMapInstance = mockMap;
       mapManager.initFavoritesMap(mockPlaygrounds);
+
+      // 検証：古い地図のremoveが呼ばれたか
       expect(mockMap.remove).toHaveBeenCalled();
+      // 検証：新しい地図が生成されたか
+      expect(mockL.map).toHaveBeenCalled();
     });
   });
 

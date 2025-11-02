@@ -16,7 +16,6 @@
   "exclude": [
     "node_modules",
     "myapp/static/js/tests",
-    "myapp/static/js/dist",
-    "myapp/static/js/scripts.js"
+    "myapp/static/js/dist"
   ]
 }

@@ -56,12 +56,6 @@ class FavoriteManager {
       .then((response) => response.json()) // レスポンスをJSONとしてパース
       .then((data: { status: string }) => {
         if (data.status === 'ok') {
-          // サーバーからの応答が成功の場合
-          // ボタンのテキストを新しいお気に入り状態に合わせて更新
-          button.textContent = isFavorite
-            ? 'お気に入りに追加'
-            : 'お気に入り解除';
-
           // 地図ポップアップ用のお気に入りIDリスト (window.favorite_ids) を更新
           if (!isFavorite) {
             // お気に入りに追加された場合
@@ -73,6 +67,9 @@ class FavoriteManager {
               window.favorite_ids.splice(index, 1); // リストからIDを削除
             }
           }
+
+          // このページのすべてのお気に入りボタンの表示を更新してUIの整合性を保つ
+          this.updateFavoriteButtons(window.favorite_ids);
 
           // 現在のページがお気に入りページの場合、ページをリロードして表示を更新
           if (window.location.pathname.includes('/favorites/')) {

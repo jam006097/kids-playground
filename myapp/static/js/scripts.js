@@ -1,4 +1,4 @@
-import { MapManager } from './map.js';
+import { MapManager } from './dist/map.js';
 import { FavoriteManager } from './dist/favorite.js';
 import { ReviewManager } from './dist/review.js';
 

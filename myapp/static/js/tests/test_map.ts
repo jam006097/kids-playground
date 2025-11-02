@@ -1,12 +1,22 @@
-import { MapManager } from '../map.js';
+import { MapManager } from '../map';
+
+// テストデータ用の型定義
+interface MockPlayground {
+  id: string;
+  name?: string;
+  address?: string;
+  phone?: string;
+  latitude: string;
+  longitude: string;
+}
 
 describe('MapManager', () => {
-  let mapManager;
-  let mockMap;
-  let mockTileLayer;
-  let mockMarker;
-  let mockL;
-  let mockDocumentQuerySelectorAll;
+  let mapManager: MapManager;
+  let mockMap: any;
+  let mockTileLayer: any;
+  let mockMarker: any;
+  let mockL: any;
+  let mockDocumentQuerySelectorAll: jest.Mock;
 
   beforeEach(() => {
     // LeafletのLオブジェクトをモック
@@ -32,7 +42,7 @@ describe('MapManager', () => {
     // DOM要素をモック
     mockDocumentQuerySelectorAll = jest.fn(() => [
       {
-        getAttribute: jest.fn((name) => {
+        getAttribute: jest.fn((name: string) => {
           if (name === 'data-playground-id') return '1';
           return null;
         }),
@@ -45,9 +55,9 @@ describe('MapManager', () => {
     });
 
     // windowオブジェクトのモック
-    global.window.mapInstance = undefined;
-    global.window.favMapInstance = undefined;
-    global.window.favorite_ids = [];
+    window.mapInstance = undefined;
+    window.favMapInstance = undefined;
+    window.favorite_ids = [];
 
     // setTimeoutをモック
     jest.useFakeTimers();
@@ -67,13 +77,13 @@ describe('MapManager', () => {
   });
 
   describe('initMap', () => {
-    const mockPlaygrounds = [
+    const mockPlaygrounds: MockPlayground[] = [
       { id: '1', latitude: '31.5', longitude: '130.5' },
       { id: '2', latitude: '31.6', longitude: '130.6' },
     ];
 
     test('地図を初期化し、遊び場のピンを配置すること', () => {
-      mapManager.initMap(mockPlaygrounds);
+      mapManager.initMap(mockPlaygrounds as any);
 
       // 検証：地図が生成され、ピンが遊び場の数だけ作られようとしたか
       expect(mockL.map).toHaveBeenCalled();
@@ -81,8 +91,8 @@ describe('MapManager', () => {
     });
 
     test('地図が既に存在する場合、古い地図を破棄してから新しい地図を描画すること', () => {
-      global.window.mapInstance = mockMap;
-      mapManager.initMap(mockPlaygrounds);
+      window.mapInstance = mockMap;
+      mapManager.initMap(mockPlaygrounds as any);
 
       // 検証：古い地図のremoveが呼ばれたか
       expect(mockMap.remove).toHaveBeenCalled();
@@ -92,12 +102,12 @@ describe('MapManager', () => {
   });
 
   describe('initFavoritesMap', () => {
-    const mockPlaygrounds = [
+    const mockPlaygrounds: MockPlayground[] = [
       { id: '1', latitude: '32.0', longitude: '131.0' },
     ];
 
     test('お気に入り地図を初期化し、ピンを配置すること', () => {
-      mapManager.initFavoritesMap(mockPlaygrounds);
+      mapManager.initFavoritesMap(mockPlaygrounds as any);
 
       // 検証：地図が生成され、ピンが遊び場の数だけ作られようとしたか
       expect(mockL.map).toHaveBeenCalled();
@@ -105,8 +115,8 @@ describe('MapManager', () => {
     });
 
     test('お気に入り地図が既に存在する場合、古い地図を破棄してから新しい地図を描画すること', () => {
-      global.window.favMapInstance = mockMap;
-      mapManager.initFavoritesMap(mockPlaygrounds);
+      window.favMapInstance = mockMap;
+      mapManager.initFavoritesMap(mockPlaygrounds as any);
 
       // 検証：古い地図のremoveが呼ばれたか
       expect(mockMap.remove).toHaveBeenCalled();
@@ -116,18 +126,19 @@ describe('MapManager', () => {
   });
 
   describe('updateFavoriteButtonsOnMap', () => {
-    let mockButton1, mockButton2;
+    let mockButton1: { getAttribute: jest.Mock; textContent: string };
+    let mockButton2: { getAttribute: jest.Mock; textContent: string };
 
     beforeEach(() => {
       mockButton1 = {
-        getAttribute: jest.fn((name) => {
+        getAttribute: jest.fn((name: string) => {
           if (name === 'data-playground-id') return '1';
           return null;
         }),
         textContent: '',
       };
       mockButton2 = {
-        getAttribute: jest.fn((name) => {
+        getAttribute: jest.fn((name: string) => {
           if (name === 'data-playground-id') return '2';
           return null;
         }),
@@ -145,7 +156,7 @@ describe('MapManager', () => {
     });
 
     test('お気に入りIDが空の場合、すべてのボタンが「お気に入りに追加」になること', () => {
-      const favoriteIds = [];
+      const favoriteIds: string[] = [];
       mapManager.updateFavoriteButtonsOnMap(favoriteIds);
 
       expect(mockButton1.textContent).toBe('お気に入りに追加');
@@ -154,7 +165,7 @@ describe('MapManager', () => {
   });
 
   describe('ポップアップ内のお気に入り状態の動的更新', () => {
-    const mockPlayground = {
+    const mockPlayground: MockPlayground = {
       id: '1',
       name: '公園A',
       address: '住所A',
@@ -166,14 +177,14 @@ describe('MapManager', () => {
     test('お気に入り登録後、再度ポップアップを開くと状態が「お気に入り解除」に更新されていること', () => {
       // 1. 初期状態ではお気に入りではない
       window.favorite_ids = [];
-      let popupContent = mapManager.createPopupContent(mockPlayground);
+      let popupContent = mapManager.createPopupContent(mockPlayground as any);
       expect(popupContent).toContain('お気に入りに追加');
 
       // 2. お気に入りに登録する（FavoriteManagerの動作を模倣）
       window.favorite_ids.push('1');
 
       // 3. 再度ポップアップの内容を生成すると、状態が更新されている
-      popupContent = mapManager.createPopupContent(mockPlayground);
+      popupContent = mapManager.createPopupContent(mockPlayground as any);
       expect(popupContent).toContain('お気に入り解除');
     });
   });

@@ -52,13 +52,13 @@ classDiagram
     }
     class Favorite {
         +int id
-        +User user
+        +CustomUser user
         +Playground playground
     }
     class Review {
         +int id
         +Playground playground
-        +User user
+        +CustomUser user
         +string content
         +int rating
         +datetime created_at
@@ -70,7 +70,6 @@ classDiagram
         +bool is_staff
         +bool is_active
         +datetime date_joined
-        ... // AbstractBaseUser, PermissionsMixin fields
     }
 
     Playground "1" --> "1" PlaygroundManager : has

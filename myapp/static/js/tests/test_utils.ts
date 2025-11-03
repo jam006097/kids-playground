@@ -1,4 +1,4 @@
-import { getCookie } from '../utils.js';
+import { getCookie } from '../utils';
 
 describe('getCookie', () => {
   test('クッキーが存在する場合、その値を正しく取得できること', () => {

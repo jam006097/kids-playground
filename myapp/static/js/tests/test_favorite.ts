@@ -1,7 +1,9 @@
 import { FavoriteManager } from '../favorite';
-import { getCookie } from '../utils.js'; // getCookieはutils.jsにあると仮定
 
-// グローバルなfetch関数をモックする
+// getCookieをモック関数として定義
+const mockGetCookie = jest.fn(() => 'mockCsrfToken');
+
+// グローバルなfetch関数をモック
 global.fetch = jest.fn(() =>
   Promise.resolve({
     ok: true,
@@ -14,20 +16,23 @@ describe('FavoriteManager', () => {
   let mockButton: HTMLButtonElement;
 
   beforeEach(() => {
-    // 各テストの前にFavoriteManagerの新しいインスタンスを作成
-    favoriteManager = new FavoriteManager(getCookie);
-    // fetchのモックをクリア
+    // 各テストの前にFavoriteManagerの新しいインスタンスを作成し、モック関数を注入
+    favoriteManager = new FavoriteManager(mockGetCookie);
+    // fetchとgetCookieのモックをクリア
     (fetch as jest.Mock).mockClear();
-    // csrftokenをクッキーに設定
-    document.cookie = 'csrftoken=mockcsrftoken';
+    mockGetCookie.mockClear();
 
-    // 各テスト用にモックのボタン要素を作成
+    // 各テスト用にモックのボタン要素を作成し、documentに追加
     mockButton = document.createElement('button');
     mockButton.dataset.playgroundId = '123';
     mockButton.textContent = 'お気に入りに追加'; // 初期状態: お気に入りではない
     mockButton.disabled = false;
+    // ★★★ この行が重要 ★★★
+    // updateFavoriteButtonsがボタンを見つけられるように、クラスとDOMに追加する
+    mockButton.classList.add('btn-outline-success');
+    document.body.appendChild(mockButton);
 
-    // エラーハンドリングテストのためにalertとconsole.errorをスパイ
+    // alertとconsole.errorをスパイ
     jest.spyOn(window, 'alert').mockImplementation(() => {});
     jest.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -38,6 +43,7 @@ describe('FavoriteManager', () => {
   afterEach(() => {
     // 各テストの後にすべてのモックを復元
     jest.restoreAllMocks();
+    document.body.innerHTML = ''; // bodyをクリーンアップ
   });
 
   // シナリオ: お気に入りに追加する
@@ -50,7 +56,7 @@ describe('FavoriteManager', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'X-CSRFToken': 'mockcsrftoken',
+        'X-CSRFToken': 'mockCsrfToken',
       },
       body: 'playground_id=123',
     });
@@ -75,7 +81,7 @@ describe('FavoriteManager', () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'X-CSRFToken': 'mockcsrftoken',
+        'X-CSRFToken': 'mockCsrfToken',
       },
       body: 'playground_id=123',
     });

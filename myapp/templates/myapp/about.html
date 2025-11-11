@@ -4,46 +4,49 @@
 
 {% block content %}
 <div class="container my-5">
-    <h1 class="text-center mb-4 display-4 fw-bold">このサイトについて</h1>
+    <div class="p-5 text-center bg-body-tertiary rounded-3">
+        <h1 class="text-body-emphasis display-4 fw-bold">親子で遊ぼうナビ</h1>
+        <p class="col-lg-8 mx-auto fs-5 text-muted ">
+            このサイトは、子供たちが安全に楽しく遊べる場所を探している保護者のためのWebアプリケーションです。
+        </p>
+        <p class="text-muted">Django, TypeScript, Docker, TDD, CI/CDなど、モダンな技術を用いて開発されています。</p>
+    </div>
 
-    <section class="py-5 mb-5">
+    <section class="py-5 mb-4">
         <h2 class="h4 text-center mb-4">サイトの目的</h2>
-        <p class="lead">この「親子で遊ぼうナビ」は、子供たちが安全に楽しく遊べる場所を見つけるための情報提供を目的としたWebアプリケーションです。保護者の方々が安心して子供を遊ばせられるよう、公園や遊び場の詳細情報、レビュー、お気に入り登録機能などを提供します。</p>
-        <p>本サイトは、私のWeb開発スキルを示すポートフォリオとして開発されました。Djangoを用いたバックエンド開発、JavaScriptによるインタラクティブなフロントエンド、そして堅牢なデータベース設計とテスト駆動開発（TDD）の実践を特徴としています。また、開発プロセスにはGitHub Actionsを活用したCI/CDパイプラインを導入し、品質と効率を両立させています。</p>
+        <p class="lead">
+            「今日の公園、どこに行こう？」そんな親の悩みに応えるため、「親子で遊ぼうナビ」は生まれました。子供たちが思いっきり体を動かせる公園や、雨の日でも安心な児童館など、様々な施設情報を分かりやすく提供します。</p>
+        <p>本サイトは、Web開発者としての私のスキルセットを示すポートフォリオです。単に機能するだけでなく、保守性・拡張性・安全性を重視した設計と、テスト駆動開発（TDD）やCI/CDといったモダンな開発プロセスを実践している点が特徴です。
+        </p>
     </section>
 
-    <section class="py-5 bg-light mb-5">
+    <section class="py-5 bg-light mb-4 rounded-3">
         <h2 class="h4 text-center mb-4">主な機能</h2>
         <div class="row text-center">
             <div class="col-md-4 mb-4">
                 <i class="fas fa-search fa-3x text-primary mb-3"></i>
-                <h5>遊び場検索</h5>
-                <p>地域や設備で遊び場を検索できます。</p>
+                <h5>詳細な遊び場検索</h5>
+                <p>キーワードや住所だけでなく、駐車場の有無、料金、授乳室といった詳細な設備からも施設を絞り込めます。</p>
             </div>
             <div class="col-md-4 mb-4">
-                <i class="fas fa-info-circle fa-3x text-success mb-3"></i>
-                <h5>詳細情報</h5>
-                <p>各遊び場の地図、設備、利用時間などの詳細情報を確認できます。</p>
+                <i class="fas fa-map-marked-alt fa-3x text-success mb-3"></i>
+                <h5>地図連携</h5>
+                <p>検索結果を地図上に表示し、場所を直感的に把握できます。お気に入り一覧も地図で確認可能です。</p>
             </div>
             <div class="col-md-4 mb-4">
                 <i class="fas fa-comments fa-3x text-info mb-3"></i>
-                <h5>レビュー投稿</h5>
-                <p>実際に利用したユーザーからのレビューを閲覧・投稿できます。</p>
-            </div>
-            <div class="col-md-4 mb-4">
-                <i class="fas fa-robot fa-3x text-danger mb-3"></i>
-                <h5>口コミAI要約</h5>
-                <p>Hugging Face Spacesを活用してAIが、投稿された口コミを自動で要約します。</p>
+                <h5>口コミとAI要約</h5>
+                <p>施設のリアルな評判が分かる口コミ機能に加え、AIが長いレビューを3行で要約し、忙しい中でも素早く情報を得られます。</p>
             </div>
             <div class="col-md-4 mb-4">
                 <i class="fas fa-heart fa-3x text-danger mb-3"></i>
                 <h5>お気に入り登録</h5>
-                <p>気に入った遊び場をお気に入りリストに保存できます。</p>
+                <p>気になる施設を保存し、いつでもマイページから見返すことができます。</p>
             </div>
             <div class="col-md-4 mb-4">
                 <i class="fas fa-trophy fa-3x text-warning mb-3"></i>
                 <h5>ランキング</h5>
-                <p>人気の遊び場をランキング形式で表示します。</p>
+                <p>評価の高い順、レビューの多い順で、今人気の施設を簡単に見つけられます。</p>
             </div>
             <div class="col-md-4 mb-4">
                 <i class="fas fa-user-plus fa-3x text-secondary mb-3"></i>
@@ -51,49 +54,50 @@
                 <p>ユーザーアカウントを作成し、お気に入り機能やレビュー投稿を利用できます。</p>
             </div>
             <div class="col-md-4 mb-4">
-                <i class="fas fa-robot fa-3x text-primary mb-3"></i>
+                <i class="fas fa-robot fa-3x text-secondary mb-3"></i>
                 <h5>AIチャット</h5>
-                <p>遊び場探しや子育ての簡単な相談ができます。</p>
+                <p>「雨でも遊べる場所は？」「3歳児向けの公園は？」といった質問に、AIが対話形式で答えてくれます。</p>
             </div>
         </div>
     </section>
 
-    <section class="py-5 mb-5 text-center">
+    <section class="py-5 mb-4 text-center">
         <h2 class="h4 text-center mb-4">技術スタック</h2>
         <div class="row">
             <div class="col-md-6">
-                <h5 class="mb-3">バックエンド</h5>
-                <ul class="list-unstyled d-inline-block mx-auto">
-                    <li class="mb-2"><i class="fas fa-leaf text-success mr-2"></i>Django 5.1.5</li>
-                    <li class="mb-2"><i class="fab fa-python text-primary mr-2"></i>Python 3.12.3</li>
-                    <li class="mb-2"><i class="fas fa-database text-secondary mr-2"></i>PostgreSQL</li>
-                    <li class="mb-2"><i class="fab fa-docker text-primary mr-2"></i>Docker (コンテナ化デプロイ)</li>
-                    <li class="mb-2"><i class="fas fa-robot text-danger mr-2"></i>Hugging Face Spaces (AI要約API)</li>
-                    <li class="mb-2"><i class="fas fa-robot text-primary mr-2"></i>Dify (AIチャットボット)</li>
-                    <li class="mb-2"><i class="fab fa-github-alt text-dark mr-2"></i>GitHub Actions (CI/CD)</li>
-                    <li class="mb-2"><i class="fas fa-flask text-info mr-2"></i>Pytest</li>
-                    <li class="mb-2"><i class="fas fa-check-circle text-success mr-2"></i>Flake8</li>
-                    <li class="mb-2"><i class="fas fa-paint-brush text-primary mr-2"></i>Black</li>
-                    <li class="mb-2"><i class="fas fa-code text-info mr-2"></i>Mypy</li>
+                <h5 class="mb-3">バックエンド & CI/CD</h5>
+                <ul class="list-unstyled d-inline-block mx-auto text-start">
+                    <li class="mb-2"><i class="fab fa-python text-primary"></i> Python 3.12 / Django 5.1</li>
+                    <li class="mb-2"><i class="fas fa-database text-secondary"></i> PostgreSQL</li>
+                    <li class="mb-2"><i class="fab fa-docker text-primary"></i> Docker / Docker Compose</li>
+                    <li class="mb-2"><i class="fab fa-github-alt text-dark"></i> GitHub Actions (CI/CD)</li>
+                    <li class="mb-2"><i class="fas fa-server"></i> Gunicorn / WhiteNoise</li>
+                    <li class="mb-2"><i class="fas fa-robot text-danger"></i> Hugging Face (AI要約)</li>
+                    <li class="mb-2"><i class="fas fa-shield-alt text-success"></i> Bandit (セキュリティスキャン)</li>
+                    <li class="mb-2"><i class="fas fa-flask text-info"></i> Pytest (TDD)</li>
+                    <li class="mb-2"><i class="fas fa-code text-info"></i> Mypy (型チェック)</li>
                 </ul>
             </div>
             <div class="col-md-6">
                 <h5 class="mb-3">フロントエンド</h5>
-                <ul class="list-unstyled d-inline-block mx-auto">
-                    <li class="mb-2"><i class="fab fa-html5 text-orange mr-2"></i>HTML5</li>
-                    <li class="mb-2"><i class="fab fa-css3-alt text-blue mr-2"></i>CSS3 (Bootstrap 5)</li>
-                    <li class="mb-2"><i class="fab fa-js text-warning mr-2"></i>JavaScript</li>
-                    <li class="mb-2"><i class="fas fa-vial text-purple mr-2"></i>Jest</li>
-                    <li class="mb-2"><i class="fas fa-code text-dark mr-2"></i>ESLint, Prettier</li>
+                <ul class="list-unstyled d-inline-block mx-auto text-start">
+                    <li class="mb-2"><i class="fab fa-js-square text-warning"></i> TypeScript</li>
+                    <li class="mb-2"><i class="fab fa-html5 text-danger"></i> HTML5</li>
+                    <li class="mb-2"><i class="fab fa-css3-alt text-primary"></i> CSS3 (Bootstrap 5)</li>
+                    <li class="mb-2"><i class="fas fa-vial text-purple"></i> Jest (TDD)</li>
+                    <li class="mb-2"><i class="fas fa-cogs text-secondary"></i> Babel / tsc (ビルド)</li>
+                    <li class="mb-2"><i class="fas fa-code text-dark"></i> ESLint / Prettier (コード品質)</li>
                 </ul>
             </div>
         </div>
     </section>
 
-    <section class="py-5 bg-light text-center">
+    <section class="py-5 bg-light text-center rounded-3">
         <h2 class="h4 mb-4">作者について</h2>
-        <p class="lead text-left">このサイトは、1人の開発者によって作成されました。ユーザーフレンドリーなインターフェースと堅牢なバックエンドの構築を目指し、日々学習と実践を重ねています。ご意見やご感想がありましたら、お気軽にお問い合わせください。</p>
-        <a href="https://github.com/jam006097/kidsPlayGround" target="_blank" rel="noopener noreferrer" class="btn btn-dark btn-lg mt-3"><i class="fab fa-github mr-2"></i>GitHubでプロジェクトを見る</a>
+        <p class="lead text-left">
+            このサイトは、1人の開発者によって設計・開発・運用されています。ユーザーフレンドリーなインターフェースと、テスト可能で保守性の高いコードを追求し、日々学習と実践を重ねています。</p>
+        <a href="https://github.com/jam006097/kidsPlayGround" target="_blank" rel="noopener noreferrer"
+            class="btn btn-dark btn-lg mt-3"><i class="fab fa-github"></i> GitHubでプロジェクトを見る</a>
     </section>
 </div>
 {% endblock %}

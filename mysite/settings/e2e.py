@@ -15,6 +15,10 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "myapp", "static", "js", "dist"),
+]
+
 # Logging for E2E tests (optional)
 LOGGING = {
     "version": 1,

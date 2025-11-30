@@ -13,9 +13,6 @@ from django.test import override_settings
 # Using StaticLiveServerTestCase to serve static files correctly during tests
 @override_settings(
     DEBUG=True,  # Ensure debug is on for static files serving in LiveServerTestCase
-    STATICFILES_DIRS=[
-        os.path.join(settings.BASE_DIR, "myapp", "static"),
-    ],
 )
 class FrontendModuleLoadingTest(StaticLiveServerTestCase):
     host = "127.0.0.1"  # Listen on localhost

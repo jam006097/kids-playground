@@ -10,7 +10,7 @@ from myapp.views.ranking_views import RankingListView
 from myapp.views.detail_views import FacilityDetailView
 from myapp.views.chat_views import ChatView
 from myapp.views.about import about_view
-from myapp.views.summary_views import SummarizeReviewsView
+
 
 app_name = "myapp"
 
@@ -33,9 +33,4 @@ urlpatterns = [
     ),
     path("about/", about_view, name="about"),
     path("chat/", ChatView.as_view(), name="chat"),
-    path(
-        "summarize/playground/<int:playground_id>/",
-        SummarizeReviewsView.as_view(),
-        name="summarize_reviews",
-    ),
 ]

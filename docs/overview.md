@@ -26,7 +26,6 @@ graph TD
     end
 
     subgraph "API (内部動作)"
-        SUMMARIZE_API[AI口コミ要約 API]
     end
 
     TOP --> LIST
@@ -43,7 +42,6 @@ graph TD
     LIST --> DETAIL
     DETAIL --> REVIEW_FORM
     DETAIL --> REVIEW_LIST
-    DETAIL -.-> SUMMARIZE_API
 ```
 
 ## アプリケーション構成
@@ -103,5 +101,4 @@ graph TD
 | お気に入り登録   | 遊び場をお気に入りリストに追加/削除                      |
 | 口コミ投稿     | 遊び場への口コミ投稿                                     |
 | 口コミ一覧表示   | 施設ごとの口コミを一覧で表示                             |
-| AI口コミ要約     | 投稿された口コミをAIが要約して表示                     |
 | このサイトについて | サイトの目的や使い方を説明するページ                     |

@@ -27,22 +27,9 @@
                 <li class="list-group-item"><strong>おむつ交換台:</strong> {% if playground.diaper_changing_station_available %}あり{% else %}なし{% endif %}</li>
 
                 <li class="list-group-item"><strong>昼食利用:</strong> {% if playground.lunch_allowed %}可能{% else %}不可{% endif %}</li>
-                <li id="summary-container" class="list-group-item" data-url="{% url 'myapp:summarize_reviews' playground.id %}">
-                    <strong>AIによる口コミ要約:</strong>
-                    <div id="summary-text">
-                        <div class="d-flex align-items-center">
-                            <strong>要約を生成中...</strong>
-                            <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
-                        </div>
-                    </div>
-                </li>
             </ul>
             <a href="{% url 'myapp:index' %}" class="btn btn-secondary mt-3">一覧に戻る</a>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'js/summary.js' %}"></script>
 {% endblock %}

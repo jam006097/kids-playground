@@ -41,6 +41,10 @@ jobs:
         pip install -r requirements.txt
         pip install pip-audit
 
+    - name: Install Playwright browsers # Playwrightのブラウザドライバをインストール
+      run: |
+        playwright install
+
     - name: Run pip-audit # Pythonの脆弱性監査を実行
       run: |
         pip-audit --ignore-vuln GHSA-4xh5-x5gv-qwph --ignore-vuln GHSA-2qfp-q593-8484 --ignore-vuln GHSA-7f5h-v6xp-fcq8
@@ -51,6 +55,16 @@ jobs:
         SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }} # GitHub Secretsから秘密の鍵を渡す
       run: |
         pytest --ds=mysite.settings.dev
+
+    - name: Run E2E Frontend Module Load Test # E2Eフロントエンドモジュールロードテストを実行
+      env:
+        DJANGO_SETTINGS_MODULE: mysite.settings.e2e # E2Eテスト用の設定ファイルを使用
+        DJANGO_ALLOW_ASYNC_UNSAFE: "True" # 非同期コンテキストでの同期操作を許可
+        DATABASE_URL: "postgres://kina:Kaim2308!@127.0.0.1:5432/test_db" # テスト用DBの接続情報
+        SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }} # GitHub Secretsから秘密の鍵を渡す
+      run: |
+        pytest myapp/tests/e2e/test_browser_modules.py
+
 
     - name: Run Django Deploy Check # Djangoの本番設定チェック
       env:

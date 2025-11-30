@@ -1,6 +1,6 @@
-import { MapManager } from './map.js';
-import { FavoriteManager } from './favorite.js';
-import { ReviewManager } from './review.js';
+import { MapManager } from './map';
+import { FavoriteManager } from './favorite';
+import { ReviewManager } from './review';
 
 document.addEventListener('DOMContentLoaded', () => {
   const mapManager = new MapManager();

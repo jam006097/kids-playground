@@ -1,4 +1,4 @@
-import { getCookie as defaultGetCookie } from './utils.js';
+import { getCookie as defaultGetCookie } from './utils';
 
 // getCookie関数の型を定義
 type GetCookieFunc = (name: string) => string | null;

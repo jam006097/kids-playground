@@ -73,7 +73,7 @@ class MapManager {
 
     window.mapInstance = this.L.map('map-container').setView(
       this.KAGOSHIMA_CENTER,
-      this.DEFAULT_ZOOM_LEVEL
+      this.DEFAULT_ZOOM_LEVEL,
     );
 
     this.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -105,7 +105,7 @@ class MapManager {
 
     const map = this.L.map('mypage-map-container').setView(
       this.KAGOSHIMA_CENTER,
-      this.DEFAULT_ZOOM_LEVEL
+      this.DEFAULT_ZOOM_LEVEL,
     );
     window.favMapInstance = map;
 
@@ -131,12 +131,16 @@ class MapManager {
    */
   updateFavoriteButtonsOnMap(favorite_ids: string[]): void {
     document
-      .querySelectorAll<HTMLButtonElement>('.btn-outline-success[data-playground-id]')
+      .querySelectorAll<HTMLButtonElement>(
+        '.btn-outline-success[data-playground-id]',
+      )
       .forEach((button) => {
         const playgroundId = button.getAttribute('data-playground-id');
         if (playgroundId) {
           const isFavorite = favorite_ids.includes(playgroundId);
-          button.textContent = isFavorite ? 'お気に入り解除' : 'お気に入りに追加';
+          button.textContent = isFavorite
+            ? 'お気に入り解除'
+            : 'お気に入りに追加';
         }
       });
   }

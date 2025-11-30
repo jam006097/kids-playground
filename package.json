@@ -27,8 +27,8 @@
   },
   "scripts": {
     "test": "jest",
-    "lint": "eslint \"myapp/**/*.js\"",
-    "format": "prettier --write \"myapp/**/*.js\"",
+    "lint": "eslint \"myapp/**/*.ts\"",
+    "format": "prettier --write \"myapp/**/*.ts\"",
     "build": "tsc",
     "build:watch": "tsc --watch"
   },

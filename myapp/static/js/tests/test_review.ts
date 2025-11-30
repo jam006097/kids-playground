@@ -12,7 +12,7 @@ global.fetch = jest.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({ message: '口コミが投稿されました。' }),
-  })
+  }),
 ) as jest.Mock;
 
 describe('ReviewManagerの口コミ投稿機能', () => {
@@ -48,7 +48,9 @@ describe('ReviewManagerの口コミ投稿機能', () => {
 
     reviewModal = document.getElementById('reviewModal')!;
     reviewForm = document.getElementById('reviewForm')! as HTMLFormElement;
-    playgroundIdInput = document.getElementById('playgroundId')! as HTMLInputElement;
+    playgroundIdInput = document.getElementById(
+      'playgroundId',
+    )! as HTMLInputElement;
     modalTitle = reviewModal.querySelector('.modal-title')!;
   });
 
@@ -64,7 +66,10 @@ describe('ReviewManagerの口コミ投稿機能', () => {
     triggerButton.dataset.playgroundName = '別の公園';
 
     const event = new Event('show.bs.modal');
-    Object.defineProperty(event, 'relatedTarget', { value: triggerButton, writable: false });
+    Object.defineProperty(event, 'relatedTarget', {
+      value: triggerButton,
+      writable: false,
+    });
 
     reviewModal.dispatchEvent(event);
 

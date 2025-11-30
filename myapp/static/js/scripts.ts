@@ -32,7 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (target && target.matches('[data-action="toggle-favorite"]')) {
       const playgroundId = target.getAttribute('data-playground-id');
       if (playgroundId) {
-        favoriteManager.toggleFavorite(target as HTMLButtonElement, playgroundId);
+        favoriteManager.toggleFavorite(
+          target as HTMLButtonElement,
+          playgroundId,
+        );
       }
     }
   });

@@ -8,7 +8,7 @@ global.fetch = jest.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({ status: 'ok' }),
-  })
+  }),
 ) as jest.Mock;
 
 describe('FavoriteManager', () => {
@@ -128,7 +128,7 @@ describe('FavoriteManager', () => {
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ status: 'error', message: 'API Error' }),
-      })
+      }),
     );
 
     // 実行: toggleFavoriteを呼び出す
@@ -144,7 +144,7 @@ describe('FavoriteManager', () => {
   test('ネットワークエラーが発生した場合、アラートを表示する', async () => {
     // 準備: fetchがネットワークエラーを発生させるようにモック
     (fetch as jest.Mock).mockImplementationOnce(() =>
-      Promise.reject(new Error('Network Error'))
+      Promise.reject(new Error('Network Error')),
     );
 
     // 実行: toggleFavoriteを呼び出す

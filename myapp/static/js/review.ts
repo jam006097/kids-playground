@@ -1,5 +1,3 @@
-
-
 /**
  * 口コミ管理を行うクラス
  */
@@ -11,7 +9,11 @@ class ReviewManager {
   private playgroundIdInput: HTMLInputElement | null;
   private modalTitle: HTMLElement | null;
 
-  constructor(modalElement: HTMLElement, formElement: HTMLFormElement, documentObj: Document = document) {
+  constructor(
+    modalElement: HTMLElement,
+    formElement: HTMLFormElement,
+    documentObj: Document = document,
+  ) {
     if (!modalElement || !formElement) {
       throw new Error('ReviewManagerにはモーダルとフォームの要素が必要です。');
     }
@@ -20,8 +22,10 @@ class ReviewManager {
     this.document = documentObj;
     this.modal = new window.bootstrap.Modal(this.modalElement);
 
-    this.playgroundIdInput = this.formElement.querySelector<HTMLInputElement>('#playgroundId');
-    this.modalTitle = this.modalElement.querySelector<HTMLElement>('.modal-title');
+    this.playgroundIdInput =
+      this.formElement.querySelector<HTMLInputElement>('#playgroundId');
+    this.modalTitle =
+      this.modalElement.querySelector<HTMLElement>('.modal-title');
 
     this.handleSubmit = this.handleSubmit.bind(this);
 
@@ -29,7 +33,9 @@ class ReviewManager {
   }
 
   getCsrfToken(): string {
-    const tokenElement = this.document.querySelector<HTMLInputElement>('[name=csrfmiddlewaretoken]');
+    const tokenElement = this.document.querySelector<HTMLInputElement>(
+      '[name=csrfmiddlewaretoken]',
+    );
     return tokenElement ? tokenElement.value : '';
   }
 
@@ -53,11 +59,15 @@ class ReviewManager {
   async handleSubmit(event: Event): Promise<void> {
     event.preventDefault();
 
-    const urlEncodedData = new URLSearchParams(new FormData(this.formElement) as any);
+    const urlEncodedData = new URLSearchParams(
+      new FormData(this.formElement) as any,
+    );
     const csrfToken = this.getCsrfToken();
     urlEncodedData.append('csrfmiddlewaretoken', csrfToken);
 
-    const playgroundId = this.playgroundIdInput ? this.playgroundIdInput.value : '';
+    const playgroundId = this.playgroundIdInput
+      ? this.playgroundIdInput.value
+      : '';
 
     try {
       const response = await fetch(`/playground/${playgroundId}/add_review/`, {

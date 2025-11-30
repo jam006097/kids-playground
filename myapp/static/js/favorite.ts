@@ -32,7 +32,10 @@ class FavoriteManager {
    * @param {string} playgroundId - 遊び場のID。
    * @returns {Promise<void>} 非同期操作のPromise。
    */
-  toggleFavorite(button: HTMLButtonElement, playgroundId: string): Promise<void> {
+  toggleFavorite(
+    button: HTMLButtonElement,
+    playgroundId: string,
+  ): Promise<void> {
     // ボタンが無効化されている場合は処理を中断
     if (button.disabled) return Promise.resolve();
 
@@ -100,7 +103,9 @@ class FavoriteManager {
     if (typeof favorite_ids !== 'undefined' && favorite_ids) {
       // data-playground-id属性を持つすべてのお気に入りボタン要素を取得
       document
-        .querySelectorAll<HTMLButtonElement>('.btn-outline-success[data-playground-id]')
+        .querySelectorAll<HTMLButtonElement>(
+          '.btn-outline-success[data-playground-id]',
+        )
         .forEach((button) => {
           const playgroundId = button.getAttribute('data-playground-id'); // ボタンから遊び場IDを取得
           if (playgroundId) {

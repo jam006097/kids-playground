@@ -63,7 +63,7 @@ jobs:
         DATABASE_URL: "postgres://kina:Kaim2308!@127.0.0.1:5432/test_db" # テスト用DBの接続情報
         SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }} # GitHub Secretsから秘密の鍵を渡す
       run: |
-        pytest myapp/tests/e2e/test_browser_modules.py
+        pytest --ds=mysite.settings.e2e myapp/tests/e2e/test_browser_modules.py
 
 
     - name: Run Django Deploy Check # Djangoの本番設定チェック

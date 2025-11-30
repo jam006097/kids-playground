@@ -18,18 +18,6 @@ services:
       timeout: 5s
       retries: 5
 
-  ai-api:
-    build:
-      context: ../kids-playground-ai-api
-      dockerfile: Dockerfile
-    container_name: kidsplayground_ai_api
-    ports:
-      - "8001:7860"
-    env_file:
-      - ../kids-playground-ai-api/.env
-    volumes:
-      - ../kids-playground-ai-api:/app
-
   web:
     build: .
     container_name: kidsplayground_web
@@ -41,12 +29,9 @@ services:
     environment:
       DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${POSTGRES_DB}
       SECRET_KEY: ${SECRET_KEY} # Assuming SECRET_KEY is set in the host's .env or environment
-      AI_API_URL: http://ai-api:7860
     depends_on:
       db:
         condition: service_healthy
-      ai-api:
-        condition: service_started
 
 volumes:
   postgres_data:

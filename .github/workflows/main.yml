@@ -41,6 +41,17 @@ jobs:
         pip install -r requirements.txt
         pip install pip-audit
 
+    - name: Set up Node.js # Node.js環境をセットアップ (JSテスト用)
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Node.js dependencies # Node.jsの依存ライブラリをインストール
+      run: npm ci # package-lock.jsonに基づきクリーンインストール
+
+    - name: Run TypeScript Build # TypeScriptのビルドを実行
+      run: npm run build
+
     - name: Install Playwright browsers # Playwrightのブラウザドライバをインストール
       run: |
         playwright install
@@ -65,21 +76,12 @@ jobs:
       run: |
         pytest --ds=mysite.settings.e2e myapp/tests/e2e/test_browser_modules.py
 
-
     - name: Run Django Deploy Check # Djangoの本番設定チェック
       env:
         DJANGO_SETTINGS_MODULE: mysite.settings.prod
         SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
       run: |
         python manage.py check --deploy
-
-    - name: Set up Node.js # Node.js環境をセットアップ (JSテスト用)
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
-    - name: Install Node.js dependencies # Node.jsの依存ライブラリをインストール
-      run: npm ci # package-lock.jsonに基づきクリーンインストール
 
     - name: Run npm audit # Node.jsの脆弱性監査を実行
       run: npm audit
@@ -109,12 +111,12 @@ jobs:
         username: ${{ github.actor }} # ワークフローを実行したユーザー名
         password: ${{ secrets.GHCR_PAT }} # GHCR_PATを使用！
 
-    - name: Build and push Docker image # Dockerイメージのビルドとプッシュ
+    - name: Build and push Docker image # Dockerイメージのビルとプッシュ
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ github.repository }}:latest # 小文字に変換したリポジトリ名を使用
+        tags: ghcr.io/${{ github.repository }}:latest # 小文字に変換したリポジリ名を使用
 
     - name: Deploy to Render # Renderへのデプロイをトリガー
       env:

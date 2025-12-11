@@ -20,7 +20,6 @@ graph TD
         FAVORITE[お気に入り一覧 (地図機能含む)]
         REVIEW_FORM[口コミ投稿]
         REVIEW_LIST[口コミ一覧]
-        AI_CHAT[AIチャット]
         RANKING[ランキング]
         ABOUT[このサイトについて]
     end
@@ -31,7 +30,6 @@ graph TD
     TOP --> LIST
     TOP --> LOGIN
     TOP --> REGISTER
-    TOP --> AI_CHAT
     TOP --> RANKING
     TOP --> ABOUT
 
@@ -95,7 +93,6 @@ graph TD
 | 地図表示         | 遊び場一覧とお気に入り一覧にLeaflet.jsで地図表示           |
 | 遊び場詳細         | 遊び場の詳細情報・口コミ表示                             |
 | ランキング表示   | 口コミに基づいた施設ランキング表示                       |
-| AIチャット       | AIチャットボットとの対話機能                             |
 | 会員登録/ログイン | ユーザー認証                                               |
 | マイページ       | お気に入り・投稿口コミ管理                                 |
 | お気に入り登録   | 遊び場をお気に入りリストに追加/削除                      |

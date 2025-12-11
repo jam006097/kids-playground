@@ -8,7 +8,6 @@ from myapp.views.favorite_views import (
 from myapp.views.review_views import AddReviewView, ReviewListView
 from myapp.views.ranking_views import RankingListView
 from myapp.views.detail_views import FacilityDetailView
-from myapp.views.chat_views import ChatView
 from myapp.views.about import about_view
 
 
@@ -32,5 +31,4 @@ urlpatterns = [
         name="view_reviews",
     ),
     path("about/", about_view, name="about"),
-    path("chat/", ChatView.as_view(), name="chat"),
 ]

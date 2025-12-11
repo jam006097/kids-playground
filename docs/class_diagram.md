@@ -45,11 +45,6 @@ classDiagram
         +template_name = "ranking/list.html"
         +get_queryset() QuerySet[Playground]
     }
-    class ChatView {
-        <<View>>
-        +template_name = "myapp/chat.html"
-        +get_context_data() dict
-    }
     class Favorite {
         +int id
         +CustomUser user

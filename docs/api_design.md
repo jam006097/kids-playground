@@ -31,7 +31,6 @@
 | `/favorites/`          | GET      | お気に入り一覧表示| `?city=東京都`       | HTMLページ           | 必要 |
 | `/playground/<int:playground_id>/reviews/` | GET | レビュー一覧表示  | なし                 | HTMLページ           | 不要 |
 | `/about/`              | GET      | このサイトについて| なし                 | HTMLページ           | 不要 |
-| `/chat/`               | GET      | AIチャット        | なし                 | HTMLページ           | 不要 |
 
 ---
 

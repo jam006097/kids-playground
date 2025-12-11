@@ -223,13 +223,3 @@ class PlaygroundListViewTest(TestCase):
         """GETパラメータがない場合にsearch_form_openedがFalseになることをテスト"""
         response = self.client.get(self.url)
         self.assertFalse(response.context.get("search_form_opened", False))
-
-    def test_header_contains_ai_chat_link(self):
-        """
-        ヘッダーに「AIチャット」へのリンクが含まれていることをテスト
-        """
-        response = self.client.get(self.url)
-        self.assertContains(
-            response,
-            f'<a class="nav-link" href="{reverse("myapp:chat")}">AIチャット</a>',
-        )

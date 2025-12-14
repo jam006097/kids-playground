@@ -3,7 +3,7 @@ import os
 import sys
 
 DEBUG = True
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "myapp.local"]
 
 
 # Logging settings for development (override base.py)

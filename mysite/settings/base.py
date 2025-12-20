@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "csp",
     "myapp",
     "users",
     "bootstrap4",
@@ -38,6 +39,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "csp.middleware.CSPMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # allauth middleware
     "allauth.account.middleware.AccountMiddleware",
@@ -156,3 +158,58 @@ LOGGING = {
 
 # cron設定
 CRONJOBS = [("0 0 1 * *", "myapp.management.commands.fetch_playgrounds")]
+
+
+# Content Security Policy (CSP) settings
+# https://django-csp.readthedocs.io/en/latest/
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": ("'self'",),
+        "script-src": (
+            "'self'",
+            "ajax.googleapis.com",
+            "cdnjs.cloudflare.com",
+            "use.fontawesome.com",
+            "www.googletagmanager.com",
+            "stats.g.doubleclick.net",  # For Google Analytics
+            "analytics.google.com",  # For Google Analytics
+        ),
+        "style-src": (
+            "'self'",
+            "stackpath.bootstrapcdn.com",
+            "cdnjs.cloudflare.com",
+            "use.fontawesome.com",
+            "fonts.googleapis.com",
+            "'unsafe-inline'",
+            # Temporarily allow for development, but should be removed or use nonces/hashes in production
+        ),
+        "img-src": (
+            "'self'",
+            "data:",  # Allow data URIs for images (e.g., small icons)
+            "www.google.co.jp",  # For Google Maps images/tiles
+            "www.gstatic.com",
+        ),
+        "font-src": (
+            "'self'",
+            "cdnjs.cloudflare.com",
+            "use.fontawesome.com",
+            "fonts.gstatic.com",
+        ),
+        "connect-src": (
+            "'self'",
+            "analytics.google.com",
+            "stats.g.doubleclick.net",
+        ),
+        "frame-src": (
+            "'self'",
+            "www.google.co.jp",  # For Google Maps iframes
+            "maps.google.com",
+            "maps.app.goo.gl",
+        ),
+        "object-src": ("'none'",),  # Disallow <object>, <embed>, <applet>
+        "base-uri": ("'self'",),
+        "form-action": ("'self'",),
+        "frame-ancestors": ("'self'",),
+    },
+    "REPORT_URI": None,  # Optional: URL to send CSP violation reports to
+}

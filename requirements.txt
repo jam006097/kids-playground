@@ -19,13 +19,13 @@ defusedxml==0.7.1
 distlib==0.4.0
 dj-database-url==2.1.0
 Django==5.1.15
-django-allauth==0.61.1
+django-allauth==65.13.0
 django-bootstrap4==24.4
 django-crontab==0.7.1
 django-stubs==5.0.0
 django-stubs-ext==5.2.2
 ffmpy==0.6.1
-filelock==3.19.1
+filelock==3.20.1
 flake8==7.3.0
 fsspec==2025.9.0
 groovy==0.1.2

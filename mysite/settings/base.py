@@ -109,13 +109,11 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 # django-allauth（カスタムユーザーモデル用）設定
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
-ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 
 
 # ロギング設定
@@ -173,6 +171,9 @@ CONTENT_SECURITY_POLICY = {
             "www.googletagmanager.com",
             "stats.g.doubleclick.net",  # For Google Analytics
             "analytics.google.com",  # For Google Analytics
+            "cdn.jsdelivr.net",  # For Bootstrap
+            "unpkg.com",  # For Leaflet
+            "'sha256-byly89INaW5OlnSUBFJrkf3zS2e/MPPjW507b0aNIzc='",  # For inline script
         ),
         "style-src": (
             "'self'",
@@ -180,6 +181,8 @@ CONTENT_SECURITY_POLICY = {
             "cdnjs.cloudflare.com",
             "use.fontawesome.com",
             "fonts.googleapis.com",
+            "cdn.jsdelivr.net",  # For Bootstrap
+            "unpkg.com",  # For Leaflet
             "'unsafe-inline'",
             # Temporarily allow for development, but should be removed or use nonces/hashes in production
         ),

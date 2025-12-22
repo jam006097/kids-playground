@@ -202,6 +202,8 @@ CONTENT_SECURITY_POLICY = {
             "'self'",
             "analytics.google.com",
             "stats.g.doubleclick.net",
+            "cdn.jsdelivr.net",  # For Bootstrap source maps
+            "unpkg.com",  # For Leaflet source maps
         ),
         "frame-src": (
             "'self'",

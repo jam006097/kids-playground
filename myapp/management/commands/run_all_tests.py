@@ -34,7 +34,7 @@ class Command(BaseCommand):
         # 1. Python/Django/Playwright tests
         self.stdout.write(self.style.HTTP_INFO("Starting Python tests (pytest)..."))
         pytest_command = [
-            "venv/bin/pytest",
+            "pytest",
             "-o",
             "addopts=",
         ]

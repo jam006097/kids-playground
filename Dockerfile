@@ -13,6 +13,12 @@ RUN apt-get update && apt-get install -y curl && \
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Playwrightのブラウザをシステムワイドな場所にインストール
+RUN PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright playwright install --with-deps
+ENV PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright
+ENV DJANGO_ALLOW_ASYNC_UNSAFE=1
+
+
 # アプリケーションコードをコピー
 COPY . /app/
 

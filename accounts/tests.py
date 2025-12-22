@@ -10,7 +10,7 @@ User = get_user_model()
 class MyPageTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            email="testuser@example.com", password="password", username="testuser"
+            email="testuser@example.com", password="password", account_name="testuser"
         )
         self.client.login(email="testuser@example.com", password="password")
 
@@ -34,7 +34,7 @@ class MyPageTest(TestCase):
 class AccountNameChangeViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            email="testuser@example.com", password="password", username="testuser"
+            email="testuser@example.com", password="password", account_name="testuser"
         )
         self.client.login(email="testuser@example.com", password="password")
         self.url = reverse("accounts:name_change")

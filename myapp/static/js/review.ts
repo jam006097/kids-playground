@@ -85,6 +85,8 @@ class ReviewManager {
 
       const data: { message: string } = await response.json();
       alert(data.message);
+      // Focesd element in modal is blurred before hiding modal.
+      (this.document.activeElement as HTMLElement)?.blur();
       this.modal.hide();
     } catch (error) {
       alert('口コミの投稿に失敗しました。');

@@ -27,6 +27,8 @@ services:
     environment:
       DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${POSTGRES_DB}
       SECRET_KEY: ${SECRET_KEY} # Assuming SECRET_KEY is set in the host's .env or environment
+      PLAYWRIGHT_BROWSERS_PATH: /usr/local/share/playwright
+      DJANGO_ALLOW_ASYNC_UNSAFE: "1"
     depends_on:
       db:
         condition: service_healthy

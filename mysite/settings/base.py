@@ -174,7 +174,8 @@ CONTENT_SECURITY_POLICY = {
             "analytics.google.com",  # For Google Analytics
             "cdn.jsdelivr.net",  # For Bootstrap
             "unpkg.com",  # For Leaflet
-            "'sha256-byly89INaW5OlnSUBFJrkf3zS2e/MPPjW507b0aNIzc='",  # For inline script
+            "'sha256-byly89INaW5OlnSUBFJrkf3zS2e/MPPjW507b0aNIzc='",  # For inline script (original)
+            "'sha256-bRNsevt2vDj4vEdivjSCVt0GbXKt+Lh/PVAAnkcFW9s='",  # For inline script (accounts/email/)
         ),
         "style-src": (
             "'self'",

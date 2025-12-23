@@ -54,6 +54,11 @@ class ReviewManager {
     });
 
     this.formElement.addEventListener('submit', this.handleSubmit);
+
+    // モーダルが完全に閉じられた後に、フォーカスをbody要素に戻す
+    this.modalElement.addEventListener('hidden.bs.modal', () => {
+      this.document.body.focus();
+    });
   }
 
   async handleSubmit(event: Event): Promise<void> {

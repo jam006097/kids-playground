@@ -14,11 +14,11 @@ from django.views.generic import ListView, View, CreateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-
+from .mixins import LoginRequiredJsonMixin
 from users.models import CustomUser
 
 
-class AddReviewView(LoginRequiredMixin, View):
+class AddReviewView(LoginRequiredJsonMixin):
     """
     レビュー追加ビュー。
     ログインしているユーザーのみがアクセス可能。

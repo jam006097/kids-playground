@@ -13,11 +13,12 @@ from django.views.generic import ListView, View, CreateView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from .mixins import LoginRequiredJsonMixin
 from ..filters import PlaygroundFilterMixin
 from users.models import CustomUser
 
 
-class AddFavoriteView(LoginRequiredMixin, View):
+class AddFavoriteView(LoginRequiredJsonMixin):
     """
     お気に入り追加ビュー。
     ログインしているユーザーのみがアクセス可能。
@@ -45,7 +46,7 @@ class AddFavoriteView(LoginRequiredMixin, View):
         return JsonResponse({"status": "ok"})
 
 
-class RemoveFavoriteView(LoginRequiredMixin, View):
+class RemoveFavoriteView(LoginRequiredJsonMixin):
     """
     お気に入り削除ビュー。
     ログインしているユーザーのみがアクセス可能。

@@ -98,3 +98,23 @@ class FavoriteViewsTest(TestCase):
         self.client.login(email="testuser@example.com", password="testpassword")
         response = self.client.get(self.favorites_url)
         self.assertFalse(response.context.get("search_form_opened", False))
+
+    def test_add_favorite_view_invalid_id(self):
+        """不正なplayground_idでお気に入り追加を試みると400エラーが返ることをテスト"""
+        self.client.login(email="testuser@example.com", password="testpassword")
+        response = self.client.post(self.add_favorite_url, {"playground_id": "abc"})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["message"], "Invalid playground_id")
+
+    def test_remove_favorite_view_invalid_id(self):
+        """不正なplayground_idでお気に入り削除を試みると400エラーが返ることをテスト"""
+        self.client.login(email="testuser@example.com", password="testpassword")
+        response = self.client.post(self.remove_favorite_url, {"playground_id": "abc"})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["message"], "Invalid playground_id")
+
+    def test_add_favorite_view_nonexistent_id(self):
+        """存在しないplayground_idでお気に入り追加を試みると404エラーが返ることをテスト"""
+        self.client.login(email="testuser@example.com", password="testpassword")
+        response = self.client.post(self.add_favorite_url, {"playground_id": "999"})
+        self.assertEqual(response.status_code, 404)

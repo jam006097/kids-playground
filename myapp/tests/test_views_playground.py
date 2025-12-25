@@ -223,3 +223,33 @@ class PlaygroundListViewTest(TestCase):
         """GETパラメータがない場合にsearch_form_openedがFalseになることをテスト"""
         response = self.client.get(self.url)
         self.assertFalse(response.context.get("search_form_opened", False))
+
+    # --- TDD for SSI Vulnerability ---
+
+    def test_ssi_injection_attempt_on_fee_min(self):
+        """fee_minパラメータへのSSI攻撃をしてもサーバーエラーが発生しないことをテスト"""
+        with self.settings(DEBUG=True):
+            response = self.client.get(self.url, {"fee_min": '<!--#EXEC cmd="ls /"-->'})
+            self.assertEqual(response.status_code, 200)
+
+    def test_ssi_injection_attempt_on_fee_max(self):
+        """fee_maxパラメータへのSSI攻撃をしてもサーバーエラーが発生しないことをテスト"""
+        with self.settings(DEBUG=True):
+            response = self.client.get(self.url, {"fee_max": '<!--#EXEC cmd="ls /"-->'})
+            self.assertEqual(response.status_code, 200)
+
+    def test_ssi_injection_attempt_on_target_age_min(self):
+        """target_age_minパラメータへのSSI攻撃をしてもサーバーエラーが発生しないことをテスト"""
+        with self.settings(DEBUG=True):
+            response = self.client.get(
+                self.url, {"target_age_min": '<!--#EXEC cmd="ls /"-->'}
+            )
+            self.assertEqual(response.status_code, 200)
+
+    def test_ssi_injection_attempt_on_target_age_max(self):
+        """target_age_maxパラメータへのSSI攻撃をしてもサーバーエラーが発生しないことをテスト"""
+        with self.settings(DEBUG=True):
+            response = self.client.get(
+                self.url, {"target_age_max": '<!--#EXEC cmd="ls /"-->'}
+            )
+            self.assertEqual(response.status_code, 200)

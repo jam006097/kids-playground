@@ -3,6 +3,7 @@ from django.db.models.query import QuerySet
 from typing import Any, Dict
 from myapp.models import Playground
 from django.http import HttpRequest
+import decimal
 
 
 class PlaygroundFilterMixin:
@@ -64,14 +65,32 @@ class PlaygroundFilterMixin:
             queryset = queryset.filter(indoor_play_area=True)
         if self.kids_toilet:
             queryset = queryset.filter(kids_toilet_available=True)
+
         if self.target_age_min:
-            queryset = queryset.filter(target_age_start__gte=self.target_age_min)
+            try:
+                target_age_min_int = int(self.target_age_min)
+                queryset = queryset.filter(target_age_start__gte=target_age_min_int)
+            except (ValueError, TypeError):
+                pass
         if self.target_age_max:
-            queryset = queryset.filter(target_age_end__lte=self.target_age_max)
+            try:
+                target_age_max_int = int(self.target_age_max)
+                queryset = queryset.filter(target_age_end__lte=target_age_max_int)
+            except (ValueError, TypeError):
+                pass
         if self.fee_min:
-            queryset = queryset.filter(fee_decimal__gte=self.fee_min)
+            try:
+                fee_min_decimal = decimal.Decimal(self.fee_min)
+                queryset = queryset.filter(fee_decimal__gte=fee_min_decimal)
+            except (decimal.InvalidOperation, TypeError):
+                pass
         if self.fee_max:
-            queryset = queryset.filter(fee_decimal__lte=self.fee_max)
+            try:
+                fee_max_decimal = decimal.Decimal(self.fee_max)
+                queryset = queryset.filter(fee_decimal__lte=fee_max_decimal)
+            except (decimal.InvalidOperation, TypeError):
+                pass
+
         if self.parking_info and self.parking_info != "all":
             queryset = queryset.filter(parking_info=self.parking_info)
         return queryset

@@ -70,3 +70,12 @@ class ReviewViewsTest(TestCase):
         response = self.client.get(self.review_list_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["reviews"][0].user.account_name, new_name)
+
+    def test_add_review_view_invalid_rating(self):
+        """不正なratingでレビュー追加を試みると400エラーが返ることをテスト"""
+        self.client.login(email="testuser@example.com", password="testpassword")
+        response = self.client.post(
+            self.add_review_url, {"content": "Great park!", "rating": "abc"}
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["message"], "Invalid rating")

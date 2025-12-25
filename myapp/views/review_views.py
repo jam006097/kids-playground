@@ -42,10 +42,17 @@ class AddReviewView(LoginRequiredMixin, View):
         # 公園オブジェクトを取得
         playground = get_object_or_404(Playground, id=playground_id)
 
+        try:
+            rating_int = int(rating)
+        except (ValueError, TypeError):
+            return JsonResponse(
+                {"status": "error", "message": "Invalid rating"}, status=400
+            )
+
         # レビューを作成
         user = cast(CustomUser, request.user)
         Review.objects.create(
-            playground=playground, user=user, content=content, rating=rating
+            playground=playground, user=user, content=content, rating=rating_int
         )
 
         return JsonResponse(

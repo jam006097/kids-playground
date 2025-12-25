@@ -27,12 +27,18 @@ class AddFavoriteView(LoginRequiredMixin, View):
         """
         POSTリクエストを処理し、指定された公園をお気に入りに追加する。
         """
-        playground_id = request.POST.get("playground_id")
-        if playground_id is None:
+        playground_id_str = request.POST.get("playground_id")
+        if playground_id_str is None:
             return JsonResponse(
                 {"status": "error", "message": "playground_id is required"}, status=400
             )
-        playground = Playground.objects.get(id=playground_id)
+        try:
+            playground_id = int(playground_id_str)
+        except (ValueError, TypeError):
+            return JsonResponse(
+                {"status": "error", "message": "Invalid playground_id"}, status=400
+            )
+        playground = get_object_or_404(Playground, id=playground_id)
         # お気に入りを作成または取得
         user = cast(CustomUser, request.user)
         Favorite.objects.get_or_create(user=user, playground=playground)
@@ -49,12 +55,18 @@ class RemoveFavoriteView(LoginRequiredMixin, View):
         """
         POSTリクエストを処理し、指定された公園をお気に入りから削除する。
         """
-        playground_id = request.POST.get("playground_id")
-        if playground_id is None:
+        playground_id_str = request.POST.get("playground_id")
+        if playground_id_str is None:
             return JsonResponse(
                 {"status": "error", "message": "playground_id is required"}, status=400
             )
-        playground = Playground.objects.get(id=playground_id)
+        try:
+            playground_id = int(playground_id_str)
+        except (ValueError, TypeError):
+            return JsonResponse(
+                {"status": "error", "message": "Invalid playground_id"}, status=400
+            )
+        playground = get_object_or_404(Playground, id=playground_id)
         # お気に入りを削除
         user = cast(CustomUser, request.user)
         Favorite.objects.filter(user=user, playground=playground).delete()

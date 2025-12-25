@@ -14,10 +14,12 @@ class LoginRequiredJsonMixin(AccessMixin, View):
         if not request.user.is_authenticated:
             # AJAXリクエスト(X-Requested-Withヘッダーを持つ)の場合はJSONレスポンスを返す
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                return JsonResponse(
-                    {"status": "error", "message": "Authentication required"},
-                    status=401,
-                )
+                # `get_login_url()` は AccessMixin から提供される
+                login_url = self.get_login_url()
+                # ログイン後のリダイレクト先として現在のURLを指定
+                next_url = request.get_full_path()
+                redirect_url = f"{login_url}?next={next_url}"
+                return JsonResponse({"redirect_url": redirect_url}, status=401)
             # それ以外の場合は通常のログインページへリダイレクト
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)

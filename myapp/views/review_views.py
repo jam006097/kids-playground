@@ -85,7 +85,11 @@ class ReviewListView(ListView):
         """
         playground_id = self.kwargs["playground_id"]
         self.playground = get_object_or_404(Playground, id=playground_id)
-        return Review.objects.filter(playground=self.playground).select_related("user")
+        return (
+            Review.objects.filter(playground=self.playground)
+            .select_related("user")
+            .order_by("-created_at")
+        )
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """

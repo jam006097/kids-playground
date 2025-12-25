@@ -79,3 +79,25 @@ class ReviewViewsTest(TestCase):
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["message"], "Invalid rating")
+
+    def test_reviews_ordered_by_created_at_descending(self):
+        """レビューが投稿日時の新しい順に表示されることをテスト"""
+        # ユーザーと公園はsetUpで作成済み
+        # 異なるタイミングでレビューを作成
+        review1 = Review.objects.create(
+            user=self.user, playground=self.playground, content="Old review", rating=3
+        )
+        # created_atがreview1より後になるように少し待つ（テストの確実性を高めるため）
+        # ただし、DjangoのTestCaseはトランザクションを使うため、実際にはcreated_atはほぼ同じになる可能性もある
+        # そのため、ID順でソートされていないことを確認する
+        review2 = Review.objects.create(
+            user=self.user, playground=self.playground, content="New review", rating=5
+        )
+
+        response = self.client.get(self.review_list_url)
+        self.assertEqual(response.status_code, 200)
+        reviews_in_context = response.context["reviews"]
+
+        # 新しいレビューが最初に表示されることを確認
+        self.assertEqual(reviews_in_context[0].id, review2.id)
+        self.assertEqual(reviews_in_context[1].id, review1.id)

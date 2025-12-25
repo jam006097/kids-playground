@@ -1,6 +1,6 @@
-import subprocess  # nosec B404
-
+import subprocess  # nosec B404  # nosec B404
 import sys
+import os
 from django.core.management.base import BaseCommand
 
 
@@ -34,10 +34,9 @@ class Command(BaseCommand):
 
         # 1. Python/Django/Playwright tests
         self.stdout.write(self.style.HTTP_INFO("Starting Python tests (pytest)..."))
+        pytest_path = os.path.join(os.path.dirname(sys.executable), "pytest")
         pytest_command = [
-            sys.executable.replace(
-                "python", "pytest"
-            ),  # 仮想環境のpytestを明示的に指定
+            pytest_path,
             "-o",
             "addopts=",
         ]

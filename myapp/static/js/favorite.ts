@@ -3,6 +3,9 @@ import { getCookie as defaultGetCookie } from './utils.js';
 // getCookie関数の型を定義
 type GetCookieFunc = (name: string) => string | null;
 
+// ログイン状態をチェックする関数の型を定義
+type AuthChecker = () => boolean;
+
 // windowオブジェクトにカスタムプロパティを拡張
 declare global {
   interface Window {
@@ -16,13 +19,19 @@ declare global {
  */
 class FavoriteManager {
   private getCookie: GetCookieFunc;
+  private authChecker: AuthChecker;
 
   /**
    * FavoriteManagerのコンストラクタ。
-   * @param {GetCookieFunc} [getCookie=defaultGetCookie] - クッキーを取得するための関数。テスト用にモックを注入できるようにします。
+   * @param {GetCookieFunc} [getCookie=defaultGetCookie] - クッキーを取得するための関数。テスト用にモックを注入できます。
+   * @param {AuthChecker} [authChecker=() => true] - ログイン状態をチェックする関数。デフォルトは常にtrue（ログイン済み）を返します。
    */
-  constructor(getCookie: GetCookieFunc = defaultGetCookie) {
+  constructor(
+    getCookie: GetCookieFunc = defaultGetCookie,
+    authChecker: AuthChecker = () => true,
+  ) {
     this.getCookie = getCookie;
+    this.authChecker = authChecker;
   }
 
   /**
@@ -39,6 +48,11 @@ class FavoriteManager {
     // ボタンが無効化されている場合は処理を中断
     if (button.disabled) return Promise.resolve();
 
+    // ログイン状態をチェックし、未ログインの場合はアラートを表示して処理を中断
+    if (!this.authChecker()) {
+      alert('ログインまたは会員登録が必要です');
+      return Promise.resolve();
+    }
     const csrfToken = this.getCookie('csrftoken'); // CSRFトークンを取得
     // ボタンのテキストから現在のお気に入り状態を判断
     const isFavorite = button.textContent?.includes('解除') ?? false;

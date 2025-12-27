@@ -28,7 +28,7 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "test": "jest",
+    "test": "jest --config jest.config.cjs",
     "lint": "eslint \"myapp/**/*.ts\"",
     "format": "prettier --write \"myapp/**/*.ts\"",
     "build": "tsc",
@@ -36,5 +36,8 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "regenerator-runtime": "^0.14.1"
+  }
 }

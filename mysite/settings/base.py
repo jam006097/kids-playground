@@ -117,9 +117,6 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 
 # allauth の非推奨警告対策
-ACCOUNT_RATE_LIMITS = {
-    "login_failed": "none",  # ログイン失敗時のレート制限を無効化
-}
 
 
 # ロギング設定

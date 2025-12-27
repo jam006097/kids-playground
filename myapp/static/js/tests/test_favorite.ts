@@ -1,3 +1,4 @@
+require('regenerator-runtime');
 import { FavoriteManager } from '../favorite';
 
 // getCookieをモック関数として定義
@@ -17,8 +18,8 @@ describe('FavoriteManager', () => {
 
   beforeEach(() => {
     // 各テストの前にFavoriteManagerの新しいインスタンスを作成し、モック関数を注入
-    favoriteManager = new FavoriteManager(mockGetCookie);
-    // fetchとgetCookieのモックをクリア
+    // デフォルトの認証チェッカーは常にtrue（ログイン済み）を返すようにし、既存のテストへの影響を防ぐ
+    favoriteManager = new FavoriteManager(mockGetCookie, () => true);    // fetchとgetCookieのモックをクリア
     (fetch as jest.Mock).mockClear();
     mockGetCookie.mockClear();
 
@@ -157,9 +158,26 @@ describe('FavoriteManager', () => {
     expect(mockButton.disabled).toBe(false);
   });
 
+  test('未ログインユーザーの場合、アラートを表示し、fetchが呼び出されないこと', async () => {
+    // 準備: ログイン状態をチェックする関数をモックし、常にfalse（未ログイン）を返すように設定
+    const mockAuthChecker = jest.fn(() => false);
+    // favoriteManagerにモック関数を注入してインスタンス化
+    favoriteManager = new FavoriteManager(mockGetCookie, mockAuthChecker);
+
+    // 実行: toggleFavoriteを呼び出す
+    await favoriteManager.toggleFavorite(mockButton, '123');
+
+    // 検証: fetchが呼び出されていないこと
+    expect(fetch).not.toHaveBeenCalled();
+    // 検証: 正しいメッセージでアラートが表示されたこと
+    expect(window.alert).toHaveBeenCalledWith('ログインまたは会員登録が必要です');
+    // 検証: ボタンが無効化されていないこと
+    expect(mockButton.disabled).toBe(false);
+  });
+
+
   // シナリオ: ボタンが無効化されている場合
-  test('ボタンが無効化されている場合、処理を続行しない', async () => {
-    // 準備: ボタンを無効化する
+  test('ボタンが無効化されている場合、処理を続行しない', async () => {    // 準備: ボタンを無効化する
     mockButton.disabled = true;
 
     // 実行: toggleFavoriteを呼び出す

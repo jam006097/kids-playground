@@ -1,6 +1,11 @@
 /**
  * 口コミ管理を行うクラス
  */
+
+interface BootstrapModalEvent extends Event {
+  relatedTarget: EventTarget | null;
+}
+
 class ReviewManager {
   private modalElement: HTMLElement;
   private formElement: HTMLFormElement;
@@ -40,18 +45,22 @@ class ReviewManager {
   }
 
   initEventHandlers(): void {
-    this.modalElement.addEventListener('show.bs.modal', (event: Event) => {
-      const button = (event as any).relatedTarget as HTMLButtonElement | null;
-      if (!button) return;
-      const playgroundId = button.dataset.playgroundId;
-      const playgroundName = button.dataset.playgroundName;
-      if (this.playgroundIdInput && playgroundId) {
-        this.playgroundIdInput.value = playgroundId;
-      }
-      if (this.modalTitle && playgroundName) {
-        this.modalTitle.textContent = playgroundName + 'への口コミ';
-      }
-    });
+    this.modalElement.addEventListener(
+      'show.bs.modal',
+      (event: BootstrapModalEvent) => {
+        const button = event.relatedTarget;
+        if (button instanceof HTMLButtonElement) {
+          const playgroundId = button.dataset.playgroundId;
+          const playgroundName = button.dataset.playgroundName;
+          if (this.playgroundIdInput && playgroundId) {
+            this.playgroundIdInput.value = playgroundId;
+          }
+          if (this.modalTitle && playgroundName) {
+            this.modalTitle.textContent = playgroundName + 'への口コミ';
+          }
+        }
+      },
+    );
 
     this.formElement.addEventListener('submit', this.handleSubmit);
 
@@ -65,7 +74,7 @@ class ReviewManager {
     event.preventDefault();
 
     const urlEncodedData = new URLSearchParams(
-      new FormData(this.formElement) as any,
+      new FormData(this.formElement) as unknown as Iterable<[string, string]>,
     );
     const csrfToken = this.getCsrfToken();
     urlEncodedData.append('csrfmiddlewaretoken', csrfToken);
@@ -93,7 +102,7 @@ class ReviewManager {
       // Focesd element in modal is blurred before hiding modal.
       (this.document.activeElement as HTMLElement)?.blur();
       this.modal.hide();
-    } catch (error) {
+    } catch (_error) {
       alert('口コミの投稿に失敗しました。');
     }
   }

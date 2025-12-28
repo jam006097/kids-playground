@@ -1,5 +1,13 @@
 import { ReviewManager } from '../review';
 
+declare global {
+  interface Window {
+    bootstrap: {
+      Modal: jest.Mock;
+    };
+  }
+}
+
 // jest.config.jsのmoduleNameMapperにより、'bootstrap'はダミーに置き換えられるが、
 // テストコード内でbootstrap.Modalがコンストラクタとして振る舞うように、ここで再度モックする。
 const mockHide = jest.fn();
@@ -23,7 +31,7 @@ describe('ReviewManagerの口コミ投稿機能', () => {
 
   beforeEach(() => {
     // グローバルなwindowオブジェクトにbootstrapのモックをセットアップ
-    (window as any).bootstrap = {
+    window.bootstrap = {
       Modal: mockModalConstructor,
     };
 
@@ -60,7 +68,7 @@ describe('ReviewManagerの口コミ投稿機能', () => {
   });
 
   test('「口コミを書く」ボタンでモーダルを開いたとき、対象の施設名がタイトルに表示されること', () => {
-    const manager = new ReviewManager(reviewModal, reviewForm, document);
+    new ReviewManager(reviewModal, reviewForm, document);
     const triggerButton = document.createElement('button');
     triggerButton.dataset.playgroundId = '456';
     triggerButton.dataset.playgroundName = '別の公園';

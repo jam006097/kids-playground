@@ -17,7 +17,7 @@ declare global {
     mapInstance?: L.Map;
     favMapInstance?: L.Map;
     favorite_ids: string[];
-    playgrounds: any[];
+    playgrounds: Playground[];
     L: typeof L;
   }
 }

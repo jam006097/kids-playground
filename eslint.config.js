@@ -6,6 +6,7 @@ const tsEslint = require("@typescript-eslint/eslint-plugin");
 const tsParser = require("@typescript-eslint/parser");
 
 module.exports = [
+  prettierRecommended, // Make sure this is last -> moved to top
   {
     // General configuration for all files
     plugins: {
@@ -35,7 +36,14 @@ module.exports = [
     rules: {
       ...tsEslint.configs['recommended'].rules,
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
       'no-unused-vars': 'off', // Turn off base rule to avoid conflicts
       'no-console': 'off',
     },
@@ -60,5 +68,11 @@ module.exports = [
       'jest/valid-expect': 'error',
     },
   },
-  prettierRecommended, // Make sure this is last
+  {
+    // Override for test_map.ts to allow any, because disable comments are not working.
+    files: ["myapp/static/js/tests/test_map.ts"],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
 ];

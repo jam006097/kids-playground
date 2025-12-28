@@ -3,19 +3,31 @@ import { MapManager } from '../map';
 // テストデータ用の型定義
 interface MockPlayground {
   id: string;
-  name?: string;
-  address?: string;
-  phone?: string;
+  name: string;
+  address: string;
+  phone: string;
+  formatted_phone: string;
   latitude: string;
   longitude: string;
 }
 
 describe('MapManager', () => {
   let mapManager: MapManager;
-  let mockMap: any;
-  let mockTileLayer: any;
-  let mockMarker: any;
-  let mockL: any;
+  let mockMap: {
+    setView: jest.Mock;
+    remove: jest.Mock;
+    addLayer: jest.Mock;
+  };
+  let mockTileLayer: { addTo: jest.Mock };
+  let mockMarker: {
+    addTo: jest.Mock;
+    bindPopup: jest.Mock;
+  };
+  let mockL: {
+    map: jest.Mock;
+    tileLayer: jest.Mock;
+    marker: jest.Mock;
+  };
   let mockDocumentQuerySelectorAll: jest.Mock;
 
   beforeEach(() => {
@@ -62,7 +74,7 @@ describe('MapManager', () => {
     // setTimeoutをモック
     jest.useFakeTimers();
 
-    mapManager = new MapManager(mockL);
+    mapManager = new MapManager(mockL as any);
   });
 
   afterEach(() => {
@@ -78,12 +90,28 @@ describe('MapManager', () => {
 
   describe('initMap', () => {
     const mockPlaygrounds: MockPlayground[] = [
-      { id: '1', latitude: '31.5', longitude: '130.5' },
-      { id: '2', latitude: '31.6', longitude: '130.6' },
+      {
+        id: '1',
+        name: 'Park 1',
+        address: 'Addr 1',
+        phone: '111',
+        formatted_phone: '111-1',
+        latitude: '31.5',
+        longitude: '130.5',
+      },
+      {
+        id: '2',
+        name: 'Park 2',
+        address: 'Addr 2',
+        phone: '222',
+        formatted_phone: '222-2',
+        latitude: '31.6',
+        longitude: '130.6',
+      },
     ];
 
     test('地図を初期化し、遊び場のピンを配置すること', () => {
-      mapManager.initMap(mockPlaygrounds as any);
+      mapManager.initMap(mockPlaygrounds);
 
       // 検証：地図が生成され、ピンが遊び場の数だけ作られようとしたか
       expect(mockL.map).toHaveBeenCalled();
@@ -91,8 +119,8 @@ describe('MapManager', () => {
     });
 
     test('地図が既に存在する場合、古い地図を破棄してから新しい地図を描画すること', () => {
-      window.mapInstance = mockMap;
-      mapManager.initMap(mockPlaygrounds as any);
+      window.mapInstance = mockMap as any;
+      mapManager.initMap(mockPlaygrounds);
 
       // 検証：古い地図のremoveが呼ばれたか
       expect(mockMap.remove).toHaveBeenCalled();
@@ -103,11 +131,19 @@ describe('MapManager', () => {
 
   describe('initFavoritesMap', () => {
     const mockPlaygrounds: MockPlayground[] = [
-      { id: '1', latitude: '32.0', longitude: '131.0' },
+      {
+        id: '1',
+        name: 'Fav Park 1',
+        address: 'Fav Addr 1',
+        phone: '333',
+        formatted_phone: '333-3',
+        latitude: '32.0',
+        longitude: '131.0',
+      },
     ];
 
     test('お気に入り地図を初期化し、ピンを配置すること', () => {
-      mapManager.initFavoritesMap(mockPlaygrounds as any);
+      mapManager.initFavoritesMap(mockPlaygrounds);
 
       // 検証：地図が生成され、ピンが遊び場の数だけ作られようとしたか
       expect(mockL.map).toHaveBeenCalled();
@@ -115,8 +151,8 @@ describe('MapManager', () => {
     });
 
     test('お気に入り地図が既に存在する場合、古い地図を破棄してから新しい地図を描画すること', () => {
-      window.favMapInstance = mockMap;
-      mapManager.initFavoritesMap(mockPlaygrounds as any);
+      window.favMapInstance = mockMap as any;
+      mapManager.initFavoritesMap(mockPlaygrounds);
 
       // 検証：古い地図のremoveが呼ばれたか
       expect(mockMap.remove).toHaveBeenCalled();
@@ -170,6 +206,7 @@ describe('MapManager', () => {
       name: '公園A',
       address: '住所A',
       phone: '111',
+      formatted_phone: '111-formatted',
       latitude: '31.5',
       longitude: '130.5',
     };
@@ -177,14 +214,14 @@ describe('MapManager', () => {
     test('お気に入り登録後、再度ポップアップを開くと状態が「お気に入り解除」に更新されていること', () => {
       // 1. 初期状態ではお気に入りではない
       window.favorite_ids = [];
-      let popupContent = mapManager.createPopupContent(mockPlayground as any);
+      let popupContent = mapManager.createPopupContent(mockPlayground);
       expect(popupContent).toContain('お気に入りに追加');
 
       // 2. お気に入りに登録する（FavoriteManagerの動作を模倣）
       window.favorite_ids.push('1');
 
       // 3. 再度ポップアップの内容を生成すると、状態が更新されている
-      popupContent = mapManager.createPopupContent(mockPlayground as any);
+      popupContent = mapManager.createPopupContent(mockPlayground);
       expect(popupContent).toContain('お気に入り解除');
     });
   });

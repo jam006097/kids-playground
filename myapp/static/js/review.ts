@@ -45,22 +45,21 @@ class ReviewManager {
   }
 
   initEventHandlers(): void {
-    this.modalElement.addEventListener(
-      'show.bs.modal',
-      (event: BootstrapModalEvent) => {
-        const button = event.relatedTarget;
-        if (button instanceof HTMLButtonElement) {
-          const playgroundId = button.dataset.playgroundId;
-          const playgroundName = button.dataset.playgroundName;
-          if (this.playgroundIdInput && playgroundId) {
-            this.playgroundIdInput.value = playgroundId;
-          }
-          if (this.modalTitle && playgroundName) {
-            this.modalTitle.textContent = playgroundName + 'への口コミ';
-          }
+    const modalListener = (event: Event) => {
+      const customEvent = event as BootstrapModalEvent;
+      const button = customEvent.relatedTarget;
+      if (button instanceof HTMLButtonElement) {
+        const playgroundId = button.dataset.playgroundId;
+        const playgroundName = button.dataset.playgroundName;
+        if (this.playgroundIdInput && playgroundId) {
+          this.playgroundIdInput.value = playgroundId;
         }
-      },
-    );
+        if (this.modalTitle && playgroundName) {
+          this.modalTitle.textContent = playgroundName + 'への口コミ';
+        }
+      }
+    };
+    this.modalElement.addEventListener('show.bs.modal', modalListener);
 
     this.formElement.addEventListener('submit', this.handleSubmit);
 
@@ -74,7 +73,10 @@ class ReviewManager {
     event.preventDefault();
 
     const urlEncodedData = new URLSearchParams(
-      new FormData(this.formElement) as unknown as Iterable<[string, string]>,
+      Array.from(new FormData(this.formElement).entries()) as [
+        string,
+        string,
+      ][],
     );
     const csrfToken = this.getCsrfToken();
     urlEncodedData.append('csrfmiddlewaretoken', csrfToken);

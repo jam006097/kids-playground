@@ -67,6 +67,14 @@ jobs:
       run: |
         pytest --ds=mysite.settings.dev
 
+    - name: Run Django General Check # Djangoの一般的な設定チェック
+      env:
+        DJANGO_SETTINGS_MODULE: mysite.settings.dev # 開発設定を使用してチェック
+        SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      run: |
+        python manage.py check
+
+
     - name: Run E2E Frontend Module Load Test # E2Eフロントエンドモジュールロードテストを実行
       env:
         DJANGO_SETTINGS_MODULE: mysite.settings.e2e # E2Eテスト用の設定ファイルを使用

@@ -31,3 +31,12 @@ repos:
       - id: bandit
         args: ["-c", "bandit.yaml"]
         files: \.py$
+  - repo: local
+    hooks:
+      - id: django-check
+        name: Django Check
+        entry: bash -c 'venv/bin/python3 manage.py check --settings=mysite.settings.dev'
+        language: system
+        pass_filenames: false
+        always_run: true
+        types: [python]

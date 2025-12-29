@@ -110,3 +110,5 @@ virtualenv==20.34.0
 websockets==15.0.1
 whitenoise==6.7.0
 django-csp
+pytest-asyncio
+pytest-playwright

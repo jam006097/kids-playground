@@ -2,13 +2,13 @@ import pytest
 from playwright.sync_api import Page
 from django.urls import reverse
 
-# テスト対象のURLパス
-URL_PATHS = [
-    "/",
-    "/about/",
-    "/ranking/",
-    "/accounts/login/",
-    "/accounts/signup/",
+# テスト対象のURL名
+URL_NAMES = [
+    "myapp:index",
+    "myapp:about",
+    "myapp:ranking",
+    "account_login",
+    "account_signup",
 ]
 
 
@@ -21,8 +21,8 @@ def browser_context_args(browser_context_args):
 
 
 @pytest.mark.e2e
-@pytest.mark.parametrize("path", URL_PATHS)
-def test_page_is_healthy(live_server, page: Page, path: str):
+@pytest.mark.parametrize("url_name", URL_NAMES)
+def test_page_is_healthy(live_server, page: Page, url_name: str):
     """
     指定されたページにアクセスした際、エラーが発生せず正常に表示されること。
     - ページが200 OKを返す
@@ -50,6 +50,7 @@ def test_page_is_healthy(live_server, page: Page, path: str):
     )
 
     # When: ページにアクセス
+    path = reverse(url_name)
     full_url = live_server.url + path
     response = page.goto(full_url)
     page.wait_for_load_state("networkidle")

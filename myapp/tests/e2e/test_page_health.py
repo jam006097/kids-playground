@@ -7,6 +7,7 @@ URL_NAMES = [
     "myapp:index",
     "myapp:about",
     "myapp:ranking",
+    "myapp:favorites",  # お気に入り一覧画面を追加
     "account_login",
     "account_signup",
 ]

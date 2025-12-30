@@ -1,109 +1,116 @@
-import { ReviewManager } from '../review';
+/**
+ * @jest-environment jsdom
+ */
 
-declare global {
-  interface Window {
-    bootstrap: {
-      Modal: jest.Mock;
-    };
-  }
-}
+// モジュールのモックを先に設定
+const mockModalHide = jest.fn();
+const mockToastShow = jest.fn();
 
-// jest.config.jsのmoduleNameMapperにより、'bootstrap'はダミーに置き換えられるが、
-// テストコード内でbootstrap.Modalがコンストラクタとして振る舞うように、ここで再度モックする。
-const mockHide = jest.fn();
-const mockModalConstructor = jest.fn(() => ({
-  hide: mockHide,
-}));
+// グローバルなbootstrapオブジェクトをモック
+window.bootstrap = {
+  Modal: jest.fn().mockImplementation(() => ({
+    hide: mockModalHide,
+  })),
+  Toast: jest.fn().mockImplementation(() => ({
+    show: mockToastShow,
+  })),
+};
 
 // fetchをグローバルにモック
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    ok: true,
-    json: () => Promise.resolve({ message: '口コミが投稿されました。' }),
-  }),
-) as jest.Mock;
+global.fetch = jest.fn();
 
-describe('ReviewManagerの口コミ投稿機能', () => {
-  let reviewModal: HTMLElement;
-  let reviewForm: HTMLFormElement;
-  let playgroundIdInput: HTMLInputElement;
-  let modalTitle: HTMLElement;
-
+describe('Review Form Submission', () => {
   beforeEach(() => {
-    // グローバルなwindowオブジェクトにbootstrapのモックをセットアップ
-    window.bootstrap = {
-      Modal: mockModalConstructor,
-    };
-
-    // 各モックをクリア
-    (fetch as jest.Mock).mockClear();
-    mockModalConstructor.mockClear();
-    mockHide.mockClear();
-    jest.spyOn(global, 'alert').mockImplementation(() => {});
-
-    // テスト用のDOMをセットアップ
+    // 各テストの前にDOMとモックをクリーンアップ
     document.body.innerHTML = `
-      <div class="modal" id="reviewModal">
-        <h5 class="modal-title">口コミを投稿</h5>
-        <form id="reviewForm">
-          <input type="hidden" name="csrfmiddlewaretoken" value="mockCsrfToken">
-          <input type="hidden" id="playgroundId" name="playground_id">
-          <input name="rating" value="5">
-          <textarea name="content">Great!</textarea>
-        </form>
+      <div id="reviewModal"></div>
+      <form id="reviewForm">
+        <input type="hidden" name="csrfmiddlewaretoken" value="test-token">
+        <input type="hidden" id="playgroundId" value="123">
+        <input name="rating" id="rating">
+        <textarea name="content" id="content"></textarea>
+      </form>
+      <ul id="review-list">
+        <li id="no-reviews-message">まだ口コミがありません。</li>
+      </ul>
+      <div id="notificationToast" class="toast">
+        <div id="notificationToastBody"></div>
       </div>
     `;
 
-    reviewModal = document.getElementById('reviewModal')!;
-    reviewForm = document.getElementById('reviewForm')! as HTMLFormElement;
-    playgroundIdInput = document.getElementById(
-      'playgroundId',
-    )! as HTMLInputElement;
-    modalTitle = reviewModal.querySelector('.modal-title')!;
+    // モジュールを動的にインポートして、DOMの準備ができた後にスクリプトが実行されるようにする
+    require('../review.ts');
+
+    // DOMContentLoadedを発火させて、スクリプト内のイベントリスナーを有効化
+    document.dispatchEvent(
+      new Event('DOMContentLoaded', {
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+
+    // モックの呼び出し履歴をリセット
+    (fetch as jest.Mock).mockClear();
+    mockModalHide.mockClear();
+    mockToastShow.mockClear();
+    if (window.bootstrap.Modal) (window.bootstrap.Modal as jest.Mock).mockClear();
+    if (window.bootstrap.Toast) (window.bootstrap.Toast as jest.Mock).mockClear();
   });
 
-  afterEach(() => {
-    document.body.innerHTML = '';
-    jest.restoreAllMocks();
-  });
-
-  test('「口コミを書く」ボタンでモーダルを開いたとき、対象の施設名がタイトルに表示されること', () => {
-    new ReviewManager(reviewModal, reviewForm, document);
-    const triggerButton = document.createElement('button');
-    triggerButton.dataset.playgroundId = '456';
-    triggerButton.dataset.playgroundName = '別の公園';
-
-    const event = new Event('show.bs.modal');
-    Object.defineProperty(event, 'relatedTarget', {
-      value: triggerButton,
-      writable: false,
+  test('should add review to the list on successful submission', async () => {
+    // Arrange: 成功時のfetchレスポンスをモック
+    const mockReview = {
+      user_account_name: 'テストユーザー',
+      rating: 5,
+      content: '最高の公園でした！',
+      created_at: '2023年01月01日 12:00',
+    };
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ status: 'success', review: mockReview }),
     });
 
-    reviewModal.dispatchEvent(event);
+    const reviewForm = document.getElementById('reviewForm') as HTMLFormElement;
+    const ratingInput = document.getElementById('rating') as HTMLInputElement;
+    const contentInput = document.getElementById('content') as HTMLTextAreaElement;
+    ratingInput.value = '5';
+    contentInput.value = '最高の公園でした！';
 
-    expect(playgroundIdInput.value).toBe('456');
-    expect(modalTitle.textContent).toBe('別の公園への口コミ');
+    // Act: フォーム送信をシミュレート
+    await reviewForm.dispatchEvent(new Event('submit'));
+
+    // Assert: DOMの更新、モーダルの非表示、トーストの表示を確認
+    const reviewList = document.getElementById('review-list') as HTMLUListElement;
+    // 非同期処理の完了を待つ
+    await new Promise(process.nextTick);
+
+    expect(reviewList.querySelector('#no-reviews-message')).toBeNull();
+    expect(reviewList.children.length).toBe(1);
+    expect(reviewList.innerHTML).toContain('最高の公園でした！');
+    expect(reviewList.innerHTML).toContain('テストユーザー');
+    expect(ratingInput.value).toBe(''); // jest-environment-jsdomはreset()を完全にはサポートしないため、手動でチェック
+    expect(contentInput.value).toBe('');
+    expect(mockModalHide).toHaveBeenCalled();
+    expect(mockToastShow).toHaveBeenCalled();
+    expect(document.getElementById('notificationToastBody')?.textContent).toBe('口コミが投稿されました！');
   });
 
-  test('有効な口コミを送信したとき、「投稿しました」と表示されモーダルが閉じること', async () => {
-    const manager = new ReviewManager(reviewModal, reviewForm, document);
-    playgroundIdInput.value = '123';
+  test('should show an error toast on failed submission', async () => {
+    // Arrange: 失敗時のfetchレスポンスをモック
+    (fetch as jest.Mock).mockRejectedValueOnce(new Error('サーバーエラー'));
 
-    const mockEvent = { preventDefault: jest.fn() };
-    await manager.handleSubmit(mockEvent as Event);
+    const reviewForm = document.getElementById('reviewForm') as HTMLFormElement;
 
-    expect(global.alert).toHaveBeenCalledWith('口コミが投稿されました。');
-    expect(mockHide).toHaveBeenCalled();
-  });
+    // Act: フォーム送信をシミュレート
+    await reviewForm.dispatchEvent(new Event('submit'));
 
-  test('口コミの送信に失敗したとき、「投稿に失敗しました」と表示されること', async () => {
-    (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
-    const manager = new ReviewManager(reviewModal, reviewForm, document);
-    playgroundIdInput.value = '123';
+    // Assert: エラートーストが表示され、DOMが変更されていないことを確認
+    await new Promise(process.nextTick);
 
-    const mockEvent = { preventDefault: jest.fn() };
-    await manager.handleSubmit(mockEvent as Event);
-
-    expect(global.alert).toHaveBeenCalledWith('口コミの投稿に失敗しました。');
+    const reviewList = document.getElementById('review-list') as HTMLUListElement;
+    expect(reviewList.querySelector('#no-reviews-message')).not.toBeNull();
+    expect(mockModalHide).not.toHaveBeenCalled();
+    expect(mockToastShow).toHaveBeenCalled();
+    expect(document.getElementById('notificationToastBody')?.textContent).toBe('サーバーエラー');
   });
 });

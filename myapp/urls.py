@@ -5,7 +5,7 @@ from myapp.views.favorite_views import (
     RemoveFavoriteView,
     FavoriteListView,
 )
-from myapp.views.review_views import AddReviewView, ReviewListView
+from myapp.views.review_views import AddReviewView
 from myapp.views.ranking_views import RankingListView
 from myapp.views.detail_views import FacilityDetailView
 from myapp.views.about import about_view
@@ -24,11 +24,6 @@ urlpatterns = [
         "playground/<int:playground_id>/add_review/",
         AddReviewView.as_view(),
         name="add_review",
-    ),
-    path(
-        "playground/<int:playground_id>/reviews/",
-        ReviewListView.as_view(),
-        name="view_reviews",
     ),
     path("about/", about_view, name="about"),
 ]

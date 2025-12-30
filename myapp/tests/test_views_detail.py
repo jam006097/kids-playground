@@ -1,7 +1,8 @@
 import pytest
 from django.urls import reverse
 from django.test import Client
-from myapp.models import Playground
+from myapp.models import Playground, Review
+from users.models import CustomUser
 
 
 @pytest.fixture
@@ -17,23 +18,29 @@ def playground():
         phone="000-111-2222",
         latitude=35.0,
         longitude=135.0,
-        description="テスト説明",
-        opening_hours="9:00-17:00",
-        website="http://test.com",
-        nursing_room_available=True,
-        diaper_changing_station_available=True,
-        stroller_accessible=True,
-        kids_space_available=True,
-        notes_for_infants="特記事項テスト",
-        # New fields
-        google_map_url="http://maps.google.com/test",
-        parking_available=True,
-        indoor_play_area=True,
-        kids_toilet_available=True,
-        target_age="0-6歳",
-        fee="無料",
-        lunch_allowed=True,
     )
+
+
+@pytest.mark.django_db
+def test_facility_detail_displays_reviews(client, playground):
+    """
+    施設詳細ページに、その施設に関連するレビューが表示されることを確認する。
+    """
+    user = CustomUser.objects.create_user(
+        email="testuser@example.com", password="password", account_name="テストユーザー"
+    )
+    review = Review.objects.create(
+        playground=playground,
+        user=user,
+        content="素晴らしい公園でした！",
+        rating=5,
+    )
+
+    response = client.get(reverse("myapp:facility_detail", args=[playground.id]))
+
+    assert response.status_code == 200
+    assert review.content in response.content.decode("utf-8")
+    assert review.user.account_name in response.content.decode("utf-8")
 
 
 @pytest.mark.django_db

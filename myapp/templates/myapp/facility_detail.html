@@ -25,11 +25,82 @@
                 <li class="list-group-item"><strong>ベビーカー:</strong> {% if playground.stroller_accessible %}アクセス可{% else %}アクセス不可{% endif %}</li>
                 <li class="list-group-item"><strong>授乳室:</strong> {% if playground.nursing_room_available %}あり{% else %}なし{% endif %}</li>
                 <li class="list-group-item"><strong>おむつ交換台:</strong> {% if playground.diaper_changing_station_available %}あり{% else %}なし{% endif %}</li>
-
                 <li class="list-group-item"><strong>昼食利用:</strong> {% if playground.lunch_allowed %}可能{% else %}不可{% endif %}</li>
             </ul>
             <a href="{% url 'myapp:index' %}" class="btn btn-secondary mt-3">一覧に戻る</a>
         </div>
     </div>
+
+    <!-- Review Section -->
+    <div class="card mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">口コミ一覧</h2>
+            {% if user.is_authenticated %}
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal" data-playground-id="{{ playground.id }}" data-playground-name="{{ playground.name }}">
+                口コミを投稿する
+            </button>
+            {% else %}
+            <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-primary">ログインして口コミを投稿</a>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush" id="review-list">
+                {% for review in reviews %}
+                <li class="list-group-item">
+                    <strong>{{ review.user.account_name }}</strong> (評価: {{ review.rating }})<br>
+                    <p class="mt-2">{{ review.content|linebreaksbr }}</p>
+                    <small class="text-muted d-block text-end">投稿日: {{ review.created_at|date:"Y年m月d日 H:i" }}</small>
+                </li>
+                {% empty %}
+                <li class="list-group-item" id="no-reviews-message">まだ口コミがありません。</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </div>
+
+<!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalLabel">口コミを投稿</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reviewForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="playgroundId" id="playgroundId" value="{{ playground.id }}">
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">評価 (5段階)</label>
+                        <input type="number" class="form-control" id="rating" name="rating" min="1" max="5" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">口コミ内容</label>
+                        <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">投稿する</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast for notifications -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">通知</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="notificationToastBody">
+            <!-- Message will be inserted here -->
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'myapp/js/dist/review.js' %}"></script>
 {% endblock %}

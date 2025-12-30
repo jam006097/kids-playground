@@ -127,19 +127,6 @@
                             <a href="{% url 'myapp:facility_detail' pk=playground.pk %}" class="btn btn-outline-primary mt-2">詳細を見る</a>
                             <!-- お気に入り登録ボタン -->
                             {% include 'partials/_favorite_button.html' with playground=playground %}
-                            <!-- 口コミボタン -->
-                            {% if user.is_authenticated %}
-                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#reviewModal"
-                                    data-playground-id="{{ playground.id }}" data-playground-name="{{ playground.name }}">
-                                口コミを書く
-                            </button>
-                            {% else %}
-                            <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-secondary">
-                                口コミを書く
-                            </a>
-                            {% endif %}
-                            <!-- 口コミを見るボタン -->
-                            <a href="{% url 'myapp:view_reviews' playground.id %}" class="btn btn-outline-info mt-2">口コミを見る</a>
                         </div>
                     </div>
                 </div>
@@ -153,34 +140,6 @@
     </div>
 </div>
 
-<!-- モーダル要素 -->
-<div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reviewModalLabel">口コミを投稿</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="reviewForm">
-                    {% csrf_token %}
-                    <input type="hidden" id="playgroundId" name="playground_id">
-                    <div class="form-group">
-                        <label for="reviewContent">施設の感想</label>
-                        <textarea id="reviewContent" name="content" class="form-control" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="reviewRating">評価 (1〜5)</label>
-                        <input type="number" id="reviewRating" name="rating" class="form-control" min="1" max="5" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">送信</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block extra_css %}

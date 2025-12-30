@@ -1,6 +1,5 @@
 import { MapManager } from './map.js';
 import { FavoriteManager } from './favorite.js';
-import { ReviewManager } from './review.js';
 
 // DOMからログイン状態を読み取る責務を持つ関数
 const isAuthenticated = (): boolean => {
@@ -11,12 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const mapManager = new MapManager();
   // FavoriteManagerに認証チェック関数を注入してインスタンス化
   const favoriteManager = new FavoriteManager(undefined, isAuthenticated);
-
-  const reviewModal = document.getElementById('reviewModal') as HTMLElement;
-  const reviewForm = document.getElementById('reviewForm') as HTMLFormElement;
-  if (reviewModal && reviewForm) {
-    new ReviewManager(reviewModal, reviewForm);
-  }
 
   const mapTab = document.getElementById('map-tab');
   if (mapTab) {

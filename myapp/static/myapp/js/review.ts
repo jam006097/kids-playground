@@ -1,113 +1,91 @@
 /**
- * 口コミ管理を行うクラス
+ * Handles review form submission via AJAX and dynamically updates the UI.
  */
+document.addEventListener('DOMContentLoaded', () => {
+    const reviewForm = document.getElementById('reviewForm') as HTMLFormElement;
+    const reviewList = document.getElementById('review-list') as HTMLUListElement;
+    const noReviewsMessage = document.getElementById('no-reviews-message');
+    const modalElement = document.getElementById('reviewModal');
+    const reviewModal = modalElement ? new window.bootstrap.Modal(modalElement) : null;
 
-interface BootstrapModalEvent extends Event {
-  relatedTarget: EventTarget | null;
-}
+    const toastElement = document.getElementById('notificationToast');
+    const toastBody = document.getElementById('notificationToastBody');
+    const notificationToast = toastElement ? new window.bootstrap.Toast(toastElement) : null;
 
-class ReviewManager {
-  private modalElement: HTMLElement;
-  private formElement: HTMLFormElement;
-  private document: Document;
-  private modal: bootstrap.Modal;
-  private playgroundIdInput: HTMLInputElement | null;
-  private modalTitle: HTMLElement | null;
-
-  constructor(
-    modalElement: HTMLElement,
-    formElement: HTMLFormElement,
-    documentObj: Document = document,
-  ) {
-    if (!modalElement || !formElement) {
-      throw new Error('ReviewManagerにはモーダルとフォームの要素が必要です。');
-    }
-    this.modalElement = modalElement;
-    this.formElement = formElement;
-    this.document = documentObj;
-    this.modal = new window.bootstrap.Modal(this.modalElement);
-
-    this.playgroundIdInput =
-      this.formElement.querySelector<HTMLInputElement>('#playgroundId');
-    this.modalTitle =
-      this.modalElement.querySelector<HTMLElement>('.modal-title');
-
-    this.handleSubmit = this.handleSubmit.bind(this);
-
-    this.initEventHandlers();
-  }
-
-  getCsrfToken(): string {
-    const tokenElement = this.document.querySelector<HTMLInputElement>(
-      '[name=csrfmiddlewaretoken]',
-    );
-    return tokenElement ? tokenElement.value : '';
-  }
-
-  initEventHandlers(): void {
-    const modalListener = (event: Event) => {
-      const customEvent = event as BootstrapModalEvent;
-      const button = customEvent.relatedTarget;
-      if (button instanceof HTMLButtonElement) {
-        const playgroundId = button.dataset.playgroundId;
-        const playgroundName = button.dataset.playgroundName;
-        if (this.playgroundIdInput && playgroundId) {
-          this.playgroundIdInput.value = playgroundId;
-        }
-        if (this.modalTitle && playgroundName) {
-          this.modalTitle.textContent = playgroundName + 'への口コミ';
-        }
-      }
+    const getCsrfToken = (): string => {
+        const tokenElement = document.querySelector<HTMLInputElement>('[name=csrfmiddlewaretoken]');
+        return tokenElement ? tokenElement.value : '';
     };
-    this.modalElement.addEventListener('show.bs.modal', modalListener);
 
-    this.formElement.addEventListener('submit', this.handleSubmit);
+    const showToast = (message: string, isError: boolean = false) => {
+        if (toastBody && notificationToast) {
+            toastBody.textContent = message;
+            toastElement?.classList.toggle('bg-danger', isError);
+            toastElement?.classList.toggle('text-white', isError);
+            notificationToast.show();
+        } else {
+            // Fallback to alert if toast elements are not found
+            alert(message);
+        }
+    };
 
-    // モーダルが完全に閉じられた後に、フォーカスをbody要素に戻す
-    this.modalElement.addEventListener('hidden.bs.modal', () => {
-      this.document.body.focus();
-    });
-  }
+    const addReviewToDom = (review: { content: string, rating: number, user_account_name: string, created_at: string }) => {
+        if (noReviewsMessage) {
+            noReviewsMessage.remove();
+        }
 
-  async handleSubmit(event: Event): Promise<void> {
-    event.preventDefault();
+        const reviewEl = document.createElement('li');
+        reviewEl.className = 'list-group-item';
+        reviewEl.innerHTML = `
+            <strong>${review.user_account_name}</strong> (評価: ${review.rating})<br>
+            <p class="mt-2">${review.content.replace(/\n/g, '<br>')}</p>
+            <small class="text-muted d-block text-end">投稿日: ${review.created_at}</small>
+        `;
+        reviewList.prepend(reviewEl);
+    };
 
-    const urlEncodedData = new URLSearchParams(
-      Array.from(new FormData(this.formElement).entries()) as [
-        string,
-        string,
-      ][],
-    );
-    const csrfToken = this.getCsrfToken();
-    urlEncodedData.append('csrfmiddlewaretoken', csrfToken);
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
 
-    const playgroundId = this.playgroundIdInput
-      ? this.playgroundIdInput.value
-      : '';
+            const formData = new FormData(reviewForm);
+            const urlEncodedData = new URLSearchParams(Array.from(formData.entries()) as [string, string][]);
+            const csrfToken = getCsrfToken();
+            const playgroundId = (document.getElementById('playgroundId') as HTMLInputElement)?.value;
 
-    try {
-      const response = await fetch(`/playground/${playgroundId}/add_review/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-CSRFToken': csrfToken,
-        },
-        body: urlEncodedData.toString(),
-      });
+            if (!playgroundId) {
+                showToast('Playground IDが見つかりません。', true);
+                return;
+            }
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok.');
-      }
+            try {
+                const response = await fetch(`/playground/${playgroundId}/add_review/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: urlEncodedData.toString(),
+                });
 
-      const data: { message: string } = await response.json();
-      alert(data.message);
-      // Focesd element in modal is blurred before hiding modal.
-      (this.document.activeElement as HTMLElement)?.blur();
-      this.modal.hide();
-    } catch (_error) {
-      alert('口コミの投稿に失敗しました。');
+                if (!response.ok) {
+                    throw new Error('サーバーとの通信に失敗しました。');
+                }
+
+                const data = await response.json();
+
+                if (data.status === 'success' && data.review) {
+                    addReviewToDom(data.review);
+                    reviewForm.reset();
+                    reviewModal?.hide();
+                    showToast('口コミが投稿されました！');
+                } else {
+                    throw new Error(data.message || '口コミの投稿に失敗しました。');
+                }
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : '不明なエラーが発生しました。';
+                showToast(errorMessage, true);
+            }
+        });
     }
-  }
-}
-
-export { ReviewManager };
+});

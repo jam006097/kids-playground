@@ -54,11 +54,6 @@ class MapManager {
           <button class="btn btn-outline-success btn-sm mt-2" data-playground-id="${playground.id}" data-action="toggle-favorite">
               ${buttonText}
           </button>
-          <button class="btn btn-outline-secondary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#reviewModal"
-                  data-playground-id="${playground.id}" data-playground-name="${playground.name}">
-              口コミを書く
-          </button>
-          <a href="/playground/${playground.id}/reviews/" class="btn btn-outline-info btn-sm mt-2">口コミを見る</a>
       </div>
     `;
   }

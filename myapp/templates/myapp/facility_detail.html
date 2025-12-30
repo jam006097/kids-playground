@@ -55,6 +55,11 @@
                 <li class="list-group-item" id="no-reviews-message">まだ口コミがありません。</li>
                 {% endfor %}
             </ul>
+            {% if has_more_reviews %}
+            <div class="text-center mt-3">
+                <a href="{% url 'myapp:view_reviews' playground.id %}" class="btn btn-outline-secondary">口コミをすべて見る</a>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

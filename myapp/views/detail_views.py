@@ -1,6 +1,7 @@
 from django.views.generic import DetailView
 from myapp.models import Playground, Review
 from typing import Any, Dict
+from django.core.paginator import Paginator
 
 
 class FacilityDetailView(DetailView):
@@ -17,13 +18,17 @@ class FacilityDetailView(DetailView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         """
         テンプレートに渡すコンテキストデータを拡張します。
+        レビューをページ分割して追加します。
         """
         context = super().get_context_data(**kwargs)
         playground = self.get_object()
-        reviews = (
+
+        # 直近10件のレビューを取得
+        all_reviews = (
             Review.objects.filter(playground=playground)
             .select_related("user")
             .order_by("-created_at")
         )
-        context["reviews"] = reviews
+        context["reviews"] = all_reviews[:10]
+        context["has_more_reviews"] = all_reviews.count() > 10
         return context

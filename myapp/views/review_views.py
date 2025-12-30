@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpRequest
-from typing import Any, cast
+from typing import Any, cast, Dict
 from myapp.models import Playground, Review
-from django.views.generic import View
+from django.views.generic import View, ListView
 from .mixins import LoginRequiredJsonMixin
 from users.models import CustomUser
 
@@ -55,9 +55,33 @@ class AddReviewView(LoginRequiredJsonMixin):
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         """
-
         GETリクエストは無効。
         """
         return JsonResponse(
             {"status": "error", "message": "無効なリクエストです。"}, status=400
         )
+
+
+class ReviewListView(ListView):
+    """
+    レビュー一覧ビュー。
+    指定された公園のレビュー一覧を表示する。
+    """
+
+    model = Review
+    template_name = "reviews/review_list.html"
+    context_object_name = "reviews"
+    paginate_by = 10  # 1ページあたり10件
+
+    def get_queryset(self):
+        self.playground = get_object_or_404(Playground, id=self.kwargs["playground_id"])
+        return (
+            Review.objects.filter(playground=self.playground)
+            .select_related("user")
+            .order_by("-created_at")
+        )
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["playground"] = self.playground
+        return context

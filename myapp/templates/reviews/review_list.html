@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ playground.name }}の口コミ一覧{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1>{{ playground.name }}の口コミ一覧</h1>
+    <p class="mb-4">{{ playground.address }}</p>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h2 class="h5 mb-0">口コミ</h2>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                {% for review in reviews %}
+                <li class="list-group-item">
+                    <strong>{{ review.user.account_name }}</strong> (評価: {{ review.rating }})<br>
+                    <p class="mt-2">{{ review.content|linebreaksbr }}</p>
+                    <small class="text-muted d-block text-end">投稿日: {{ review.created_at|date:"Y年m月d日 H:i" }}</small>
+                </li>
+                {% empty %}
+                <li class="list-group-item">まだ口コミがありません。</li>
+                {% endfor %}
+            </ul>
+
+            <!-- Pagination Controls -->
+            {% if is_paginated %}
+            <nav aria-label="レビューのページネーション" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% url 'myapp:view_reviews' playground.id %}?page={{ page_obj.previous_page_number }}" aria-label="前へ">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">前へ</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">前へ</span>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item active"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% url 'myapp:view_reviews' playground.id %}?page={{ page_obj.next_page_number }}" aria-label="次へ">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">次へ</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">次へ</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+    <div class="text-center mt-3">
+        <a href="{% url 'myapp:facility_detail' playground.id %}" class="btn btn-secondary">施設詳細に戻る</a>
+    </div>
+</div>
+{% endblock %}

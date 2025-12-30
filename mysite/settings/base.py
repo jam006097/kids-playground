@@ -114,6 +114,7 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "/accounts/login/"
 # django-allauth（カスタムユーザーモデル用）設定
 ACCOUNT_AUTHENTICATION_METHODS = ["email"]
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"

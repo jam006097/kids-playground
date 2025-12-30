@@ -14,7 +14,7 @@ class ReviewViewsTest(TestCase):
             email="testuser@example.com",
             password="testpassword",
             account_name="testuser",
-        )
+        )  # type: ignore
         self.playground = Playground.objects.create(
             name="Test Park", address="Test Address", phone="123-456-7890"
         )
@@ -61,3 +61,96 @@ class ReviewViewsTest(TestCase):
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["message"], "Invalid rating")
+
+
+class ReviewListPageTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            email="testuser@example.com",
+            password="password",
+            account_name="テストユーザー",
+        )  # type: ignore
+        self.playground = Playground.objects.create(name="Review List Park")
+        # Create 15 reviews for pagination testing (10 on page 1, 5 on page 2)
+        for i in range(15):
+            Review.objects.create(
+                playground=self.playground,
+                user=self.user,
+                content=f"List Review {i + 1}",
+                rating=3,
+            )
+        self.review_list_url = reverse(
+            "myapp:view_reviews", kwargs={"playground_id": self.playground.id}
+        )
+
+    def test_review_list_page_displays_first_page(self):
+        """レビュー一覧ページが最初のページを正しく表示し、次のページへのリンクがあることをテストする。"""
+        response = self.client.get(self.review_list_url, {"page": 1})
+        view_reviews_url = reverse(
+            "myapp:view_reviews", kwargs={"playground_id": self.playground.id}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "List Review 15")  # Newest first
+        self.assertContains(response, "List Review 6")
+        self.assertNotContains(response, "List Review 5")  # Should be on next page
+
+        # Check for pagination links
+        self.assertContains(
+            response,
+            f'<a class="page-link" href="{view_reviews_url}'
+            f'?page=2" aria-label="次へ">',
+        )
+        self.assertNotContains(
+            response,
+            (
+                f'<a class="page-link" href="{view_reviews_url}'
+                f'?page=0" aria-label="前へ">'
+            ),
+        )  # Ensure no active previous link
+        self.assertNotContains(
+            response,
+            (
+                '<li class="page-item disabled"><span class="page-link" aria-hidden="true">'
+                "&laquo;</span>"
+            ),
+            html=True,
+        )
+
+    def test_review_list_page_displays_second_page(self):
+        """レビュー一覧ページが2ページ目を正しく表示し、前後のページへのリンクがあることをテストする。"""
+        response = self.client.get(self.review_list_url, {"page": 2})
+        view_reviews_url = reverse(
+            "myapp:view_reviews", kwargs={"playground_id": self.playground.id}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "List Review 5")
+        self.assertContains(response, "List Review 1")
+        self.assertNotContains(response, "List Review 6")  # Should be on previous page
+
+        # Check for pagination links
+        self.assertContains(
+            response,
+            f'<a class="page-link" href="{view_reviews_url}'
+            f'?page=1" aria-label="前へ">',
+        )
+        self.assertNotContains(
+            response,
+            (
+                f'<a class="page-link" href="{view_reviews_url}'
+                f'?page=3" aria-label="次へ">'
+            ),
+        )  # Ensure no active next link
+        self.assertNotContains(
+            response,
+            (
+                '<li class="page-item disabled"><span class="page-link" aria-hidden="true">'
+                "&raquo;</span>"
+            ),
+            html=True,
+        )
+
+    def test_review_list_page_invalid_page_returns_404(self):
+        """レビュー一覧ページで無効なページ番号が指定された場合に404が返されることをテストする。"""
+        response = self.client.get(self.review_list_url, {"page": 99})
+        self.assertEqual(response.status_code, 404)

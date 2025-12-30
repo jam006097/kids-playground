@@ -20,15 +20,10 @@ def browser_context_args(browser_context_args):
     }
 
 
-@pytest.mark.e2e
-@pytest.mark.parametrize("url_name", URL_NAMES)
-def test_page_is_healthy(live_server, page: Page, url_name: str):
+@pytest.fixture
+def page_data_for_health_check(live_server, page: Page, url_name: str):
     """
-    指定されたページにアクセスした際、エラーが発生せず正常に表示されること。
-    - ページが200 OKを返す
-    - コンソールにエラーが出力されない
-    - ページ内でハンドルされない例外が発生しない
-    - 参照されているリソースで404が発生しない
+    指定されたURLにアクセスし、レスポンスと発生した各種エラーを収集するフィクスチャ。
     """
     console_errors: list[str] = []
     page_errors: list[str] = []
@@ -55,25 +50,72 @@ def test_page_is_healthy(live_server, page: Page, url_name: str):
     response = page.goto(full_url)
     page.wait_for_load_state("networkidle")
 
-    # Then: 各種エラーが発生していないことを表明
+    # NOTE: favicon.icoの404は多くのブラウザでデフォルトでリクエストされるため、一旦除外する
+    filtered_404_errors = [
+        err for err in resource_404_errors if "favicon.ico" not in err
+    ]
+
+    return {
+        "response": response,
+        "console_errors": console_errors,
+        "page_errors": page_errors,
+        "resource_404_errors": filtered_404_errors,
+        "full_url": full_url,
+    }
+
+
+@pytest.mark.e2e
+@pytest.mark.parametrize("url_name", URL_NAMES)
+def test_page_returns_ok_status(page_data_for_health_check: dict):
+    """
+    指定されたページが200 OKステータスを返すこと。
+    """
+    response = page_data_for_health_check["response"]
+    full_url = page_data_for_health_check["full_url"]
     assert response is not None, f"ページ '{full_url}' のレスポンスがありません"
     assert (
         response.ok
     ), f"ページ '{full_url}' が 200 OK ではありません (status: {response.status})"
+
+
+@pytest.mark.e2e
+@pytest.mark.parametrize("url_name", URL_NAMES)
+def test_page_has_no_console_errors(page_data_for_health_check: dict):
+    """
+    指定されたページにアクセスした際にコンソールエラーが発生しないこと。
+    """
+    console_errors = page_data_for_health_check["console_errors"]
+    full_url = page_data_for_health_check["full_url"]
     assert (
         len(console_errors) == 0
     ), f"ページ '{full_url}' でコンソールエラーが発生しました:\n" + "\n".join(
         console_errors
     )
+
+
+@pytest.mark.e2e
+@pytest.mark.parametrize("url_name", URL_NAMES)
+def test_page_has_no_js_exceptions(page_data_for_health_check: dict):
+    """
+    指定されたページにアクセスした際にページ内でJavaScript例外が発生しないこと。
+    """
+    page_errors = page_data_for_health_check["page_errors"]
+    full_url = page_data_for_health_check["full_url"]
     assert (
         len(page_errors) == 0
     ), f"ページ '{full_url}' でページエラー（JS例外）が発生しました:\n" + "\n".join(
         page_errors
     )
-    # NOTE: favicon.icoの404は多くのブラウザでデフォルトでリクエストされるため、一旦除外する
-    resource_404_errors = [
-        err for err in resource_404_errors if "favicon.ico" not in err
-    ]
+
+
+@pytest.mark.e2e
+@pytest.mark.parametrize("url_name", URL_NAMES)
+def test_page_has_no_404_resource_errors(page_data_for_health_check: dict):
+    """
+    指定されたページにアクセスした際に参照されているリソースで404エラーが発生しないこと（favicon.icoを除く）。
+    """
+    resource_404_errors = page_data_for_health_check["resource_404_errors"]
+    full_url = page_data_for_health_check["full_url"]
     assert (
         len(resource_404_errors) == 0
     ), f"ページ '{full_url}' でリソースの404エラーが発生しました:\n" + "\n".join(

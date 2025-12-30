@@ -1,116 +1,108 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment node
  */
+import { submitReview, Review } from '../review';
 
-// モジュールのモックを先に設定
-const mockModalHide = jest.fn();
-const mockToastShow = jest.fn();
-
-// グローバルなbootstrapオブジェクトをモック
-window.bootstrap = {
-  Modal: jest.fn().mockImplementation(() => ({
-    hide: mockModalHide,
-  })),
-  Toast: jest.fn().mockImplementation(() => ({
-    show: mockToastShow,
-  })),
-};
-
-// fetchをグローバルにモック
+// global.fetch をテスト全体でモックする
 global.fetch = jest.fn();
+const mockedFetch = fetch as jest.Mock;
 
-describe('Review Form Submission', () => {
+describe('Core Logic: submitReview', () => {
+  let formData: FormData;
+
+  // 各テストの前にモックとフォームデータを初期化
   beforeEach(() => {
-    // 各テストの前にDOMとモックをクリーンアップ
-    document.body.innerHTML = `
-      <div id="reviewModal"></div>
-      <form id="reviewForm">
-        <input type="hidden" name="csrfmiddlewaretoken" value="test-token">
-        <input type="hidden" id="playgroundId" value="123">
-        <input name="rating" id="rating">
-        <textarea name="content" id="content"></textarea>
-      </form>
-      <ul id="review-list">
-        <li id="no-reviews-message">まだ口コミがありません。</li>
-      </ul>
-      <div id="notificationToast" class="toast">
-        <div id="notificationToastBody"></div>
-      </div>
-    `;
-
-    // モジュールを動的にインポートして、DOMの準備ができた後にスクリプトが実行されるようにする
-    require('../review.ts');
-
-    // DOMContentLoadedを発火させて、スクリプト内のイベントリスナーを有効化
-    document.dispatchEvent(
-      new Event('DOMContentLoaded', {
-        bubbles: true,
-        cancelable: true,
-      }),
-    );
-
-    // モックの呼び出し履歴をリセット
-    (fetch as jest.Mock).mockClear();
-    mockModalHide.mockClear();
-    mockToastShow.mockClear();
-    if (window.bootstrap.Modal) (window.bootstrap.Modal as jest.Mock).mockClear();
-    if (window.bootstrap.Toast) (window.bootstrap.Toast as jest.Mock).mockClear();
+    mockedFetch.mockClear();
+    formData = new FormData();
+    formData.append('rating', '5');
+    formData.append('content', 'This is a test review.');
   });
 
-  test('should add review to the list on successful submission', async () => {
-    // Arrange: 成功時のfetchレスポンスをモック
-    const mockReview = {
-      user_account_name: 'テストユーザー',
-      rating: 5,
-      content: '最高の公園でした！',
-      created_at: '2023年01月01日 12:00',
-    };
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ status: 'success', review: mockReview }),
+  // 正常系のテスト
+  describe('Given the submission is successful', () => {
+    test('it should return the new review data when the API responds with success', async () => {
+      // Given: APIが成功レスポンスを返すように設定
+      const mockReview: Review = {
+        user_account_name: 'Test User',
+        rating: 5,
+        content: 'This is a test review.',
+        created_at: '2023-01-01 12:00',
+      };
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ status: 'success', review: mockReview }),
+      } as Response);
+
+      // When: submitReview を呼び出す
+      const result = await submitReview('1', 'csrf-token', formData);
+
+      // Then: 正しいエンドポイントにデータが送信され、レビューデータが返される
+      expect(mockedFetch).toHaveBeenCalledWith('/playground/1/add_review/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': 'csrf-token' },
+        body: formData,
+      });
+      expect(result).toEqual(mockReview);
+    });
+  });
+
+  // 異常系のテスト
+  describe('Given the submission has issues', () => {
+    test('it should throw an error if playgroundId is not provided', async () => {
+      // Given: playgroundId が空
+      const playgroundId = '';
+      // When/Then: submitReview を呼び出すとエラーがスローされる
+      await expect(submitReview(playgroundId, 'csrf-token', formData)).rejects.toThrow(
+        'Playground ID is not provided.',
+      );
+      expect(mockedFetch).not.toHaveBeenCalled();
     });
 
-    const reviewForm = document.getElementById('reviewForm') as HTMLFormElement;
-    const ratingInput = document.getElementById('rating') as HTMLInputElement;
-    const contentInput = document.getElementById('content') as HTMLTextAreaElement;
-    ratingInput.value = '5';
-    contentInput.value = '最高の公園でした！';
+    test('it should throw an error if the network request fails', async () => {
+      // Given: fetch がネットワークエラーで失敗するように設定
+      const networkError = new Error('Network failure');
+      mockedFetch.mockRejectedValueOnce(networkError);
 
-    // Act: フォーム送信をシミュレート
-    await reviewForm.dispatchEvent(new Event('submit'));
+      // When/Then: submitReview を呼び出すとエラーがスローされる
+      await expect(submitReview('1', 'csrf-token', formData)).rejects.toThrow(networkError);
+    });
 
-    // Assert: DOMの更新、モーダルの非表示、トーストの表示を確認
-    const reviewList = document.getElementById('review-list') as HTMLUListElement;
-    // 非同期処理の完了を待つ
-    await new Promise(process.nextTick);
+    test('it should throw an error if the server responds with a non-ok status', async () => {
+      // Given: APIサーバーが500エラーを返すように設定
+      mockedFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+      } as Response);
 
-    expect(reviewList.querySelector('#no-reviews-message')).toBeNull();
-    expect(reviewList.children.length).toBe(1);
-    expect(reviewList.innerHTML).toContain('最高の公園でした！');
-    expect(reviewList.innerHTML).toContain('テストユーザー');
-    expect(ratingInput.value).toBe(''); // jest-environment-jsdomはreset()を完全にはサポートしないため、手動でチェック
-    expect(contentInput.value).toBe('');
-    expect(mockModalHide).toHaveBeenCalled();
-    expect(mockToastShow).toHaveBeenCalled();
-    expect(document.getElementById('notificationToastBody')?.textContent).toBe('口コミが投稿されました！');
-  });
+      // When/Then: submitReview を呼び出すとエラーがスローされる
+      await expect(submitReview('1', 'csrf-token', formData)).rejects.toThrow(
+        'Server responded with status: 500',
+      );
+    });
 
-  test('should show an error toast on failed submission', async () => {
-    // Arrange: 失敗時のfetchレスポンスをモック
-    (fetch as jest.Mock).mockRejectedValueOnce(new Error('サーバーエラー'));
+    test('it should throw an error if the API returns an application-level error', async () => {
+      // Given: APIがアプリケーションレベルのエラーを返すように設定
+      const errorMessage = 'Invalid input provided.';
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ status: 'error', message: errorMessage }),
+      } as Response);
 
-    const reviewForm = document.getElementById('reviewForm') as HTMLFormElement;
+      // When/Then: submitReview を呼び出すとエラーがスローされる
+      await expect(submitReview('1', 'csrf-token', formData)).rejects.toThrow(errorMessage);
+    });
 
-    // Act: フォーム送信をシミュレート
-    await reviewForm.dispatchEvent(new Event('submit'));
+    test('it should throw a generic error if the API response is malformed', async () => {
+      // Given: APIが成功ステータスだが、期待されるデータを含まないレスポンスを返す
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ status: 'success' }), // "review" プロパティが欠けている
+      } as Response);
 
-    // Assert: エラートーストが表示され、DOMが変更されていないことを確認
-    await new Promise(process.nextTick);
-
-    const reviewList = document.getElementById('review-list') as HTMLUListElement;
-    expect(reviewList.querySelector('#no-reviews-message')).not.toBeNull();
-    expect(mockModalHide).not.toHaveBeenCalled();
-    expect(mockToastShow).toHaveBeenCalled();
-    expect(document.getElementById('notificationToastBody')?.textContent).toBe('サーバーエラー');
+      // When/Then: submitReview を呼び出すとエラーがスローされる
+      await expect(submitReview('1', 'csrf-token', formData)).rejects.toThrow(
+        'An unknown error occurred.',
+      );
+    });
   });
 });

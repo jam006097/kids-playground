@@ -9,10 +9,14 @@
                     <h1 class="card-title text-center">{{ playground.name }} の口コミを投稿する</h1>
                 </div>
                 <div class="card-body">
-                    <p class="text-center">口コミ投稿フォームはここに表示されます。</p>
-                    <div class="text-center mt-4">
-                        <a href="{% url 'myapp:facility_detail' playground.pk %}" class="btn btn-secondary">詳細に戻る</a>
-                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary">投稿する</button>
+                            <a href="{% url 'myapp:facility_detail' playground.pk %}" class="btn btn-secondary">キャンセル</a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

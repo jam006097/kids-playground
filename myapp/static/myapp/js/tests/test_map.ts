@@ -28,7 +28,7 @@ interface MockMarkerType extends Partial<L.Marker> {
   bindPopup: jest.Mock<L.Marker, [L.Content, L.PopupOptions?]>;
 }
 
-interface MockLeafletType extends Partial<typeof L> {
+interface MockLeafletType {
   map: jest.Mock<MockMapType, [string]>;
   tileLayer: jest.Mock<MockTileLayerType, [string, L.TileLayerOptions?]>;
   marker: jest.Mock<MockMarkerType, [L.LatLngExpression, L.MarkerOptions?]>;
@@ -58,9 +58,13 @@ describe('MapManager', () => {
     };
 
     mockL = {
-      map: jest.fn(() => mockMap),
-      tileLayer: jest.fn(() => mockTileLayer),
-      marker: jest.fn(() => mockMarker),
+      map: jest.fn((_elementId: string) => mockMap),
+      tileLayer: jest.fn(
+        (_url: string, _options?: L.TileLayerOptions) => mockTileLayer,
+      ),
+      marker: jest.fn(
+        (_latlng: L.LatLngExpression, _options?: L.MarkerOptions) => mockMarker,
+      ),
     };
 
     // DOM要素をモック

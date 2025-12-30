@@ -9,6 +9,7 @@ from myapp.views.review_views import AddReviewView, ReviewListView
 from myapp.views.ranking_views import RankingListView
 from myapp.views.detail_views import FacilityDetailView
 from myapp.views.about import about_view
+import myapp.views as views  # viewsモジュールをインポート
 
 
 app_name = "myapp"
@@ -29,6 +30,11 @@ urlpatterns = [
         "playground/<int:playground_id>/reviews/",
         ReviewListView.as_view(),
         name="view_reviews",
+    ),
+    path(
+        "playground/<int:pk>/review/create/",
+        views.ReviewCreateView.as_view(),
+        name="review_create",
     ),
     path("about/", about_view, name="about"),
 ]

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title text-center">{{ playground.name }} の口コミを投稿する</h1>
+                </div>
+                <div class="card-body">
+                    <p class="text-center">口コミ投稿フォームはここに表示されます。</p>
+                    <div class="text-center mt-4">
+                        <a href="{% url 'myapp:facility_detail' playground.pk %}" class="btn btn-secondary">詳細に戻る</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

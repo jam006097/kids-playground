@@ -2,12 +2,12 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from myapp.models import Playground, Review
+from myapp.forms import ReviewForm  # ReviewFormをインポート
 
 User = get_user_model()
 
 
 class ReviewViewsTest(TestCase):
-    # テストのセットアップ
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(
@@ -154,3 +154,91 @@ class ReviewListPageTest(TestCase):
         """レビュー一覧ページで無効なページ番号が指定された場合に404が返されることをテストする。"""
         response = self.client.get(self.review_list_url, {"page": 99})
         self.assertEqual(response.status_code, 404)
+
+
+class ReviewCreateViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            email="testuser2@example.com",
+            password="testpassword2",
+            account_name="testuser2",
+        )
+        self.playground = Playground.objects.create(
+            name="Create Review Park", address="Create Address", phone="098-765-4321"
+        )
+        self.review_create_url = reverse(
+            "myapp:review_create", kwargs={"pk": self.playground.pk}
+        )
+
+    def test_unauthenticated_user_redirected_to_login(self):
+        """未認証ユーザーはレビュー作成ページにアクセスするとログインページにリダイレクトされること。"""
+        response = self.client.get(self.review_create_url)
+        self.assertRedirects(
+            response, f"/accounts/login/?next={self.review_create_url}"
+        )
+
+    def test_authenticated_user_accesses_review_create_page(self):
+        """認証済みユーザーはレビュー作成ページにアクセスでき、正しいテンプレートとコンテキストがレンダリングされること。"""
+        self.client.login(email="testuser2@example.com", password="testpassword2")
+        response = self.client.get(self.review_create_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "reviews/review_form.html")
+
+        self.assertIn("form", response.context)
+        self.assertIsInstance(response.context["form"], ReviewForm)
+        self.assertFalse(response.context["form"].is_bound)  # フォームは空であるべき
+
+        self.assertIn("playground", response.context)
+        self.assertEqual(response.context["playground"], self.playground)
+
+    def test_authenticated_user_can_submit_review(self):
+        """認証済みユーザーは有効なレビューを投稿でき、詳細ページにリダイレクトされること。"""
+        self.client.login(email="testuser2@example.com", password="testpassword2")
+        review_count_before = Review.objects.count()
+
+        post_data = {
+            "content": "This is a great playground!",
+            "rating": 5,
+        }
+        response = self.client.post(self.review_create_url, post_data)
+
+        self.assertEqual(Review.objects.count(), review_count_before + 1)
+        new_review = Review.objects.latest("id")
+        self.assertEqual(new_review.content, post_data["content"])
+        self.assertEqual(new_review.rating, post_data["rating"])
+        self.assertEqual(new_review.playground, self.playground)
+        self.assertEqual(new_review.user, self.user)
+
+        expected_redirect_url = reverse(
+            "myapp:facility_detail", kwargs={"pk": self.playground.pk}
+        )
+        self.assertRedirects(response, expected_redirect_url)
+
+    def test_authenticated_user_cannot_submit_invalid_review(self):
+        """認証済みユーザーは無効なレビューを投稿できず、フォームエラーが表示されること。"""
+        self.client.login(email="testuser2@example.com", password="testpassword2")
+        review_count_before = Review.objects.count()
+
+        # contentが欠けている無効なデータ
+        post_data = {
+            "content": "",  # 必須フィールドを空にする
+            "rating": 3,
+        }
+        response = self.client.post(self.review_create_url, post_data)
+
+        self.assertEqual(
+            response.status_code, 200
+        )  # フォームエラーで同じページが再表示されるため200
+        self.assertTemplateUsed(response, "reviews/review_form.html")
+        self.assertIn("form", response.context)
+        form = response.context["form"]
+        self.assertTrue(form.errors)  # エラーがあることを確認
+        self.assertIn(
+            "content", form.errors
+        )  # contentフィールドにエラーがあることを確認
+
+        self.assertEqual(
+            Review.objects.count(), review_count_before
+        )  # レビューが作成されていないことを確認

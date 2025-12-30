@@ -201,3 +201,71 @@ def test_review_list_page_health(live_server, page: Page, existing_playground_id
         f"レビュー一覧ページ '{full_url}' でリソースの404エラーが発生しました:\n"
         + "\n".join(filtered_404_errors)
     )
+
+
+@pytest.mark.e2e
+def test_review_create_page_health(
+    live_server, page: Page, existing_playground_id: int
+):
+    """
+    指定されたPlayground IDのレビュー投稿ページがエラーなく表示されること。
+    """
+    # NOTE: このテストはログインが前提となるため、E2Eテストではログイン処理を実装した上で行うのが望ましい
+    #       現状は未ログインでのリダイレクト先（ログインページ）のヘルスチェックとして機能する
+    url_name = "myapp:review_create"
+    path = reverse(url_name, args=[existing_playground_id])
+    full_url = live_server.url + path
+
+    # page_data_for_health_checkフィクスチャのロジックを複製してエラーを監視
+    console_errors: list[str] = []
+    page_errors: list[str] = []
+    resource_404_errors: list[str] = []
+
+    page.on(
+        "console",
+        lambda msg: (
+            console_errors.append(f"[{msg.type}] {msg.text}")
+            if msg.type == "error"
+            else None
+        ),
+    )
+    page.on("pageerror", lambda exc: page_errors.append(str(exc)))
+    page.on(
+        "response",
+        lambda res: resource_404_errors.append(res.url) if res.status == 404 else None,
+    )
+
+    # When: ページにアクセス
+    response = page.goto(full_url)
+    page.wait_for_load_state("networkidle")
+
+    # NOTE: favicon.icoの404は多くのブラウザでデフォルトでリクエストされるため、一旦除外する
+    filtered_404_errors = [
+        err for err in resource_404_errors if "favicon.ico" not in err
+    ]
+
+    # Then: 各種エラーが発生しないことを確認
+    assert (
+        response is not None
+    ), f"レビュー投稿ページ '{full_url}' のレスポンスがありません"
+    assert (
+        response.ok
+    ), f"レビュー投稿ページ '{full_url}' が 200 OK ではありません (status: {response.status})"
+    assert (
+        len(console_errors) == 0
+    ), (
+        f"レビュー投稿ページ '{full_url}' でコンソールエラーが発生しました:\n"
+        + "\n".join(console_errors)
+    )
+    assert (
+        len(page_errors) == 0
+    ), (
+        f"レビュー投稿ページ '{full_url}' でページエラー（JS例外）が発生しました:\n"
+        + "\n".join(page_errors)
+    )
+    assert (
+        len(filtered_404_errors) == 0
+    ), (
+        f"レビュー投稿ページ '{full_url}' でリソースの404エラーが発生しました:\n"
+        + "\n".join(filtered_404_errors)
+    )

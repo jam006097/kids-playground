@@ -1,10 +1,19 @@
 from django.shortcuts import get_object_or_404
-from django.http import JsonResponse, HttpRequest
+from django.http import (
+    JsonResponse,
+    HttpRequest,
+    HttpResponseRedirect,
+    HttpResponse,  # HttpResponseを追加
+)
 from typing import Any, cast, Dict
 from myapp.models import Playground, Review
 from django.views.generic import View, ListView
+from django.views.generic.edit import CreateView  # CreateViewを追加
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .mixins import LoginRequiredJsonMixin
 from users.models import CustomUser
+from myapp.forms import ReviewForm  # ReviewFormをインポート
+from django.urls import reverse_lazy  # reverse_lazyをインポート
 
 
 class AddReviewView(LoginRequiredJsonMixin):
@@ -84,4 +93,46 @@ class ReviewListView(ListView):
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["playground"] = self.playground
+        return context
+
+
+class ReviewCreateView(
+    LoginRequiredMixin, CreateView
+):  # TemplateViewからCreateViewに変更
+    """
+    レビュー投稿ページビュー。
+    ログインしているユーザーのみがアクセス可能。
+    """
+
+    model = Review
+    form_class = ReviewForm
+    template_name = "reviews/review_form.html"
+
+    def get_success_url(self) -> str:
+        """
+        レビュー投稿成功後にリダイレクトするURLを返す。
+        公園の詳細ページにリダイレクトする。
+        """
+        return reverse_lazy("myapp:facility_detail", kwargs={"pk": self.kwargs["pk"]})
+
+    def form_valid(
+        self, form: ReviewForm
+    ) -> HttpResponse:  # HttpResponseRedirectからHttpResponseに変更
+        """
+        フォームが有効な場合の処理。
+        PlaygroundとUserをReviewオブジェクトに設定する。
+        """
+        playground = get_object_or_404(Playground, pk=self.kwargs["pk"])
+        form.instance.playground = playground
+        form.instance.user = cast(CustomUser, self.request.user)
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """
+        テンプレートに渡すコンテキストデータを追加する。
+        """
+        context = super().get_context_data(**kwargs)
+        context["playground"] = get_object_or_404(Playground, pk=self.kwargs["pk"])
+        if "form" not in context:  # フォームがすでにコンテキストにない場合のみ追加
+            context["form"] = self.get_form()
         return context

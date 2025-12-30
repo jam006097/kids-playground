@@ -1,4 +1,5 @@
 import { MapManager } from '../map';
+import type * as L from 'leaflet';
 
 // テストデータ用の型定義
 interface MockPlayground {
@@ -11,23 +12,34 @@ interface MockPlayground {
   longitude: string;
 }
 
+// Define interfaces for mocked Leaflet objects
+interface MockMapType extends Partial<L.Map> {
+  setView: jest.Mock<L.Map, [L.LatLngExpression, number?, L.ZoomPanOptions?]>;
+  remove: jest.Mock<L.Map, []>;
+  addLayer: jest.Mock<L.Map, [L.Layer]>;
+}
+
+interface MockTileLayerType extends Partial<L.TileLayer> {
+  addTo: jest.Mock<L.TileLayer, [L.Map | L.LayerGroup | string]>;
+}
+
+interface MockMarkerType extends Partial<L.Marker> {
+  addTo: jest.Mock<L.Marker, [L.Map | L.LayerGroup | string]>;
+  bindPopup: jest.Mock<L.Marker, [L.Content, L.PopupOptions?]>;
+}
+
+interface MockLeafletType extends Partial<typeof L> {
+  map: jest.Mock<MockMapType, [string]>;
+  tileLayer: jest.Mock<MockTileLayerType, [string, L.TileLayerOptions?]>;
+  marker: jest.Mock<MockMarkerType, [L.LatLngExpression, L.MarkerOptions?]>;
+}
+
 describe('MapManager', () => {
   let mapManager: MapManager;
-  let mockMap: {
-    setView: jest.Mock;
-    remove: jest.Mock;
-    addLayer: jest.Mock;
-  };
-  let mockTileLayer: { addTo: jest.Mock };
-  let mockMarker: {
-    addTo: jest.Mock;
-    bindPopup: jest.Mock;
-  };
-  let mockL: {
-    map: jest.Mock;
-    tileLayer: jest.Mock;
-    marker: jest.Mock;
-  };
+  let mockMap: MockMapType; // Changed type
+  let mockTileLayer: MockTileLayerType; // Changed type
+  let mockMarker: MockMarkerType; // Changed type
+  let mockL: MockLeafletType; // Changed type
   let mockDocumentQuerySelectorAll: jest.Mock;
 
   beforeEach(() => {
@@ -67,14 +79,14 @@ describe('MapManager', () => {
     });
 
     // windowオブジェクトのモック
-    window.mapInstance = undefined;
-    window.favMapInstance = undefined;
+    window.mapInstance = mockMap as L.Map; // Fixed L122
+    window.favMapInstance = mockMap as L.Map; // Fixed L154
     window.favorite_ids = [];
 
     // setTimeoutをモック
     jest.useFakeTimers();
 
-    mapManager = new MapManager(mockL as any);
+    mapManager = new MapManager(mockL as unknown as typeof L); // Fixed L77
   });
 
   afterEach(() => {
@@ -119,7 +131,7 @@ describe('MapManager', () => {
     });
 
     test('地図が既に存在する場合、古い地図を破棄してから新しい地図を描画すること', () => {
-      window.mapInstance = mockMap as any;
+      window.mapInstance = mockMap as L.Map; // Ensure type consistency
       mapManager.initMap(mockPlaygrounds);
 
       // 検証：古い地図のremoveが呼ばれたか
@@ -151,7 +163,7 @@ describe('MapManager', () => {
     });
 
     test('お気に入り地図が既に存在する場合、古い地図を破棄してから新しい地図を描画すること', () => {
-      window.favMapInstance = mockMap as any;
+      window.favMapInstance = mockMap as L.Map; // Ensure type consistency
       mapManager.initFavoritesMap(mockPlaygrounds);
 
       // 検証：古い地図のremoveが呼ばれたか

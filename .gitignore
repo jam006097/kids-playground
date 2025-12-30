@@ -82,3 +82,4 @@ node_modules/
 .pytest_cache/
 
 sqldata_buckup/
+staticfiles/

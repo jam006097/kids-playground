@@ -184,7 +184,7 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/favorites.css' %}">
+<link rel="stylesheet" href="{% static 'myapp/css/favorites.css' %}">
 {% endblock %}
 
 {% block extra_js %}
@@ -203,5 +203,5 @@ crossorigin=""></script>
     window.playgrounds = JSON.parse(document.getElementById('playgrounds-data').textContent);
     window.favorite_ids = JSON.parse(document.getElementById('favorite-ids').textContent);
 </script>
-<script type="module" src="{% static 'js/dist/scripts.js' %}"></script>
+<script type="module" src="{% static 'myapp/js/dist/scripts.js' %}"></script>
 {% endblock %}

@@ -7,15 +7,15 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
-    "outDir": "myapp/static/js/dist"
+    "outDir": "myapp/static/myapp/js/dist"
   },
   "include": [
-    "myapp/static/js/**/*.ts",
-    "myapp/static/js/**/*.js"
+    "myapp/static/myapp/js/**/*.ts",
+    "myapp/static/myapp/js/**/*.js"
   ],
   "exclude": [
     "node_modules",
-    "myapp/static/js/tests",
-    "myapp/static/js/dist"
+    "myapp/static/myapp/js/tests",
+    "myapp/static/myapp/js/dist"
   ]
 }

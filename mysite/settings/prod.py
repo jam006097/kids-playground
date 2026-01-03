@@ -9,6 +9,7 @@ ALLOWED_HOSTS = ["kidsplayground.onrender.com"]
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = ["https://kidsplayground.onrender.com"]
 # HSTS settings (start with a small value for safety)
 # Read more: https://docs.djangoproject.com/en/5.0/ref/settings/#secure-hsts-seconds
 SECURE_HSTS_SECONDS = 3600

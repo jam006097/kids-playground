@@ -2,6 +2,7 @@ services:
   db:
     image: postgres:17.5
     container_name: kidsplayground_postgres
+    env_file: .env
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${DB_USER}
@@ -19,6 +20,7 @@ services:
   web:
     build: .
     container_name: kidsplayground_web
+    env_file: .env
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app

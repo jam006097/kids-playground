@@ -8,7 +8,7 @@ from myapp.views.favorite_views import (
 from myapp.views.review_views import AddReviewView, ReviewListView
 from myapp.views.ranking_views import RankingListView
 from myapp.views.detail_views import FacilityDetailView
-from myapp.views.about import about_view, test_smtp_view # Import test_smtp_view
+from myapp.views.about import about_view, test_smtp_view  # Import test_smtp_view
 import myapp.views as views  # viewsモジュールをインポート
 
 
@@ -37,5 +37,5 @@ urlpatterns = [
         name="review_create",
     ),
     path("about/", about_view, name="about"),
-    path("test_smtp/", test_smtp_view, name="test_smtp"), # New URL for SMTP test
+    path("test_smtp/", test_smtp_view, name="test_smtp"),  # New URL for SMTP test
 ]

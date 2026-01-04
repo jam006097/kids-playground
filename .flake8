@@ -1,4 +1,4 @@
 [flake8]
 max-line-length = 120
 exclude = venv, migrations, node_modules
-ignore = F403,F401,W503
+ignore = E203,W503,W504,F403,F401

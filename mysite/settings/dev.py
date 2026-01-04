@@ -48,3 +48,10 @@ if "runserver" in sys.argv:
 else:
     # テスト実行時はコンソールに出力
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",  # Use in-memory SQLite for tests
+    }
+}

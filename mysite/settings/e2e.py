@@ -10,6 +10,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
+
+# Database settings for E2E tests
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",  # Use in-memory SQLite for E2E tests
+    }
+}
+
 # Static files for E2E tests
 # Ensure static files are collected and served during tests
 STATIC_URL = "/static/"

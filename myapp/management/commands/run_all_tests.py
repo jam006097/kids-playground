@@ -33,6 +33,12 @@ class Command(BaseCommand):
         pytest_path = os.path.join(os.path.dirname(sys.executable), "pytest")
         base_env = os.environ.copy()
 
+        # Modify DATABASE_URL to use localhost for tests running on the host
+        if "DATABASE_URL" in base_env:
+            base_env["DATABASE_URL"] = base_env["DATABASE_URL"].replace(
+                "@db:", "@localhost:"
+            )
+
         # 1. Python/Django unit and integration tests (not E2E)
         self.stdout.write(self.style.HTTP_INFO("Starting Python tests (non-e2e)..."))
         non_e2e_command = [pytest_path]  # Relies on addopts in pytest.ini

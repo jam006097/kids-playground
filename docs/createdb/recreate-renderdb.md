@@ -11,3 +11,5 @@
 
 1. データを同期する
 ``` python3 manage.py sync_to_render ```
+
+1. rebuild for WebService `kidsPlayGround`

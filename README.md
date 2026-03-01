@@ -130,12 +130,14 @@ python3 manage.py sync_to_render
 - **テスト実行**: `python3 manage.py run_all_tests`
 - **リンター・フォーマットチェック**: `pre-commit run --all-files`
 - **手動で個別にチェックする場合**:
+```
 black .        # フォーマット修正
 flake8 .       # 構文チェック
 mypy .         # 型チェック
 bandit -r .    # セキュリティチェック
 npm audit      # JSパッケージの脆弱性チェック
 pip-audit      # Pythonパッケージの脆弱性チェック
+```
 
 ## ライセンス
 MITライセンス / 作者: jam006097

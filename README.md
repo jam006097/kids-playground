@@ -1,20 +1,17 @@
-# 親子で遊ぼうナビ - 子供が遊べる施設のまとめサイト
+# kidsplayground - 子供が遊べる施設のまとめサイト
 
 ## 概要
 子供が遊べる施設や子育て支援施設を検索・表示し、お気に入り登録や口コミ投稿ができるWebアプリケーションです。
 
-- サイトURL: https://jam006097.pythonanywhere.com/
-
-
+- サイトURL: https://kidsplayground.onrender.com/
 
 ## 主な機能
 
-- **施設情報**: 全国の公園、児童館、子育て支援センターなど、子供が遊べる施設情報を一覧・地図で表示
+- **施設情報**: 子供が遊べる施設情報を一覧・地図で表示
 - **検索**: 住所や施設名での検索
-- **口コミ**: 施設ごとの口コミ投稿・表示、Hugging Face Spacesを活用したAIによる口コミ要約機能
+- **口コミ**: 施設ごとの口コミ投稿・表示
 - **お気に入り**: 気になる施設をお気に入り登録
 - **ランキング**: 口コミの評価/件数に基づいた施設ランキング
-- **AIチャット**: 遊び場探しや子育てに関する相談ができるAIチャットボット機能
 - **ユーザー認証**: 会員登録、ログイン・ログアウト
 
 ## 技術スタック
@@ -22,14 +19,14 @@
 - フレームワーク: Django, Bootstrap
 - データベース: PostgreSQL
 - コンテナ化: Docker
-- AI要約API: Hugging Face Spaces
 - CI/CD: GitHub Actions
 - コード品質: Pytest, Flake8, Black, Mypy, pre-commit
 - ソース管理: Git, GitHub
 
-## ローカル開発環境セットアップ
+---
 
-このプロジェクトでは、コード編集はローカルのPython仮想環境（`venv`）で行い、アプリケーションの実行やテストはDockerコンテナで行うハイブリッドな開発スタイルを推奨しています。
+## ローカル開発環境セットアップ
+このプロジェクトでは、コード編集はローカルのPython仮想環境（`venv`）で行い、アプリケーションの実行やテストはDockerコンテナで行うハイブリッドな開発スタイルを採用しています。
 
 ### ステップ1: コード編集環境のセットアップ (`venv`)
 
@@ -45,85 +42,92 @@
     ```bash
     python3 -m venv venv
     source venv/bin/activate
+    # Windowsの場合: venv\Scripts\activate
     ```
-    *Windowsの場合は `venv\Scripts\activate` を実行してください。*
 
 3.  **依存パッケージのインストール**
     ```bash
     pip install -r requirements.txt
-    ```
-
-4.  **pre-commitフックのセットアップ**
-    コミット前にコード品質チェックを自動実行するための設定です。
-    ```bash
+    npm install
     pre-commit install
     ```
 
-5.  **フロントエンド依存関係のインストール**
-    コードフォーマッターなどに使用します。
-    ```bash
-    npm install
-    ```
+### ステップ2: 実行環境のセットアップ (Docker)
 
-6.  **エディタの設定**
-    お使いのエディタ（VSCodeなど）で、作成した`venv`内のPythonインタープリタ（例: `venv/bin/python`）を選択してください。これにより、コードの自動補完やエラーチェックが正しく機能します。
-
-
-### ステップ2: テスト・実行環境のセットアップ (Docker)
-
-次に、アプリケーションの実際の動作確認やテストを行うためのDocker環境をセットアップします。
+次に、アプリケーションを動かすためのDocker環境をセットアップします。
 
 1.  **環境変数の設定**
-    リポジトリのルートにある `.env.example` ファイルをコピーして `.env` ファイルを作成します。
+    `.env.example` をコピーして `.env` を作成し、中身を環境に合わせて編集します。
     ```bash
     cp .env.example .env
     ```
-    `.env` ファイルには、開発用のデータベース接続情報やDjangoの`SECRET_KEY`などが含まれています。必要に応じて内容を編集してください。
 
 2.  **Dockerコンテナの起動**
-    Docker Composeを使って、DjangoアプリケーションとPostgreSQLデータベースのコンテナをビルドし、バックグラウンドで起動します。
     ```bash
-    docker-compose up -d --build
+    docker compose up -d --build
     ```
-    - 初回起動時は、Dockerイメージのビルドに時間がかかることがあります。
-    - `db`、`ai-api`、`web` の3つのサービスが起動します。
+    - `db`（PostgreSQL）と `web`（Django）の2つのサービスが起動します。
+    - **注意**: データベースは初回起動時に `.env` の設定に基づき自動作成されます。
 
-3.  **データベースの初期化**
-    コンテナ内でマイグレーションを実行し、データベースのテーブルを作成します。
+3. **データベースの作成**
     ```bash
-    docker-compose exec -T web python manage.py migrate
-    ```
-
-4.  **管理者ユーザーの作成**
-    アプリケーションにログインするための管理者（スーパーユーザー）を作成します。このコマンドは対話形式のため、ご自身のターミナルで実行してください。
-    ```bash
-    docker-compose exec web python manage.py createsuperuser
+    # データベースの作成
+    docker compose exec -T db psql -U kina -d postgres -c "CREATE DATABASE kidsplayground_db;"
+    # 権限の付与
+    docker compose exec -T db psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE kidsplayground_db TO kina;"
     ```
 
-5.  **アプリケーションへのアクセス**
-    セットアップが完了したら、ブラウザで [http://localhost:8000](http://localhost:8000) にアクセスします。
+4.  **データベースの初期化 (テーブル作成)**
+    ```bash
+    docker compose exec -T web python manage.py migrate
+    ```
 
-### コンテナの停止
+### ステップ3: データの準備 (バックアップの有無による分岐)
+
+#### A. バックアップデータから復元する場合
+既存のデータ（`sqldata_buckup/*.sql`）がある場合は、以下の手順で復元します。
+
 ```bash
-docker-compose down
+# 1. 既存のスキーマをクリア
+docker compose exec -T db psql -U kina -d kidsplayground_db -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+
+# 2. バックアップファイルを流し込み
+docker compose exec -T db psql -U kina -d kidsplayground_db < sqldata_backup/最新のファイル.sql
+
+# 3. ローカルドメインの設定 (127.0.0.1:8000に更新)
+docker compose exec web python manage.py update_site_domain
 ```
-- `-v` オプションを付けて `docker-compose down -v` を実行すると、データベースのボリュームも削除されます。
 
-## ディレクトリ構成
-- `myapp/` ... アプリ本体
-- `mysite/` ... プロジェクト設定
-- `static/` ... 静的ファイル
-- `templates/` ... テンプレート
+#### B. 新規にデータを構築する場合 (バックアップがない場合)
+管理画面にログインするための管理者ユーザーを作成します。
 
-## 開発・運用
-- コード整形: `black`, `flake8` など推奨
-- テスト: `python manage.py test`
-- CI/CD: GitHub Actionsによる自動テストとデプロイ
-- デプロイ: pythonanywhere など
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
+---
+
+## データの同期 (ローカル → 本番)
+
+ローカルで作成したデータを本番環境（Render）に反映させるための専用コマンドを用意しています。
+
+### 同期コマンドの実行
+```bash
+python3 manage.py sync_to_render
+```
+
+**このコマンドが行うこと:**
+1. ローカルDBのバックアップ作成
+2. 本番DBの初期化
+3. バックアップデータのリストア
+4. **本番ドメインの自動再設定**: `.env` の `PRODUCTION_DOMAIN` にドメインを書き戻します。
+
+---
+
+## 開発に役立つコマンド
+
+- **全リビルド**: `python3 manage.py rebuild_all`
+- **テスト実行**: `pytest`
 
 ## ライセンス
-このプロジェクトはMITライセンスです。
-
-## 作者
-- jam006097
-- お問い合わせ: GitHubのIssueまたはメールでご連絡ください。
+MITライセンス / 作者: jam006097

@@ -1,5 +1,5 @@
 import os
-import subprocess
+import subprocess  # nosec B404
 from django.core.management.base import BaseCommand
 from dotenv import load_dotenv
 
@@ -43,12 +43,24 @@ class Command(BaseCommand):
             self.stdout.write(
                 "\nステップ1: ローカルデータベースからバックアップを作成します..."
             )
-            dump_command = (
-                f"docker exec -t {local_db_container} pg_dump -U {local_db_user} "
-                f"-d {local_db_name} -F p --no-owner"
-            )
+            dump_command_args = [
+                "docker",
+                "exec",
+                "-t",
+                local_db_container,
+                "pg_dump",
+                "-U",
+                local_db_user,
+                "-d",
+                local_db_name,
+                "-F",
+                "p",
+                "--no-owner",
+            ]
             with open(backup_file, "w") as f:
-                subprocess.run(dump_command.split(), stdout=f, check=True)
+                subprocess.run(
+                    dump_command_args, stdout=f, check=True
+                )  # nosec B603 B607
             self.stdout.write(
                 self.style.SUCCESS(
                     f" -> バックアップファイル '{backup_file}' を作成しました。"
@@ -69,19 +81,29 @@ class Command(BaseCommand):
                 "\nステップ2: Renderデータベースの既存テーブルを削除します..."
             )
             drop_command_args = [
+                "docker",
+                "exec",
+                "-t",
+                local_db_container,
                 "psql",
                 render_db_url,
                 "-c",
                 "DROP SCHEMA public CASCADE; CREATE SCHEMA public;",
             ]
-            subprocess.run(drop_command_args, check=True, capture_output=True)
+            subprocess.run(
+                drop_command_args, check=True, capture_output=True
+            )  # nosec B603 B607
             self.stdout.write(self.style.SUCCESS(" -> テーブル削除完了"))
 
             self.stdout.write(
                 "\nステップ3: Renderデータベースへデータをリストアします..."
             )
-            # psqlの標準入力にバックアップファイルを渡すことで、シェルのリダイレクト(<)を代替
+            # -i (interactive) を付けて標準入力を受け付け可能にする
             restore_command_args = [
+                "docker",
+                "exec",
+                "-i",
+                local_db_container,
                 "psql",
                 render_db_url,
                 "--echo-all",
@@ -89,8 +111,47 @@ class Command(BaseCommand):
                 "ON_ERROR_STOP=1",
             ]
             with open(backup_file, "r") as f:
-                subprocess.run(restore_command_args, stdin=f, check=True)
+                subprocess.run(
+                    restore_command_args, stdin=f, check=True
+                )  # nosec B603 B607
             self.stdout.write(self.style.SUCCESS(" -> リストア処理が完了しました。"))
+
+            self.stdout.write(
+                "\nステップ4: Renderデータベースのドメイン設定を本番用に更新します..."
+            )
+            production_domain = os.getenv(
+                "PRODUCTION_DOMAIN", "kidsplayground.onrender.com"
+            )
+            site_name = "親子で遊ぼうナビ"
+            # 既存の重複ドメインがあれば削除してから、id=1を更新する（一意制約エラー防止）
+            # psqlの変数機能を使用してSQLインジェクションを防止
+            update_site_sql = (
+                "DELETE FROM django_site WHERE domain = :'domain' AND id != 1; "
+                "UPDATE django_site SET domain = :'domain', "
+                "name = :'name' WHERE id = 1;"
+            )
+            update_command_args = [
+                "docker",
+                "exec",
+                "-t",
+                local_db_container,
+                "psql",
+                render_db_url,
+                "-v",
+                f"domain={production_domain}",
+                "-v",
+                f"name={site_name}",
+                "-c",
+                update_site_sql,
+            ]
+            subprocess.run(
+                update_command_args, check=True, capture_output=True
+            )  # nosec B603 B607
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f" -> ドメインを '{production_domain}' に更新しました。"
+                )
+            )
 
         except subprocess.CalledProcessError as e:
             # エラー内容を標準エラー出力から取得して表示
@@ -124,7 +185,7 @@ class Command(BaseCommand):
         # 正常終了したことをユーザーに通知
         self.stdout.write(
             self.style.SUCCESS(
-                f"\nステップ4: バックアップファイル '{backup_file}' を保存しました。"
+                f"\nステップ5: バックアップファイル '{backup_file}' を保存しました。"
             )
         )
 

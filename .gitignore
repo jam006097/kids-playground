@@ -81,5 +81,9 @@ node_modules/
 # Test
 .pytest_cache/
 
+# Generated PDF
+portfolio.pdf
+*.pdf
+
 sqldata_buckup/
 staticfiles/

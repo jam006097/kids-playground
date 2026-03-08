@@ -33,8 +33,12 @@ class Command(BaseCommand):
         pytest_path = os.path.join(os.path.dirname(sys.executable), "pytest")
         base_env = os.environ.copy()
 
-        # Modify DATABASE_URL to use localhost for tests running on the host
-        if "DATABASE_URL" in base_env:
+        # Modify DATABASE_URL only if DATABASE_URL_OVERRIDE is set to 'true'
+        # (Useful for running tests on the host while the DB is in a container)
+        if (
+            base_env.get("DATABASE_URL_OVERRIDE") == "true"
+            and "DATABASE_URL" in base_env
+        ):
             base_env["DATABASE_URL"] = base_env["DATABASE_URL"].replace(
                 "@db:", "@localhost:"
             )
@@ -87,7 +91,7 @@ class Command(BaseCommand):
             sys.exit(1)
 
         # 3. TypeScript/Jest tests
-        if not self._run_command("npm run test", "TypeScript tests (jest)"):
+        if not self._run_command("npm run test:jest", "TypeScript tests (jest)"):
             sys.exit(1)
 
         self.stdout.write(self.style.SUCCESS("All tests passed successfully!"))

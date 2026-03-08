@@ -63,8 +63,8 @@ def page_data_for_health_check(live_server, page: Page, url_name: str):
     # When: ページにアクセス
     path = reverse(url_name)
     full_url = live_server.url + path
-    response = page.goto(full_url)
-    page.wait_for_load_state("networkidle")
+    # 待機条件を 'domcontentloaded' に緩和し、外部リソース（フォント等）の遅延によるタイムアウトを防ぐ
+    response = page.goto(full_url, wait_until="domcontentloaded", timeout=60000)
 
     # NOTE: favicon.icoの404は多くのブラウザでデフォルトでリクエストされるため、一旦除外する
     filtered_404_errors = [
@@ -168,8 +168,7 @@ def test_review_list_page_health(live_server, page: Page, existing_playground_id
     )
 
     # When: ページにアクセス
-    response = page.goto(full_url)
-    page.wait_for_load_state("networkidle")
+    response = page.goto(full_url, wait_until="domcontentloaded", timeout=60000)
 
     # NOTE: favicon.icoの404は多くのブラウザでデフォルトでリクエストされるため、一旦除外する
     filtered_404_errors = [
@@ -236,8 +235,7 @@ def test_review_create_page_health(
     )
 
     # When: ページにアクセス
-    response = page.goto(full_url)
-    page.wait_for_load_state("networkidle")
+    response = page.goto(full_url, wait_until="domcontentloaded", timeout=60000)
 
     # NOTE: favicon.icoの404は多くのブラウザでデフォルトでリクエストされるため、一旦除外する
     filtered_404_errors = [

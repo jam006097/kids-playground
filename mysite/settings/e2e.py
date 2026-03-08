@@ -17,7 +17,7 @@ DATABASES = {
         "NAME": os.getenv("POSTGRES_DB", "kidsplayground_db"),
         "USER": os.getenv("DB_USER", "kina"),
         "PASSWORD": os.getenv("DB_PASSWORD", "Kaim2308!"),
-        "HOST": "localhost",  # Explicitly set to localhost for host-based E2E tests
+        "HOST": os.getenv("DB_HOST", "localhost"),
         "PORT": os.getenv("DB_PORT", "5432"),
     }
 }

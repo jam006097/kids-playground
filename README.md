@@ -77,9 +77,9 @@
     docker compose exec -T db psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE kidsplayground_db TO kina;"
     ```
 
-4.  **データベースの初期化 (テーブル作成)**
+3.  **データベースの初期化 (テーブル作成)**
     ```bash
-    docker compose exec -T web python manage.py migrate
+    npm run migrate
     ```
 
 ### ステップ3: データの準備 (バックアップの有無による分岐)
@@ -99,11 +99,50 @@ docker compose exec web python manage.py update_site_domain
 ```
 
 #### B. 新規にデータを構築する場合 (バックアップがない場合)
-管理画面にログインするための管理者ユーザーを作成します。
+管理画面にログインするための管理者ユーザーを作成し、ダミーデータを生成します。
 
 ```bash
 docker compose exec web python manage.py createsuperuser
+npm run dummy
 ```
+
+---
+
+## 開発に役立つコマンド
+
+頻繁に使用する操作は `npm` スクリプトとして登録されています。
+
+- **全テスト実行**: `npm test` (Python + TS + E2E)
+- **環境の再構築**: `npm run rebuild` (ビルドから再起動まで)
+- **ポートフォリオPDF生成**: `npm run pdf` (主要ページのキャプチャPDF)
+- **ダミーレビュー生成**: `npm run dummy`
+- **DBマイグレーション**: `npm run migrate`
+
+- **リンター・フォーマットチェック**: `pre-commit run --all-files`
+- **手動で個別にチェックする場合**:
+```bash
+black .        # Python フォーマット修正
+flake8 .       # Python 構文チェック
+mypy .         # Python 型チェック
+npm run lint   # TS 構文チェック
+npm run format # TS フォーマット修正
+bandit -r .    # セキュリティチェック
+npm audit      # JSパッケージの脆弱性チェック
+pip-audit      # Pythonパッケージの脆弱性チェック
+```
+
+---
+
+## ポートフォリオPDF生成
+
+ポートフォリオ用に主要ページを自動巡回し、1つのPDFにまとめるコマンドを用意しています。
+実行前に、サーバーが `localhost:8000` で起動していることを確認してください。
+
+```bash
+npm run pdf
+```
+
+出力先: `portfolio.pdf`（プロジェクトルート）
 
 ---
 
@@ -123,21 +162,5 @@ python3 manage.py sync_to_render
 4. **本番ドメインの自動再設定**: `.env` の `PRODUCTION_DOMAIN` にドメインを書き戻します。
 
 ---
-
-## 開発に役立つコマンド
-
-- **全リビルド**: `python3 manage.py rebuild_all`
-- **テスト実行**: `python3 manage.py run_all_tests`
-- **リンター・フォーマットチェック**: `pre-commit run --all-files`
-- **手動で個別にチェックする場合**:
-```
-black .        # フォーマット修正
-flake8 .       # 構文チェック
-mypy .         # 型チェック
-bandit -r .    # セキュリティチェック
-npm audit      # JSパッケージの脆弱性チェック
-pip-audit      # Pythonパッケージの脆弱性チェック
-```
-
 ## ライセンス
 MITライセンス / 作者: jam006097

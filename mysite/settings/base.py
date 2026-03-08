@@ -66,7 +66,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "mysite.wsgi.application"
 
-DATABASES = {"default": dj_database_url.config(default=os.getenv("DATABASE_URL"))}
+# DB接続情報の構築
+DB_USER = os.getenv("DB_USER", "kina")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
+POSTGRES_DB = os.getenv("POSTGRES_DB", "kidsplayground_db")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+
+DEFAULT_DATABASE_URL = (
+    f"postgres://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{POSTGRES_DB}"
+)
+
+DATABASES = {
+    "default": dj_database_url.config(
+        default=os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL)
+    )
+}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

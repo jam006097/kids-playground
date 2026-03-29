@@ -4,7 +4,7 @@ anyio==4.10.0
 asgiref==3.8.1
 bandit==1.8.6
 beautifulsoup4==4.12.3
-black==25.1.0
+black==26.3.1
 boolean.py==5.0
 Brotli==1.1.0
 CacheControl==0.14.3
@@ -13,7 +13,7 @@ certifi==2025.1.31
 cfgv==3.4.0
 charset-normalizer==3.4.1
 click==8.2.1
-cryptography==46.0.5
+cryptography==46.0.6
 cyclonedx-python-lib==9.1.0
 defusedxml==0.7.1
 distlib==0.4.0
@@ -52,7 +52,7 @@ orjson==3.11.7
 packageurl-python==0.17.5
 packaging==24.2
 pandas==2.3.2
-pathspec==0.12.1
+pathspec==1.0.4
 pillow==12.1.1
 pip-api==0.0.34
 pip-requirements-parser==32.0.1
@@ -70,7 +70,7 @@ pydantic_core==2.33.2
 pydub==0.25.1
 pyflakes==3.4.0
 Pygments==2.19.2
-PyJWT==2.10.1
+PyJWT==2.12.0
 pyparsing==3.2.5
 pytest==8.3.5
 pytest-django==4.11.0
@@ -81,7 +81,7 @@ python-multipart==0.0.22
 python3-openid==3.2.0
 pytz==2025.2
 PyYAML==6.0.2
-requests==2.32.4
+requests==2.33.0
 requests-oauthlib==2.0.0
 rich==14.1.0
 ruff==0.12.12
@@ -112,4 +112,4 @@ whitenoise==6.7.0
 django-csp
 pytest-asyncio
 pytest-playwright
-pypdf==6.7.5
+pypdf==6.9.2

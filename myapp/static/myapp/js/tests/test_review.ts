@@ -52,9 +52,9 @@ describe('Core Logic: submitReview', () => {
       // Given: playgroundId が空
       const playgroundId = '';
       // When/Then: submitReview を呼び出すとエラーがスローされる
-      await expect(submitReview(playgroundId, 'csrf-token', formData)).rejects.toThrow(
-        'Playground ID is not provided.',
-      );
+      await expect(
+        submitReview(playgroundId, 'csrf-token', formData),
+      ).rejects.toThrow('Playground ID is not provided.');
       expect(mockedFetch).not.toHaveBeenCalled();
     });
 
@@ -64,7 +64,9 @@ describe('Core Logic: submitReview', () => {
       mockedFetch.mockRejectedValueOnce(networkError);
 
       // When/Then: submitReview を呼び出すとエラーがスローされる
-      await expect(submitReview('1', 'csrf-token', formData)).rejects.toThrow(networkError);
+      await expect(submitReview('1', 'csrf-token', formData)).rejects.toThrow(
+        networkError,
+      );
     });
 
     test('it should throw an error if the server responds with a non-ok status', async () => {
@@ -89,7 +91,9 @@ describe('Core Logic: submitReview', () => {
       } as Response);
 
       // When/Then: submitReview を呼び出すとエラーがスローされる
-      await expect(submitReview('1', 'csrf-token', formData)).rejects.toThrow(errorMessage);
+      await expect(submitReview('1', 'csrf-token', formData)).rejects.toThrow(
+        errorMessage,
+      );
     });
 
     test('it should throw a generic error if the API response is malformed', async () => {

@@ -80,16 +80,24 @@ export const submitReview = async (
 if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
     const reviewForm = document.getElementById('reviewForm') as HTMLFormElement;
-    const reviewList = document.getElementById('review-list') as HTMLUListElement;
+    const reviewList = document.getElementById(
+      'review-list',
+    ) as HTMLUListElement;
     const noReviewsMessage = document.getElementById('no-reviews-message');
     const modalElement = document.getElementById('reviewModal');
-    const reviewModal = modalElement ? new window.bootstrap.Modal(modalElement) : null;
+    const reviewModal = modalElement
+      ? new window.bootstrap.Modal(modalElement)
+      : null;
     const toastElement = document.getElementById('notificationToast');
     const toastBody = document.getElementById('notificationToastBody');
-    const notificationToast = toastElement ? new window.bootstrap.Toast(toastElement) : null;
+    const notificationToast = toastElement
+      ? new window.bootstrap.Toast(toastElement)
+      : null;
 
     const getCsrfToken = (): string => {
-      const tokenElement = document.querySelector<HTMLInputElement>('[name=csrfmiddlewaretoken]');
+      const tokenElement = document.querySelector<HTMLInputElement>(
+        '[name=csrfmiddlewaretoken]',
+      );
       return tokenElement ? tokenElement.value : '';
     };
 
@@ -121,7 +129,9 @@ if (typeof document !== 'undefined') {
     if (reviewForm) {
       reviewForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const playgroundId = (document.getElementById('playgroundId') as HTMLInputElement)?.value;
+        const playgroundId = (
+          document.getElementById('playgroundId') as HTMLInputElement
+        )?.value;
         const csrfToken = getCsrfToken();
         const formData = new FormData(reviewForm);
 
@@ -132,7 +142,10 @@ if (typeof document !== 'undefined') {
           reviewModal?.hide();
           showToast('口コミが投稿されました！');
         } catch (error) {
-          const message = error instanceof Error ? error.message : '不明なエラーが発生しました。';
+          const message =
+            error instanceof Error
+              ? error.message
+              : '不明なエラーが発生しました。';
           showToast(message, true);
         }
       });

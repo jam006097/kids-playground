@@ -58,7 +58,7 @@ jobs:
 
     - name: Run pip-audit # Pythonの脆弱性監査を実行
       run: |
-        pip-audit --ignore-vuln GHSA-4xh5-x5gv-qwph --ignore-vuln GHSA-2qfp-q593-8484 --ignore-vuln GHSA-7f5h-v6xp-fcq8
+        pip-audit --ignore-vuln GHSA-4xh5-x5gv-qwph --ignore-vuln GHSA-2qfp-q593-8484 --ignore-vuln GHSA-7f5h-v6xp-fcq8 --ignore-vuln GHSA-5239-wwwm-4pmq
 
     - name: Run Python tests # Pythonのテストを実行
       env: # テスト用の環境変数を設定

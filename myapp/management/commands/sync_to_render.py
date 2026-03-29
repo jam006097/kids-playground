@@ -124,11 +124,13 @@ class Command(BaseCommand):
             )
             site_name = "親子で遊ぼうナビ"
             # 既存の重複ドメインがあれば削除してから、id=1を更新する（一意制約エラー防止）
-            # psqlの変数機能を使用してSQLインジェクションを防止
+            # シングルクォートをエスケープしてSQLインジェクションを防止
+            domain_escaped = production_domain.replace("'", "''")
+            name_escaped = site_name.replace("'", "''")
             update_site_sql = (
-                "DELETE FROM django_site WHERE domain = :'domain' AND id != 1; "
-                "UPDATE django_site SET domain = :'domain', "
-                "name = :'name' WHERE id = 1;"
+                f"DELETE FROM django_site WHERE domain = '{domain_escaped}' AND id != 1; "  # nosec B608
+                f"UPDATE django_site SET domain = '{domain_escaped}', "
+                f"name = '{name_escaped}' WHERE id = 1;"
             )
             update_command_args = [
                 "docker",
@@ -137,10 +139,6 @@ class Command(BaseCommand):
                 local_db_container,
                 "psql",
                 render_db_url,
-                "-v",
-                f"domain={production_domain}",
-                "-v",
-                f"name={site_name}",
                 "-c",
                 update_site_sql,
             ]

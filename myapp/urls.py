@@ -11,7 +11,6 @@ from myapp.views.detail_views import FacilityDetailView
 from myapp.views.about import about_view
 import myapp.views as views  # viewsモジュールをインポート
 
-
 app_name = "myapp"
 
 urlpatterns = [

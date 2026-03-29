@@ -1,19 +1,19 @@
 # .pre-commit-config.yaml
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
   - repo: https://github.com/psf/black
-    rev: 24.4.0
+    rev: c6755bb741b6481d6b3d3bb563c83fa060db96c9  # frozen: 26.3.1
     hooks:
       - id: black
         files: \.py$
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.0.0
+    rev: d93590f5be797aabb60e3b09f2f52dddb02f349f  # frozen: 7.3.0
     hooks:
       - id: flake8
         files: \.py$
@@ -26,7 +26,7 @@ repos:
         files: \.py$
         additional_dependencies: [django-stubs==5.0.0, mypy-extensions==1.1.0, python-dotenv==1.0.1, dj-database-url==2.1.0, django-bootstrap4==24.4, django-crontab==0.7.1, django-allauth==65.13.0, psycopg2-binary==2.9.9, types-requests, django-csp]
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.9
+    rev: 92ae8b82fb422a639f0ed8d99e96cea769594e08  # frozen: 1.9.4
     hooks:
       - id: bandit
         args: ["-c", "bandit.yaml"]
